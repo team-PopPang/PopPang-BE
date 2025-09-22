@@ -1,0 +1,111 @@
+# ✅ 기능 요약
+#
+# PR 생성 시 이메일 발송
+# PR 병합 시 이메일 발송
+# PR 코드리뷰(라인 댓글) 시 이메일 발송
+# 이슈 생성 시 이메일 발송
+# 불필요한 항목은 출력하지 않음
+
+# 📧 이메일 알림을 위한 GitHub Actions
+
+name: Email Notifications
+
+on:
+  issues:
+    types: [opened]  # ✅ 이슈 생성 시
+  pull_request:
+    types: [opened, closed]  # ✅ PR 생성 및 병합 시
+  issue_comment:
+    types: [created]  # ✅ PR에 달린 일반 댓글
+  pull_request_review_comment:
+    types: [created]  # ✅ PR 코드 한 줄 옆에 달린 댓글
+  pull_request_review:
+    types: [submitted]  # ✅ 전체 PR에 대한 리뷰 제출 (💡 지금 추가한 부분)
+
+jobs:
+  notify_by_email:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Set Custom Event Name and Build Body
+        id: set_event_name
+        run: |
+          EVENT_LABEL=""
+          BODY=""
+
+          if [[ "${{ github.event_name }}" == "pull_request" ]]; then
+            if [[ "${{ github.event.action }}" == "closed" && "${{ github.event.pull_request.merged }}" == "true" ]]; then
+              EVENT_LABEL="PR 병합"
+            else
+              EVENT_LABEL="PR 생성"
+            fi
+            TITLE="${{ github.event.pull_request.title }}"
+            LINK="${{ github.event.pull_request.html_url }}"
+
+          elif [[ "${{ github.event_name }}" == "issue_comment" ]]; then
+            if [[ "${{ toJson(github.event.issue.pull_request) }}" != "null" ]]; then
+              EVENT_LABEL="PR 댓글"
+              TITLE="${{ github.event.issue.title }}"
+              LINK="${{ github.event.comment.html_url }}"
+              COMMENT="${{ github.event.comment.body }}"
+              FILE="${{ github.event.comment.path }}"
+              LINE="${{ github.event.comment.line }}"
+            else
+              echo "event_label=무시됨" >> $GITHUB_OUTPUT
+              echo "body=이슈 댓글이므로 알림 제외됨" >> $GITHUB_OUTPUT
+              exit 0
+            fi
+
+          elif [[ "${{ github.event_name }}" == "pull_request_review_comment" ]]; then
+            EVENT_LABEL="PR 코드리뷰 댓글"
+            TITLE="${{ github.event.pull_request.title }}"
+            LINK="${{ github.event.comment.html_url }}"
+            COMMENT="${{ github.event.comment.body }}"
+            FILE="${{ github.event.comment.path }}"
+            LINE="${{ github.event.comment.line }}"
+
+          elif [[ "${{ github.event_name }}" == "pull_request_review" ]]; then
+            EVENT_LABEL="PR 리뷰 제출"
+            TITLE="${{ github.event.pull_request.title }}"
+            LINK="${{ github.event.review.html_url }}"
+            COMMENT="${{ github.event.review.body }}"
+
+          elif [[ "${{ github.event_name }}" == "issues" ]]; then
+            EVENT_LABEL="이슈 생성"
+            TITLE="${{ github.event.issue.title }}"
+            LINK="${{ github.event.issue.html_url }}"
+
+          else
+            echo "event_label=무시됨" >> $GITHUB_OUTPUT
+            echo "body=지원되지 않는 이벤트입니다." >> $GITHUB_OUTPUT
+            exit 0
+          fi
+
+          echo "event_label=$EVENT_LABEL" >> $GITHUB_OUTPUT
+
+          BODY+="📌 이벤트 종류: $EVENT_LABEL"$'\n'
+          BODY+="📁 리포지토리: ${{ github.repository }}"$'\n'
+          BODY+="🛠️ 액션: ${{ github.event.action || 'N/A' }}"$'\n'
+          BODY+="📝 제목: ${TITLE:-N/A}"$'\n'
+          BODY+="🙋 작성자: ${{ github.actor }}"$'\n'
+          [[ -n "$LINK" ]] && BODY+="🔗 링크: $LINK"$'\n'
+          [[ -n "$COMMENT" ]] && BODY+="🗨️ 댓글 내용: $COMMENT"$'\n'
+          [[ -n "$FILE" ]] && BODY+="📄 파일: $FILE"$'\n'
+          [[ -n "$LINE" ]] && BODY+="📌 위치: Line $LINE"$'\n'
+
+          echo "body<<EOF" >> $GITHUB_OUTPUT
+          echo "$BODY" >> $GITHUB_OUTPUT
+          echo "EOF" >> $GITHUB_OUTPUT
+
+      - name: Send Email Notification
+        if: steps.set_event_name.outputs.event_label != '무시됨'
+        uses: dawidd6/action-send-mail@v3
+        with:
+          server_address: smtp.gmail.com
+          server_port: 465
+          username: ${{ secrets.MAIL_USERNAME }}
+          password: ${{ secrets.MAIL_PASSWORD }}
+          subject: GitHub 알림 - ${{ steps.set_event_name.outputs.event_label }} 발생!
+          body: ${{ steps.set_event_name.outputs.body }}
+          to: indextrown@gmail.com, devsong42@gmail.com, esse3134@gmail.com
+          from: GitHub Notifier <${{ secrets.MAIL_USERNAME }}>
