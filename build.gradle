@@ -6,7 +6,7 @@ plugins {
 
 group = 'com.poppang'
 version = '0.0.1-SNAPSHOT'
-description = 'poppang-be'
+description = 'poppang-be-test'
 
 java {
     toolchain {
@@ -16,12 +16,35 @@ java {
 
 repositories {
     mavenCentral()
+    google()
 }
 
 dependencies {
+
+    // --- Spring ---
+    implementation 'org.springframework.boot:spring-boot-starter-thymeleaf'
     implementation 'org.springframework.boot:spring-boot-starter-web'
+    implementation 'org.springframework.boot:spring-boot-starter-data-jpa'
+
+    // --- DB ---
+    runtimeOnly 'com.mysql:mysql-connector-j'
+
+    // --- Lombok ---
+    compileOnly 'org.projectlombok:lombok'
+    annotationProcessor 'org.projectlombok:lombok'
+
+    // --- Apple(JWT) ---
+    implementation 'com.nimbusds:nimbus-jose-jwt:10.3'
+
+    // --- Google ---
+    implementation 'com.google.api-client:google-api-client:2.2.0'
+
+    // Jackson2 JSON 팩토리 (반드시 필요)
+    implementation 'com.google.http-client:google-http-client-jackson2:1.43.2'
+
     testImplementation 'org.springframework.boot:spring-boot-starter-test'
     testRuntimeOnly 'org.junit.platform:junit-platform-launcher'
+
 }
 
 tasks.named('test') {
