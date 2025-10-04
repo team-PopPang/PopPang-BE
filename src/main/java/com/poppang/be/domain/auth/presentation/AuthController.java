@@ -12,14 +12,6 @@ import com.poppang.be.domain.auth.kakao.application.KakaoAuthService;
 import com.poppang.be.domain.auth.kakao.dto.request.KakaoAppLoginRequestDto;
 import com.poppang.be.domain.auth.kakao.dto.request.SignupRequestDto;
 import io.swagger.v3.oas.annotations.Operation;
-import io.swagger.v3.oas.annotations.Parameter;
-import io.swagger.v3.oas.annotations.tags.Tag;
-import io.swagger.v3.oas.annotations.media.Content;
-import io.swagger.v3.oas.annotations.media.Schema;
-import io.swagger.v3.oas.annotations.media.ArraySchema;
-import io.swagger.v3.oas.annotations.parameters.RequestBody;
-import io.swagger.v3.oas.annotations.responses.ApiResponse;
-import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -27,7 +19,6 @@ import org.springframework.web.bind.annotation.*;
 @RestController
 @RequestMapping("/api/v1/auth")
 @RequiredArgsConstructor
-@Tag(name = "Auth", description = "소셜 로그인/회원가입 및 자동 로그인 API")
 public class AuthController {
 
     private final KakaoAuthService kakaoAuthService;
@@ -39,161 +30,117 @@ public class AuthController {
 
     @Operation(
             summary = "[WEB] 카카오 로그인 콜백",
-            description = "카카오 OAuth 인가코드(code)로 액세스 토큰 교환 후, 사용자 식별/업서트 및 유저 정보 반환"
+            description = "카카오 인가 코드(code)를 통해 로그인 처리 후 사용자 정보를 반환합니다.",
+            tags = {"[AUTH] 카카오"}
     )
-    @ApiResponses({
-            @ApiResponse(responseCode = "200", description = "로그인 성공",
-                    content = @Content(schema = @Schema(implementation = LoginResponseDto.class))),
-            @ApiResponse(responseCode = "400", description = "잘못된 요청"),
-            @ApiResponse(responseCode = "500", description = "서버 오류")
-    })
     @GetMapping("/kakao/login")
-    public ResponseEntity<LoginResponseDto> kakaoWebLogin(
-            @Parameter(description = "카카오 OAuth 인가 코드", required = true)
-            @RequestParam("code") String authCode
-    ) {
-        return ResponseEntity.ok(kakaoAuthService.webLogin(authCode));
+    public ResponseEntity<LoginResponseDto> kakaoWebLogin(@RequestParam("code") String authCode) {
+        LoginResponseDto loginResponseDto = kakaoAuthService.webLogin(authCode);
+        return ResponseEntity.ok(loginResponseDto);
     }
 
-    @Operation(summary = "[WEB] 애플 로그인 콜백", description = "애플 인가코드로 로그인 처리")
-    @ApiResponses({
-            @ApiResponse(responseCode = "200", description = "로그인 성공",
-                    content = @Content(schema = @Schema(implementation = LoginResponseDto.class)))
-    })
+    @Operation(
+            summary = "[WEB] 애플 로그인 콜백",
+            description = "애플 인가 코드(code)를 통해 로그인 처리 후 사용자 정보를 반환합니다.",
+            tags = {"[AUTH] 애플"}
+    )
     @GetMapping("/apple/login")
-    public ResponseEntity<LoginResponseDto> appleWebLogin(
-            @Parameter(description = "애플 OAuth 인가 코드", required = true)
-            @RequestParam("code") String authCode
-    ) {
-        return ResponseEntity.ok(appleAuthService.webLogin(authCode));
+    public ResponseEntity<LoginResponseDto> appleWebLogin(@RequestParam("code") String authCode) {
+        LoginResponseDto loginResponseDto = appleAuthService.webLogin(authCode);
+        return ResponseEntity.ok(loginResponseDto);
     }
 
-    @Operation(summary = "[WEB] 구글 로그인 콜백", description = "구글 인가코드로 로그인 처리")
-    @ApiResponses({
-            @ApiResponse(responseCode = "200", description = "로그인 성공",
-                    content = @Content(schema = @Schema(implementation = LoginResponseDto.class)))
-    })
+    @Operation(
+            summary = "[WEB] 구글 로그인 콜백",
+            description = "구글 인가 코드(code)를 통해 로그인 처리 후 사용자 정보를 반환합니다.",
+            tags = {"[AUTH] 구글"}
+    )
     @GetMapping("/google/login")
-    public ResponseEntity<LoginResponseDto> googleWebLogin(
-            @Parameter(description = "구글 OAuth 인가 코드", required = true)
-            @RequestParam("code") String authCode
-    ) {
-        return ResponseEntity.ok(googleAuthService.webLogin(authCode));
+    public ResponseEntity<LoginResponseDto> googleWebLogin(@RequestParam("code") String authCode) {
+        LoginResponseDto loginResponseDto = googleAuthService.webLogin(authCode);
+        return ResponseEntity.ok(loginResponseDto);
     }
 
     /* ---------- 앱(Native)용: POST JSON 바디 ---------- */
-    @Operation(summary = "[APP] 카카오 로그인", description = "카카오 앱에서 받은 액세스 토큰 등으로 로그인")
-    @ApiResponses({
-            @ApiResponse(responseCode = "200", description = "로그인 성공",
-                    content = @Content(schema = @Schema(implementation = LoginResponseDto.class)))
-    })
+
+    @Operation(
+            summary = "[APP] 카카오 로그인",
+            description = "카카오 앱에서 발급받은 액세스 토큰을 사용해 로그인합니다.",
+            tags = {"[AUTH] 카카오"}
+    )
     @PostMapping("/kakao/mobile/login")
-    public ResponseEntity<LoginResponseDto> kakaoMobileLogin(
-            @RequestBody(
-                    description = "카카오 앱 로그인 요청 바디",
-                    required = true,
-                    content = @Content(schema = @Schema(implementation = KakaoAppLoginRequestDto.class))
-            )
-            @org.springframework.web.bind.annotation.RequestBody KakaoAppLoginRequestDto body
-    ) {
-        return ResponseEntity.ok(kakaoAuthService.mobileLogin(body));
+    public ResponseEntity<LoginResponseDto> kakaoMobileLogin(@RequestBody KakaoAppLoginRequestDto kakaoAppLoginRequestDto) {
+        LoginResponseDto loginResponseDto = kakaoAuthService.mobileLogin(kakaoAppLoginRequestDto);
+        return ResponseEntity.ok(loginResponseDto);
     }
 
-    @Operation(summary = "[APP] 애플 로그인", description = "애플 앱에서 받은 토큰/ID 토큰으로 로그인")
-    @ApiResponses({
-            @ApiResponse(responseCode = "200", description = "로그인 성공",
-                    content = @Content(schema = @Schema(implementation = LoginResponseDto.class)))
-    })
+    @Operation(
+            summary = "[APP] 애플 로그인",
+            description = "애플 앱에서 발급받은 토큰/ID 토큰을 사용해 로그인합니다.",
+            tags = {"[AUTH] 애플"}
+    )
     @PostMapping("/apple/mobile/login")
-    public ResponseEntity<LoginResponseDto> appleMobileLogin(
-            @RequestBody(
-                    description = "애플 앱 로그인 요청 바디",
-                    required = true,
-                    content = @Content(schema = @Schema(implementation = AppleAppLoginRequestDto.class))
-            )
-            @org.springframework.web.bind.annotation.RequestBody AppleAppLoginRequestDto body
-    ) {
-        return ResponseEntity.ok(appleAuthService.mobileLogin(body));
+    public ResponseEntity<LoginResponseDto> appleMobileLogin(@RequestBody AppleAppLoginRequestDto appleAppLoginRequestDto) {
+        LoginResponseDto loginResponseDto = appleAuthService.mobileLogin(appleAppLoginRequestDto);
+        return ResponseEntity.ok(loginResponseDto);
     }
 
-    @Operation(summary = "[APP] 구글 로그인", description = "구글 앱에서 받은 액세스 토큰 등으로 로그인")
-    @ApiResponses({
-            @ApiResponse(responseCode = "200", description = "로그인 성공",
-                    content = @Content(schema = @Schema(implementation = LoginResponseDto.class)))
-    })
+    @Operation(
+            summary = "[APP] 구글 로그인",
+            description = "구글 앱에서 발급받은 액세스 토큰을 사용해 로그인합니다.",
+            tags = {"[AUTH] 구글"}
+    )
     @PostMapping("/google/mobile/login")
-    public ResponseEntity<LoginResponseDto> googleMobileLogin(
-            @RequestBody(
-                    description = "구글 앱 로그인 요청 바디",
-                    required = true,
-                    content = @Content(schema = @Schema(implementation = GoogleAppLoginRequestDto.class))
-            )
-            @org.springframework.web.bind.annotation.RequestBody GoogleAppLoginRequestDto body
-    ) {
-        return ResponseEntity.ok(googleAuthService.mobileLogin(body));
+    public ResponseEntity<LoginResponseDto> googleMobileLogin(@RequestBody GoogleAppLoginRequestDto googleAppLoginRequestDto) {
+        LoginResponseDto loginResponseDto = googleAuthService.mobileLogin(googleAppLoginRequestDto);
+        return ResponseEntity.ok(loginResponseDto);
     }
 
     /* ---------- 앱 자동 로그인 ---------- */
 
-    @Operation(summary = "자동 로그인", description = "앱 로컬에 보관 중인 uid로 사용자 정보 조회")
-    @ApiResponses({
-            @ApiResponse(responseCode = "200", description = "조회 성공",
-                    content = @Content(schema = @Schema(implementation = LoginResponseDto.class))),
-            @ApiResponse(responseCode = "404", description = "사용자 없음")
-    })
+    @Operation(
+            summary = "자동 로그인",
+            description = "앱 로컬에 저장된 uid로 자동 로그인합니다.",
+            tags = {"[AUTH] 공통"}
+    )
     @PostMapping("/autoLogin")
-    public ResponseEntity<LoginResponseDto> autoLogin(
-            @RequestBody(
-                    description = "자동 로그인 요청 바디",
-                    required = true,
-                    content = @Content(schema = @Schema(implementation = AutoLoginRequestDto.class))
-            )
-            @org.springframework.web.bind.annotation.RequestBody AutoLoginRequestDto body
-    ) {
-        return ResponseEntity.ok(authService.autoLogin(body));
+    public ResponseEntity<LoginResponseDto> autoLogin(@RequestBody AutoLoginRequestDto autoLoginRequestDto) {
+        LoginResponseDto loginResponseDto = authService.autoLogin(autoLoginRequestDto);
+        return ResponseEntity.ok(loginResponseDto);
     }
 
     /* ---------- 회원가입 ---------- */
 
-    @Operation(summary = "[카카오] 회원가입", description = "카카오 로그인 이후, 닉네임/알림/키워드/추천 카테고리 저장")
-    @ApiResponses({
-            @ApiResponse(responseCode = "200", description = "회원가입 완료",
-                    content = @Content(schema = @Schema(implementation = SignupResponseDto.class)))
-    })
+    @Operation(
+            summary = "카카오 회원가입",
+            description = "카카오 로그인 이후 닉네임/알림/키워드/추천 카테고리를 등록합니다.",
+            tags = {"[AUTH] 카카오"}
+    )
     @PostMapping("/kakao/signup")
-    public ResponseEntity<SignupResponseDto> kakaoSignup(
-            @RequestBody(
-                    description = "회원가입 요청 바디",
-                    required = true,
-                    content = @Content(schema = @Schema(implementation = SignupRequestDto.class))
-            )
-            @org.springframework.web.bind.annotation.RequestBody SignupRequestDto body
-    ) {
-        return ResponseEntity.ok(kakaoAuthService.signup(body));
+    public ResponseEntity<SignupResponseDto> kakaoSignup(@RequestBody SignupRequestDto signupRequestDto) {
+        SignupResponseDto signupResponseDto = kakaoAuthService.signup(signupRequestDto);
+        return ResponseEntity.ok(signupResponseDto);
     }
 
-    @Operation(summary = "[애플] 회원가입", description = "애플 로그인 이후 회원가입 완료 처리")
-    @ApiResponses({
-            @ApiResponse(responseCode = "200", description = "회원가입 완료",
-                    content = @Content(schema = @Schema(implementation = SignupResponseDto.class)))
-    })
+    @Operation(
+            summary = "애플 회원가입",
+            description = "애플 로그인 이후 회원가입을 완료합니다.",
+            tags = {"[AUTH] 애플"}
+    )
     @PostMapping("/apple/signup")
-    public ResponseEntity<SignupResponseDto> appleSignup(
-            @org.springframework.web.bind.annotation.RequestBody SignupRequestDto body
-    ) {
-        return ResponseEntity.ok(appleAuthService.signup(body));
+    public ResponseEntity<SignupResponseDto> appleSignup(@RequestBody SignupRequestDto signupRequestDto) {
+        SignupResponseDto signupResponseDto = appleAuthService.signup(signupRequestDto);
+        return ResponseEntity.ok(signupResponseDto);
     }
 
-    @Operation(summary = "[구글] 회원가입", description = "구글 로그인 이후 회원가입 완료 처리")
-    @ApiResponses({
-            @ApiResponse(responseCode = "200", description = "회원가입 완료",
-                    content = @Content(schema = @Schema(implementation = SignupResponseDto.class)))
-    })
+    @Operation(
+            summary = "구글 회원가입",
+            description = "구글 로그인 이후 회원가입을 완료합니다.",
+            tags = {"[AUTH] 구글"}
+    )
     @PostMapping("/google/signup")
-    public ResponseEntity<SignupResponseDto> googleSignup(
-            @org.springframework.web.bind.annotation.RequestBody SignupRequestDto body
-    ) {
-        return ResponseEntity.ok(googleAuthService.signup(body));
+    public ResponseEntity<SignupResponseDto> googleSignup(@RequestBody SignupRequestDto signupRequestDto) {
+        SignupResponseDto signupResponseDto = googleAuthService.signup(signupRequestDto);
+        return ResponseEntity.ok(signupResponseDto);
     }
-
 }
