@@ -12,6 +12,7 @@ import org.springframework.context.annotation.Configuration;
 public class GoogleProperties {
 
     private String clientId;
+    private String iosClientId;
     private String clientSecret;
     private String redirectUri;
     private String scope;

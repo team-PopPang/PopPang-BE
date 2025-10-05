@@ -129,7 +129,7 @@ public class AppleAuthService {
                 ));
     }
 
-    // 1. code -> 토큰
+    // 1. code -> access_token + id_token
     private AppleTokenResponseDto getAccessToken(String code) {
 
         try {

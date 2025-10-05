@@ -23,7 +23,7 @@ import org.springframework.util.LinkedMultiValueMap;
 import org.springframework.util.MultiValueMap;
 import org.springframework.web.client.RestTemplate;
 
-import java.util.Collections;
+import java.util.List;
 
 @Service
 @RequiredArgsConstructor
@@ -67,8 +67,10 @@ public class GoogleAuthService {
                     new NetHttpTransport(),
                     new JacksonFactory()
             )
-                    .setAudience(Collections.singletonList(googleProperties.getClientId()))
-                    .build();
+                    .setAudience(List.of(
+                            googleProperties.getClientId(),
+                            googleProperties.getIosClientId()
+                    )).build();
 
             GoogleIdToken token = verifier.verify(idToken);
             if (token == null) {
