@@ -61,3 +61,10 @@ application-local.*
 
 ### 애플 private key ###
 AuthKey_382T2TB4RW.p8
+
+### Docker ###
+# .gitignore
+*.tar
+*.tar.gz
+*.zip
+*.jar

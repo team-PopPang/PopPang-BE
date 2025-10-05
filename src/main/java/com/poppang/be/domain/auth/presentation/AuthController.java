@@ -87,7 +87,7 @@ public class AuthController {
 
     @Operation(
             summary = "[APP] 구글 로그인",
-            description = "구글 앱에서 발급받은 액세스 토큰을 사용해 로그인합니다.",
+            description = "구글 앱에서 발급받은 id_token 을 사용해 로그인합니다.",
             tags = {"[AUTH] 구글"}
     )
     @PostMapping("/google/mobile/login")
