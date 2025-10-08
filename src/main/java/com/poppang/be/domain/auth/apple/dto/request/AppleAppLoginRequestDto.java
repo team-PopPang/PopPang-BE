@@ -11,4 +11,6 @@ public class AppleAppLoginRequestDto {
     @JsonProperty("auth_code")
     private String authCode;
 
+    private String email;
+
 }
