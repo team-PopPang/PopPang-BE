@@ -1,8 +1,10 @@
 package com.poppang.be.domain.auth.apple.dto.response;
 
 import lombok.Getter;
+import lombok.NoArgsConstructor;
 
 @Getter
+@NoArgsConstructor
 public class AppleUserInfoResponseDto {
 
     private String sub;

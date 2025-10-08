@@ -75,7 +75,7 @@ public class AppleAuthService {
         AppleUserInfoResponseDto appleUserInfoResponseDto = parseIdTokenToProfile(appleToken.getIdToken());
         String uid = appleUserInfoResponseDto.getUid();
 
-        Users user = upsertByUid(uid, appleUserInfoResponseDto.getEmail());
+        Users user = upsertByUid(uid, appleAppLoginRequestDto.getEmail());
 
         return LoginResponseDto.from(user);
     }
