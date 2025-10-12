@@ -1,8 +1,10 @@
 package com.poppang.be.domain.keyword.entity;
 
+import com.poppang.be.domain.keyword.dto.request.UserKeywordRegisterRequestDto;
 import com.poppang.be.domain.users.entity.Users;
 import jakarta.persistence.*;
 import lombok.AccessLevel;
+import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 
@@ -23,10 +25,18 @@ public class UserKeyword {
     @Column(name = "keyword", nullable = false, length = 100)
     private String keyword;
 
+    @Builder
     public UserKeyword(Users user,
                        String keyword) {
         this.user = user;
         this.keyword = keyword;
+    }
+
+    public static UserKeyword from(Users users, String keyword) {
+        return UserKeyword.builder()
+                .user(users)
+                .keyword(keyword)
+                .build();
     }
 
 }
