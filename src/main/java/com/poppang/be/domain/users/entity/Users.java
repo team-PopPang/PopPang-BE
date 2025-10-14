@@ -25,7 +25,7 @@ public class Users extends BaseEntity {
     @Column(name = "uid", nullable = true, unique = true, length = 255)
     private String uid;
 
-    @Column(name = "uuid", length = 36)
+    @Column(name = "uuid", nullable = false, length = 36)
     private String uuid;
 
     @Enumerated(EnumType.STRING)
