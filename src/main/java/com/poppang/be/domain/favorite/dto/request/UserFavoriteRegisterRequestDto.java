@@ -5,7 +5,7 @@ import lombok.Getter;
 @Getter
 public class UserFavoriteRegisterRequestDto {
 
-    private Long userId;
-    private Long popupId;
+    private String userUuid;
+    private String popupUuid;
 
 }

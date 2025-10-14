@@ -48,22 +48,21 @@ public class UserFavoriteController {
             description = "특정 팝업이 받은 전체 찜 개수를 조회합니다.",
             tags = {"[FAVORITE] 공통"}
     )
-    @GetMapping("/count/{popupId}")
-    public ResponseEntity<FavoriteCountResponseDto> getFavoriteCount(@PathVariable("popupId") Long popupId) {
-        FavoriteCountResponseDto favoriteCountResponseDto = userFavoriteService.getFavoriteCount(popupId);
+    @GetMapping("/count/{popupUuid}")
+    public ResponseEntity<FavoriteCountResponseDto> getFavoriteCount(@PathVariable("popupUuid") String popupUuid) {
+        FavoriteCountResponseDto favoriteCountResponseDto = userFavoriteService.getFavoriteCount(popupUuid);
 
         return ResponseEntity.ok(favoriteCountResponseDto);
     }
-
 
     @Operation(
             summary = "유저가 찜한 팝업 목록 조회",
             description = "특정 유저가 찜한 팝업 리스트를 조회합니다.",
             tags = {"[FAVORITE] 공통"}
     )
-    @GetMapping("/popup/{userId}")
-    public ResponseEntity<List<UserFavoritePopupResponseDto>> getFavoritePopup(@PathVariable("userId") Long userId) {
-        List<UserFavoritePopupResponseDto> userFavoritePopupResponseDtoList = userFavoriteService.getFavoritePopup(userId);
+    @GetMapping("/popup/{userUuid}")
+    public ResponseEntity<List<UserFavoritePopupResponseDto>> getFavoritePopupList(@PathVariable("userUuid") String userUuid) {
+        List<UserFavoritePopupResponseDto> userFavoritePopupResponseDtoList = userFavoriteService.getFavoritePopupList(userUuid);
 
         return ResponseEntity.ok(userFavoritePopupResponseDtoList);
     }

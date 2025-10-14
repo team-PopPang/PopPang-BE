@@ -9,6 +9,8 @@ import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 
+import java.util.UUID;
+
 @Entity
 @Getter
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
@@ -22,6 +24,9 @@ public class Users extends BaseEntity {
 
     @Column(name = "uid", nullable = true, unique = true, length = 255)
     private String uid;
+
+    @Column(name = "uuid", length = 36)
+    private String uuid;
 
     @Enumerated(EnumType.STRING)
     @Column(name = "provider", nullable = true, length = 20)
@@ -46,9 +51,17 @@ public class Users extends BaseEntity {
     @Column(name = "is_deleted", nullable = true)
     private boolean deleted = false;
 
+    @PrePersist
+    private void ensureUuid() {
+        if (this.uuid == null || this.uuid.isBlank()) {
+            this.uuid = UUID.randomUUID().toString();
+        }
+    }
+
     @Builder
     public Users(Long id,
                  String uid,
+                 String uuid,
                  Provider provider,
                  String email,
                  String nickname,
@@ -58,6 +71,7 @@ public class Users extends BaseEntity {
                  boolean deleted) {
         this.id = id;
         this.uid = uid;
+        this.uuid = uuid;
         this.provider = provider;
         this.email = email;
         this.nickname = nickname;

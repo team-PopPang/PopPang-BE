@@ -7,6 +7,7 @@ import lombok.NoArgsConstructor;
 
 import java.time.LocalDate;
 import java.time.LocalTime;
+import java.util.UUID;
 
 @Entity
 @Getter
@@ -17,6 +18,9 @@ public class Popup extends BaseEntity {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
+
+    @Column(name = "uuid", length = 36)
+    private String uuid;
 
     @Column(name = "name", nullable = false, length = 50)
     private String name;
@@ -78,5 +82,12 @@ public class Popup extends BaseEntity {
 
     @Column(name = "error_code", length = 255)
     private String errorCode;
+
+    @PrePersist
+    private void ensureUuid() {
+        if (this.uuid == null || this.uuid.isBlank()) {
+            this.uuid = UUID.randomUUID().toString();
+        }
+    }
 
 }

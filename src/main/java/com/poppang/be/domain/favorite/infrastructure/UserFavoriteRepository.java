@@ -14,10 +14,10 @@ public interface UserFavoriteRepository extends JpaRepository<UserFavorite, Long
 
     boolean existsByUserAndPopup(Users user, Popup popup);
 
-    Optional<UserFavorite> findByUserIdAndPopupId(Long userId, Long popupId);
+    Optional<UserFavorite> findByUserUuidAndPopupUuid(String userUuid, String popupUuid);
 
-    long countByPopupId(Long popupId);
+    long countByPopupUuid(String popupUuid);
 
-    List<UserFavorite> findAllByUser_Id(Long userId);
+    List<UserFavorite> findAllByUserUuid(String userUuid);
 
 }
