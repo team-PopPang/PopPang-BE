@@ -3,9 +3,9 @@ package com.poppang.be.domain.keyword.dto.request;
 import lombok.Getter;
 
 @Getter
-public class UserKeywordRegisterRequestDto {
+public class UserAlertKeywordDeleteDto {
 
     private Long userId;
-    private String newKeyword;
+    private String deleteAlertKeyword;
 
 }

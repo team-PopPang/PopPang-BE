@@ -1,6 +1,5 @@
 package com.poppang.be.domain.keyword.entity;
 
-import com.poppang.be.domain.keyword.dto.request.UserKeywordRegisterRequestDto;
 import com.poppang.be.domain.users.entity.Users;
 import jakarta.persistence.*;
 import lombok.AccessLevel;
@@ -11,8 +10,8 @@ import lombok.NoArgsConstructor;
 @Entity
 @Getter
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
-@Table(name = "user_keyword")
-public class UserKeyword {
+@Table(name = "user_alert_keyword")
+public class UserAlertKeyword {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -22,20 +21,20 @@ public class UserKeyword {
     @JoinColumn(name = "users_id", nullable = false)
     private Users user;
 
-    @Column(name = "keyword", nullable = false, length = 100)
-    private String keyword;
+    @Column(name = "alert_keyword", nullable = false, length = 100)
+    private String alertKeyword;
 
     @Builder
-    public UserKeyword(Users user,
-                       String keyword) {
+    public UserAlertKeyword(Users user,
+                       String alertKeyword) {
         this.user = user;
-        this.keyword = keyword;
+        this.alertKeyword = alertKeyword;
     }
 
-    public static UserKeyword from(Users users, String keyword) {
-        return UserKeyword.builder()
+    public static UserAlertKeyword from(Users users, String alertKeyword) {
+        return UserAlertKeyword.builder()
                 .user(users)
-                .keyword(keyword)
+                .alertKeyword(alertKeyword)
                 .build();
     }
 

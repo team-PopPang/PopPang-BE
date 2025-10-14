@@ -19,7 +19,7 @@ public class SignupRequestDto {
     @JsonProperty("isAlerted")
     private boolean alerted;
     private String fcmToken;
-    private List<String> keywordList;
+    private List<String> alertKeywordList;
     private List<Long> recommendList;
 
 }
