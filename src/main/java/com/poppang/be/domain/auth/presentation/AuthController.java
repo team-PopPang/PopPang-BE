@@ -100,7 +100,7 @@ public class AuthController {
 
     @Operation(
             summary = "자동 로그인",
-            description = "앱 로컬에 저장된 uid로 자동 로그인합니다.",
+            description = "앱 로컬에 저장된 uuid로 자동 로그인합니다.",
             tags = {"[AUTH] 공통"}
     )
     @PostMapping("/autoLogin")
