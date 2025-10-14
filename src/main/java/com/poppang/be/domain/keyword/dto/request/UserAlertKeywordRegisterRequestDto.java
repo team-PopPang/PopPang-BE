@@ -5,7 +5,7 @@ import lombok.Getter;
 @Getter
 public class UserAlertKeywordRegisterRequestDto {
 
-    private Long userId;
+    private String userUuid;
     private String newAlertKeyword;
 
 }

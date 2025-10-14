@@ -22,8 +22,8 @@ public class UserAlertKeywordService {
     private final UsersRepository usersRepository;
 
     @Transactional(readOnly = true)
-    public List<UserAlertKeywordResponseDto> getUserAlertKeywords(Long userId) {
-        List<UserAlertKeyword> userAlertKeywordList = userAlertKeywordRepository.findAllByUserId(userId);
+    public List<UserAlertKeywordResponseDto> getUserAlertKeywordList(String userUuid) {
+        List<UserAlertKeyword> userAlertKeywordList = userAlertKeywordRepository.findAllByUserUuid(userUuid);
         List<UserAlertKeywordResponseDto> userAlertKeywordResponseDtoList = new ArrayList<>();
 
         for (UserAlertKeyword userAlertKeyword : userAlertKeywordList) {
@@ -35,7 +35,7 @@ public class UserAlertKeywordService {
 
     @Transactional
     public void registerAlertKeyword(UserAlertKeywordRegisterRequestDto userAlertKeywordRegisterRequestDto) {
-        Users user = usersRepository.findById(userAlertKeywordRegisterRequestDto.getUserId())
+        Users user = usersRepository.findByUuid(userAlertKeywordRegisterRequestDto.getUserUuid())
                 .orElseThrow(() -> new IllegalArgumentException("유저를 찾을 수 없습니다. "));
 
         UserAlertKeyword userAlertKeyword = UserAlertKeyword.from(user, userAlertKeywordRegisterRequestDto.getNewAlertKeyword());
@@ -45,10 +45,10 @@ public class UserAlertKeywordService {
 
     @Transactional
     public void deleteAlertKeyword(UserAlertKeywordDeleteDto userAlertKeywordDeleteDto) {
-        Users user = usersRepository.findById(userAlertKeywordDeleteDto.getUserId())
+        Users user = usersRepository.findByUuid(userAlertKeywordDeleteDto.getUserUuid())
                 .orElseThrow(() -> new IllegalArgumentException("유저를 찾을 수 없습니다. "));
 
-        UserAlertKeyword userAlertKeyword = userAlertKeywordRepository.findByUserIdAndAlertKeyword(userAlertKeywordDeleteDto.getUserId(), userAlertKeywordDeleteDto.getDeleteAlertKeyword())
+        UserAlertKeyword userAlertKeyword = userAlertKeywordRepository.findByUserUuidAndAlertKeyword(userAlertKeywordDeleteDto.getUserUuid(), userAlertKeywordDeleteDto.getDeleteAlertKeyword())
                 .orElseThrow(() -> new IllegalArgumentException("해당 키워드가 존재하지 않습니다. "));
 
         userAlertKeywordRepository.delete(userAlertKeyword);

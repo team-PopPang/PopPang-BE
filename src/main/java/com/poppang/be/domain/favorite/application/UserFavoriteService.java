@@ -27,10 +27,10 @@ public class UserFavoriteService {
 
     @Transactional
     public void registerFavorite(UserFavoriteRegisterRequestDto userFavoriteRegisterRequestDto) {
-        Users user = usersRepository.findById(userFavoriteRegisterRequestDto.getUserId())
+        Users user = usersRepository.findByUuid(userFavoriteRegisterRequestDto.getUserUuid())
                 .orElseThrow(() -> new IllegalArgumentException("유저를 찾을 수 없습니다. "));
 
-        Popup popup = popupRepository.findById(userFavoriteRegisterRequestDto.getPopupId())
+        Popup popup = popupRepository.findByUuid(userFavoriteRegisterRequestDto.getPopupUuid())
                 .orElseThrow(() -> new IllegalArgumentException("팝업을 찾을 수 없습니다. "));
 
         boolean exists = userFavoriteRepository.existsByUserAndPopup(user, popup);
@@ -45,24 +45,24 @@ public class UserFavoriteService {
 
     @Transactional
     public void deleteFavorite(UserFavoriteDeleteRequestDto userFavoriteDeleteRequestDto) {
-        UserFavorite userFavorite = userFavoriteRepository.findByUserIdAndPopupId(userFavoriteDeleteRequestDto.getUserId(), userFavoriteDeleteRequestDto.getPopupId())
+        UserFavorite userFavorite = userFavoriteRepository.findByUserUuidAndPopupUuid(userFavoriteDeleteRequestDto.getUserUuid(), userFavoriteDeleteRequestDto.getPopupUuid())
                 .orElseThrow(() -> new IllegalStateException("해당 찜 기록이 없습니다. "));
 
         userFavoriteRepository.delete(userFavorite);
     }
 
     @Transactional(readOnly = true)
-    public FavoriteCountResponseDto getFavoriteCount(Long popupId) {
-        long count = userFavoriteRepository.countByPopupId(popupId);
+    public FavoriteCountResponseDto getFavoriteCount(String popupUuid) {
+        long count = userFavoriteRepository.countByPopupUuid(popupUuid);
 
         return FavoriteCountResponseDto.from(count);
     }
 
-    public List<UserFavoritePopupResponseDto> getFavoritePopup(Long userId) {
-        Users user = usersRepository.findById(userId)
+    public List<UserFavoritePopupResponseDto> getFavoritePopupList(String userUuid) {
+        Users user = usersRepository.findByUuid(userUuid)
                 .orElseThrow(() -> new IllegalArgumentException("유저를 찾을 수 없습니다."));
 
-        List<UserFavorite> userFavoriteList = userFavoriteRepository.findAllByUser_Id(userId);
+        List<UserFavorite> userFavoriteList = userFavoriteRepository.findAllByUserUuid(userUuid);
 
         List<UserFavoritePopupResponseDto> popupList = new ArrayList<>();
         for (UserFavorite userFavorite : userFavoriteList) {

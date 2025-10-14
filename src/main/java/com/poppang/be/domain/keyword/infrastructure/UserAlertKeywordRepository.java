@@ -10,8 +10,8 @@ import java.util.Optional;
 @Repository
 public interface UserAlertKeywordRepository extends JpaRepository<UserAlertKeyword, Long> {
 
-    List<UserAlertKeyword> findAllByUserId(Long userId);
+    List<UserAlertKeyword> findAllByUserUuid(String userUuid);
 
-    Optional<UserAlertKeyword> findByUserIdAndAlertKeyword(Long userId, String deleteKeyword);
+    Optional<UserAlertKeyword> findByUserUuidAndAlertKeyword(String userUuid, String deleteKeyword);
 
 }

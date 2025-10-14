@@ -14,6 +14,7 @@ import java.time.LocalTime;
 public class PopupResponseDto {
 
     private Long id;
+    private String uuid;
     private String name;
     private LocalDate startDate;
     private LocalDate endDate;
@@ -35,8 +36,29 @@ public class PopupResponseDto {
     private String errorCode;
 
     @Builder
-    public PopupResponseDto(Long id, String name, LocalDate startDate, LocalDate endDate, LocalTime openTime, LocalTime closeTime, String address, String roadAddress, String region, Double latitude, Double longitude, String geocodingQuery, String instaPostId, String instaPostUrl, int likeCount, String captionSummary, String caption, String imageUrl, MediaType mediaType, String errorCode) {
+    public PopupResponseDto(Long id,
+                            String uuid,
+                            String name,
+                            LocalDate startDate,
+                            LocalDate endDate,
+                            LocalTime openTime,
+                            LocalTime closeTime,
+                            String address,
+                            String roadAddress,
+                            String region,
+                            Double latitude,
+                            Double longitude,
+                            String geocodingQuery,
+                            String instaPostId,
+                            String instaPostUrl,
+                            int likeCount,
+                            String captionSummary,
+                            String caption,
+                            String imageUrl,
+                            MediaType mediaType,
+                            String errorCode) {
         this.id = id;
+        this.uuid = uuid;
         this.name = name;
         this.startDate = startDate;
         this.endDate = endDate;
@@ -61,6 +83,7 @@ public class PopupResponseDto {
     public static PopupResponseDto from(Popup popup) {
         return PopupResponseDto.builder()
                 .id(popup.getId())
+                .uuid(popup.getUuid())
                 .name(popup.getName())
                 .startDate(popup.getStartDate())
                 .endDate(popup.getEndDate())

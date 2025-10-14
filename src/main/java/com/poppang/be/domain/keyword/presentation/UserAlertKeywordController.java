@@ -24,8 +24,8 @@ public class UserAlertKeywordController {
             tags = {"[USER] 알림 키워드 관리"}
     )
     @GetMapping
-    public ResponseEntity<List<UserAlertKeywordResponseDto>> getUserAlertKeywords(@RequestParam("userId") Long userId) {
-        List<UserAlertKeywordResponseDto> userAlertKeywordResponseDtoList = userAlertKeywordService.getUserAlertKeywords(userId);
+    public ResponseEntity<List<UserAlertKeywordResponseDto>> getUserAlertKeywords(@RequestParam("userUuid") String userUuid) {
+        List<UserAlertKeywordResponseDto> userAlertKeywordResponseDtoList = userAlertKeywordService.getUserAlertKeywordList(userUuid);
 
         return ResponseEntity.ok(userAlertKeywordResponseDtoList);
     }
