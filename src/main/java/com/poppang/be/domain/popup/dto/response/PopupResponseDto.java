@@ -14,7 +14,7 @@ import java.time.LocalTime;
 public class PopupResponseDto {
 
     private Long id;
-    private String uuid;
+    private String popupUuid;
     private String name;
     private LocalDate startDate;
     private LocalDate endDate;
@@ -37,7 +37,7 @@ public class PopupResponseDto {
 
     @Builder
     public PopupResponseDto(Long id,
-                            String uuid,
+                            String popupUuid,
                             String name,
                             LocalDate startDate,
                             LocalDate endDate,
@@ -58,7 +58,7 @@ public class PopupResponseDto {
                             MediaType mediaType,
                             String errorCode) {
         this.id = id;
-        this.uuid = uuid;
+        this.popupUuid = popupUuid;
         this.name = name;
         this.startDate = startDate;
         this.endDate = endDate;
@@ -83,7 +83,7 @@ public class PopupResponseDto {
     public static PopupResponseDto from(Popup popup) {
         return PopupResponseDto.builder()
                 .id(popup.getId())
-                .uuid(popup.getUuid())
+                .popupUuid(popup.getUuid())
                 .name(popup.getName())
                 .startDate(popup.getStartDate())
                 .endDate(popup.getEndDate())

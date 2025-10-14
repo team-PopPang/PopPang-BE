@@ -13,7 +13,7 @@ import lombok.NoArgsConstructor;
 public class LoginResponseDto {
 
     private String uid;
-    private String uuid;
+    private String userUuid;
     private Provider provider;
     private String email;
     private String nickname;
@@ -25,7 +25,7 @@ public class LoginResponseDto {
 
     @Builder
     public LoginResponseDto(String uid,
-                            String uuid,
+                            String userUuid,
                             Provider provider,
                             String email,
                             String nickname,
@@ -33,7 +33,7 @@ public class LoginResponseDto {
                             boolean alerted,
                             String fcmToken) {
         this.uid = uid;
-        this.uuid = uuid;
+        this.userUuid = userUuid;
         this.provider = provider;
         this.email = email;
         this.nickname = nickname;
@@ -45,7 +45,7 @@ public class LoginResponseDto {
     public static LoginResponseDto from(Users user) {
         return LoginResponseDto.builder()
                 .uid(user.getUid())
-                .uuid(user.getUuid())
+                .userUuid(user.getUuid())
                 .provider(user.getProvider())
                 .email(user.getEmail())
                 .nickname(user.getNickname())
