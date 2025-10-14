@@ -17,7 +17,7 @@ public class Recommend {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    @Column(name = "uuid", length = 36)
+    @Column(name = "uuid", nullable = false, length = 36)
     private String uuid;
 
     @Column(name = "recommend_name", nullable = false, unique = true, length = 100)
