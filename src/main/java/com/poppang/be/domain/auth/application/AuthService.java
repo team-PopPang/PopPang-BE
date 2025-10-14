@@ -15,7 +15,7 @@ public class AuthService {
 
     public LoginResponseDto autoLogin(AutoLoginRequestDto autoLoginRequestDto) {
 
-        Users user = usersRepository.findByUuidAndDeletedFalse(autoLoginRequestDto.getUuid())
+        Users user = usersRepository.findByUuidAndDeletedFalse(autoLoginRequestDto.getUserUuid())
                 .orElseThrow(() -> new IllegalArgumentException("유저를 찾을 수 없습니다. "));
 
         return LoginResponseDto.from(user);

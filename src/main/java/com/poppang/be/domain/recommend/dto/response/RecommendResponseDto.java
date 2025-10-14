@@ -9,20 +9,20 @@ import lombok.NoArgsConstructor;
 @NoArgsConstructor
 public class RecommendResponseDto {
 
-    private String uuid;
+    private Long id;
     private String recommendName;
 
     @Builder
-    public RecommendResponseDto(String uuid,
+    public RecommendResponseDto(Long id,
                                 String recommendName) {
-        this.uuid = uuid;
+        this.id = id;
         this.recommendName = recommendName;
 
     }
 
     public static RecommendResponseDto from(Recommend recommend) {
         return RecommendResponseDto.builder()
-                .uuid(recommend.getUuid())
+                .id(recommend.getId())
                 .recommendName(recommend.getRecommendName())
                 .build();
     }

@@ -5,6 +5,6 @@ import lombok.Getter;
 @Getter
 public class AutoLoginRequestDto {
 
-    private String uuid;
+    private String userUuid;
 
 }
