@@ -12,6 +12,12 @@ import com.poppang.be.domain.auth.google.dto.request.GoogleAppLoginRequestDto;
 import com.poppang.be.domain.auth.google.dto.response.GoogleTokenResponseDto;
 import com.poppang.be.domain.auth.google.dto.response.GoogleUserInfoResponseDto;
 import com.poppang.be.domain.auth.kakao.dto.request.SignupRequestDto;
+import com.poppang.be.domain.keyword.entity.UserAlertKeyword;
+import com.poppang.be.domain.keyword.infrastructure.UserAlertKeywordRepository;
+import com.poppang.be.domain.recommend.entity.Recommend;
+import com.poppang.be.domain.recommend.entity.UserRecommend;
+import com.poppang.be.domain.recommend.infrastructure.RecommendRepository;
+import com.poppang.be.domain.recommend.infrastructure.UserRecommendRepository;
 import com.poppang.be.domain.users.entity.Provider;
 import com.poppang.be.domain.users.entity.Users;
 import com.poppang.be.domain.users.infrastructure.UsersRepository;
@@ -24,6 +30,8 @@ import org.springframework.util.MultiValueMap;
 import org.springframework.web.client.RestTemplate;
 
 import java.util.List;
+import java.util.Objects;
+import java.util.Optional;
 
 @Service
 @RequiredArgsConstructor
@@ -32,6 +40,9 @@ public class GoogleAuthService {
     private final GoogleProperties googleProperties;
     private final RestTemplate restTemplate = new RestTemplate();
     private final UsersRepository usersRepository;
+    private final UserAlertKeywordRepository userAlertKeywordRepository;
+    private final UserRecommendRepository userRecommendRepository;
+    private final RecommendRepository recommendRepository;
 
     // Web 로그인
     @Transactional
@@ -91,6 +102,7 @@ public class GoogleAuthService {
     }
 
     //회원가입
+    @Transactional
     public SignupResponseDto signup(SignupRequestDto signupRequestDto) {
 
         if (usersRepository.existsByNickname(signupRequestDto.getNickname())) {
@@ -102,6 +114,25 @@ public class GoogleAuthService {
 
         user.completeSignup(signupRequestDto);
         usersRepository.save(user);
+
+        for (String alertKeyword : signupRequestDto.getAlertKeywordList()) {
+            userAlertKeywordRepository.save(new UserAlertKeyword(user, alertKeyword));
+        }
+
+        // 추천 저장
+        List<Long> recommendIds = Optional.ofNullable(signupRequestDto.getRecommendList())
+                .orElseGet(List::of)
+                .stream()
+                .filter(Objects::nonNull)
+                .distinct()
+                .toList();
+
+        if (!recommendIds.isEmpty()) {
+            List<Recommend> recommendList = recommendRepository.findAllById(recommendIds);
+            for (Recommend recommend : recommendList) {
+                userRecommendRepository.save(new UserRecommend(user, recommend));
+            }
+        }
 
         return SignupResponseDto.from(user);
     }

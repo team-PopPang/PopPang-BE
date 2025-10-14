@@ -12,8 +12,8 @@ import com.poppang.be.domain.auth.apple.util.AppleJwtVerifier;
 import com.poppang.be.domain.auth.dto.response.LoginResponseDto;
 import com.poppang.be.domain.auth.dto.response.SignupResponseDto;
 import com.poppang.be.domain.auth.kakao.dto.request.SignupRequestDto;
-import com.poppang.be.domain.keyword.entity.UserKeyword;
-import com.poppang.be.domain.keyword.infrastructure.UserKeywordRepository;
+import com.poppang.be.domain.keyword.entity.UserAlertKeyword;
+import com.poppang.be.domain.keyword.infrastructure.UserAlertKeywordRepository;
 import com.poppang.be.domain.recommend.entity.Recommend;
 import com.poppang.be.domain.recommend.entity.UserRecommend;
 import com.poppang.be.domain.recommend.infrastructure.RecommendRepository;
@@ -42,7 +42,7 @@ public class AppleAuthService {
     private final AppleProperties appleProperties;
     private final RestTemplate restTemplate = new RestTemplate();
     private final UsersRepository usersRepository;
-    private final UserKeywordRepository userKeywordRepository;
+    private final UserAlertKeywordRepository userAlertKeywordRepository;
     private final UserRecommendRepository userRecommendRepository;
     private final RecommendRepository recommendRepository;
 
@@ -94,8 +94,8 @@ public class AppleAuthService {
         usersRepository.save(user);
 
         // 키워드 저장
-        for (String keyword : signupRequestDto.getKeywordList()) {
-            userKeywordRepository.save(new UserKeyword(user, keyword));
+        for (String alertKeyword : signupRequestDto.getAlertKeywordList()) {
+            userAlertKeywordRepository.save(new UserAlertKeyword(user, alertKeyword));
         }
 
         // 추천 저장
@@ -164,7 +164,7 @@ public class AppleAuthService {
             throw new IllegalStateException("Failed to call Apple token endpoint", e);
         } catch (JOSEException | ParseException e) { // createClientSecret 등에서 던질 수 있는 구체 예외
             throw new IllegalStateException("Failed to create Apple client_secret", e);
-        }catch (Exception e){
+        } catch (Exception e) {
             throw new IllegalStateException("Unexpected error", e);
         }
     }
