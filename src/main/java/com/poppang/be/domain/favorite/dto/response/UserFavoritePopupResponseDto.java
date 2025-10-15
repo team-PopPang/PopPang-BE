@@ -99,7 +99,7 @@ public class UserFavoritePopupResponseDto {
                 .instaPostUrl(popup.getInstaPostUrl())
                 .likeCount(popup.getLikeCount())
                 .captionSummary(popup.getCaptionSummary())
-                .captionSummary(popup.getCaption())
+                .caption(popup.getCaption())
                 .imageUrl(popup.getImageUrl())
                 .mediaType(popup.getMediaType())
                 .errorCode(popup.getErrorCode())
