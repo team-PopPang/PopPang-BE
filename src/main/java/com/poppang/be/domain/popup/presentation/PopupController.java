@@ -1,12 +1,12 @@
 package com.poppang.be.domain.popup.presentation;
 
 import com.poppang.be.domain.popup.application.PopupService;
+import com.poppang.be.domain.popup.dto.request.PopupRegisterRequestDto;
 import com.poppang.be.domain.popup.dto.response.PopupResponseDto;
 import io.swagger.v3.oas.annotations.Operation;
 import lombok.RequiredArgsConstructor;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
 
@@ -27,6 +27,13 @@ public class PopupController {
         List<PopupResponseDto> allPopupList = popupService.getAllPopupList();
 
         return allPopupList;
+    }
+
+    @PostMapping
+    public ResponseEntity<Void> registerPopup(@RequestBody PopupRegisterRequestDto popupRegisterRequestDto) {
+        popupService.registerPopup(popupRegisterRequestDto);
+
+        return ResponseEntity.ok().build();
     }
 
 }

@@ -2,6 +2,7 @@ package com.poppang.be.domain.popup.entity;
 
 import com.poppang.be.common.entity.BaseEntity;
 import jakarta.persistence.*;
+import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 
@@ -88,6 +89,53 @@ public class Popup extends BaseEntity {
         if (this.uuid == null || this.uuid.isBlank()) {
             this.uuid = UUID.randomUUID().toString();
         }
+    }
+
+    @Builder
+    public Popup(Long id,
+                 String uuid,
+                 String name,
+                 LocalDate startDate,
+                 LocalDate endDate,
+                 LocalTime openTime,
+                 LocalTime closeTime,
+                 String address,
+                 String roadAddress,
+                 String region,
+                 Double latitude,
+                 Double longitude,
+                 String geocodingQuery,
+                 String instaPostId,
+                 String instaPostUrl,
+                 int likeCount,
+                 String captionSummary,
+                 String caption,
+                 String imageUrl,
+                 MediaType mediaType,
+                 boolean activated,
+                 String errorCode) {
+        this.id = id;
+        this.uuid = uuid;
+        this.name = name;
+        this.startDate = startDate;
+        this.endDate = endDate;
+        this.openTime = openTime;
+        this.closeTime = closeTime;
+        this.address = address;
+        this.roadAddress = roadAddress;
+        this.region = region;
+        this.latitude = latitude;
+        this.longitude = longitude;
+        this.geocodingQuery = geocodingQuery;
+        this.instaPostId = instaPostId;
+        this.instaPostUrl = instaPostUrl;
+        this.likeCount = likeCount;
+        this.captionSummary = captionSummary;
+        this.caption = caption;
+        this.imageUrl = imageUrl;
+        this.mediaType = mediaType;
+        this.activated = activated;
+        this.errorCode = errorCode;
     }
 
 }
