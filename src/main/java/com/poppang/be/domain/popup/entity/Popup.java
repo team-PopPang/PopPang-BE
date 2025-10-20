@@ -71,9 +71,6 @@ public class Popup extends BaseEntity {
     @Column(name = "caption", nullable = false, columnDefinition = "TEXT")
     private String caption;
 
-    @Column(name = "image_url", nullable = true, columnDefinition = "TEXT")
-    private String imageUrl;
-
     @Enumerated(EnumType.STRING)
     @Column(name = "media_type", nullable = true)
     private MediaType mediaType;
@@ -110,7 +107,6 @@ public class Popup extends BaseEntity {
                  int likeCount,
                  String captionSummary,
                  String caption,
-                 String imageUrl,
                  MediaType mediaType,
                  boolean activated,
                  String errorCode) {
@@ -132,7 +128,6 @@ public class Popup extends BaseEntity {
         this.likeCount = likeCount;
         this.captionSummary = captionSummary;
         this.caption = caption;
-        this.imageUrl = imageUrl;
         this.mediaType = mediaType;
         this.activated = activated;
         this.errorCode = errorCode;

@@ -17,7 +17,9 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 @Service
 @RequiredArgsConstructor
@@ -30,13 +32,64 @@ public class PopupService {
 
     public List<PopupResponseDto> getAllPopupList() {
         List<Popup> popupList = popupRepository.findAll();
-        List<PopupResponseDto> popupResponseDtoList = new ArrayList<>();
 
+        List<Long> popupIdList = new ArrayList<>();
         for (Popup popup : popupList) {
-            popupResponseDtoList.add(PopupResponseDto.from(popup));
+            popupIdList.add(popup.getId());
+        }
+
+        // popup 이미지 조회
+        List<PopupImage> popupImageList = popupImageRepository.findAllByPopup_IdInOrderByPopup_IdAscSortOrderAsc(popupIdList);
+
+        Map<Long, List<String>> imageMap = new HashMap<>();
+        for (PopupImage popupImage : popupImageList) {
+            Long popupId = popupImage.getPopup().getId();
+            imageMap.computeIfAbsent(popupId, k -> new ArrayList<>())
+                    .add(popupImage.getImageUrl());
+        }
+
+        // popup 추천 조회
+        List<PopupRecommend> popupRecommendList = popupRecommendRepository.findAllByPopup_IdIn(popupIdList);
+
+        Map<Long, String> recommendMap = new HashMap<>();
+        for (PopupRecommend popupRecommend : popupRecommendList) {
+            Long popupId = popupRecommend.getId();
+            recommendMap.putIfAbsent(popupId, popupRecommend.getRecommend().getRecommendName());
+        }
+
+        List<PopupResponseDto> popupResponseDtoList = new ArrayList<>();
+        for (Popup popup : popupList) {
+            List<String> imageUrlList = imageMap.getOrDefault(popup.getId(), List.of());
+            String recommend = recommendMap.getOrDefault(popup.getId(), null);
+
+            popupResponseDtoList.add(PopupResponseDto.builder()
+                    .id((popup.getId()))
+                    .popupUuid(popup.getUuid())
+                    .name(popup.getName())
+                    .startDate(popup.getStartDate())
+                    .endDate(popup.getEndDate())
+                    .openTime(popup.getOpenTime())
+                    .closeTime(popup.getCloseTime())
+                    .address(popup.getAddress())
+                    .roadAddress(popup.getRoadAddress())
+                    .region(popup.getRegion())
+                    .latitude(popup.getLatitude())
+                    .longitude(popup.getLongitude())
+                    .geocodingQuery(popup.getGeocodingQuery())
+                    .instaPostId(popup.getInstaPostId())
+                    .instaPostUrl(popup.getInstaPostUrl())
+                    .likeCount(popup.getLikeCount())
+                    .captionSummary(popup.getCaptionSummary())
+                    .caption(popup.getCaption())
+                    .imageUrlList(imageUrlList)
+                    .mediaType(popup.getMediaType())
+                    .errorCode(popup.getErrorCode())
+                    .recommend(recommend)
+                    .build());
         }
 
         return popupResponseDtoList;
+
     }
 
     @Transactional

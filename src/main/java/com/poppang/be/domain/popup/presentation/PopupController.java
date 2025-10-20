@@ -23,12 +23,18 @@ public class PopupController {
             tags = {"[POPUP] 공통"}
     )
     @GetMapping
-    public List<PopupResponseDto> getAllPopupList() {
+    public ResponseEntity<List<PopupResponseDto>> getAllPopupList() {
         List<PopupResponseDto> allPopupList = popupService.getAllPopupList();
 
-        return allPopupList;
+        return ResponseEntity.ok(allPopupList);
     }
 
+    @Operation(
+            summary = "팝업 등록",
+            description = "크롤링 또는 관리자가 신규 팝업스토어 데이터를 등록합니다. " +
+                    "이미지 리스트(`imageList`)와 추천 ID(`recommendIds`)를 함께 전달해야 합니다.",
+            tags = {"[POPUP] 관리"}
+    )
     @PostMapping
     public ResponseEntity<Void> registerPopup(@RequestBody PopupRegisterRequestDto popupRegisterRequestDto) {
         popupService.registerPopup(popupRegisterRequestDto);

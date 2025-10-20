@@ -7,6 +7,10 @@ import com.poppang.be.domain.favorite.dto.response.UserFavoritePopupResponseDto;
 import com.poppang.be.domain.favorite.entity.UserFavorite;
 import com.poppang.be.domain.favorite.infrastructure.UserFavoriteRepository;
 import com.poppang.be.domain.popup.entity.Popup;
+import com.poppang.be.domain.popup.entity.PopupImage;
+import com.poppang.be.domain.popup.entity.PopupRecommend;
+import com.poppang.be.domain.popup.infrastructure.PopupImageRepository;
+import com.poppang.be.domain.popup.infrastructure.PopupRecommendRepository;
 import com.poppang.be.domain.popup.infrastructure.PopupRepository;
 import com.poppang.be.domain.users.entity.Users;
 import com.poppang.be.domain.users.infrastructure.UsersRepository;
@@ -15,7 +19,9 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 @Service
 @RequiredArgsConstructor
@@ -24,6 +30,8 @@ public class UserFavoriteService {
     private final UsersRepository usersRepository;
     private final PopupRepository popupRepository;
     private final UserFavoriteRepository userFavoriteRepository;
+    private final PopupImageRepository popupImageRepository;
+    private final PopupRecommendRepository popupRecommendRepository;
 
     @Transactional
     public void registerFavorite(UserFavoriteRegisterRequestDto userFavoriteRegisterRequestDto) {
@@ -64,12 +72,62 @@ public class UserFavoriteService {
 
         List<UserFavorite> userFavoriteList = userFavoriteRepository.findAllByUserUuid(userUuid);
 
-        List<UserFavoritePopupResponseDto> popupList = new ArrayList<>();
-        for (UserFavorite userFavorite : userFavoriteList) {
-            popupList.add(UserFavoritePopupResponseDto.from(userFavorite.getPopup()));
+        List<Long> popupIdList = userFavoriteList.stream()
+                .map(userFavorite -> userFavorite.getPopup().getId())
+                .toList();
+
+        // popup 이미지 조회
+        List<PopupImage> popupImageList = popupImageRepository.findAllByPopup_IdInOrderByPopup_IdAscSortOrderAsc(popupIdList);
+
+        Map<Long, List<String>> imageMap = new HashMap<>();
+        for (PopupImage popupImage : popupImageList) {
+            Long popupId = popupImage.getPopup().getId();
+            imageMap.computeIfAbsent(popupId, k -> new ArrayList<>())
+                    .add(popupImage.getImageUrl());
         }
 
-        return popupList;
+        // popup 추천 조회
+        List<PopupRecommend> popupRecommendList = popupRecommendRepository.findAllByPopup_IdIn(popupIdList);
+
+        Map<Long, String> recommendMap = new HashMap<>();
+        for (PopupRecommend popupRecommend : popupRecommendList) {
+            Long popupId = popupRecommend.getPopup().getId();
+            recommendMap.putIfAbsent(popupId, popupRecommend.getRecommend().getRecommendName());
+        }
+
+        List<UserFavoritePopupResponseDto> userFavoritePopupResponseDtoList = new ArrayList<>();
+        for (UserFavorite userFavorite : userFavoriteList) {
+            Popup popup = userFavorite.getPopup();
+            List<String> imageUrlList = imageMap.getOrDefault(popup.getId(), List.of());
+            String recommend = recommendMap.getOrDefault(popup.getId(), null);
+
+            userFavoritePopupResponseDtoList.add(UserFavoritePopupResponseDto.builder()
+                    .id((popup.getId()))
+                    .popupUuid(popup.getUuid())
+                    .name(popup.getName())
+                    .startDate(popup.getStartDate())
+                    .endDate(popup.getEndDate())
+                    .openTime(popup.getOpenTime())
+                    .closeTime(popup.getCloseTime())
+                    .address(popup.getAddress())
+                    .roadAddress(popup.getRoadAddress())
+                    .region(popup.getRegion())
+                    .latitude(popup.getLatitude())
+                    .longitude(popup.getLongitude())
+                    .geocodingQuery(popup.getGeocodingQuery())
+                    .instaPostId(popup.getInstaPostId())
+                    .instaPostUrl(popup.getInstaPostUrl())
+                    .likeCount(popup.getLikeCount())
+                    .captionSummary(popup.getCaptionSummary())
+                    .caption(popup.getCaption())
+                    .imageUrlList(imageUrlList)
+                    .mediaType(popup.getMediaType())
+                    .errorCode(popup.getErrorCode())
+                    .recommend(recommend)
+                    .build());
+        }
+
+        return userFavoritePopupResponseDtoList;
     }
 
 }
