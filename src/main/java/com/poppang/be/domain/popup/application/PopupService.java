@@ -53,7 +53,7 @@ public class PopupService {
 
         Map<Long, String> recommendMap = new HashMap<>();
         for (PopupRecommend popupRecommend : popupRecommendList) {
-            Long popupId = popupRecommend.getId();
+            Long popupId = popupRecommend.getPopup().getId();
             recommendMap.putIfAbsent(popupId, popupRecommend.getRecommend().getRecommendName());
         }
 
@@ -95,7 +95,7 @@ public class PopupService {
     @Transactional
     public void registerPopup(PopupRegisterRequestDto popupRegisterRequestDto) {
 
-        // popup 테이블 젖아
+        // popup 테이블 저장
         Popup popup = Popup.builder()
                 .name(popupRegisterRequestDto.getName())
                 .startDate(popupRegisterRequestDto.getStartDate())
@@ -132,9 +132,9 @@ public class PopupService {
         }
 
         // popup 이미지 저장
-        if (popupRegisterRequestDto.getRecommendIds() != null && !popupRegisterRequestDto.getRecommendIds().isEmpty()) {
-            List<Recommend> found = recommendRepository.findAllById(popupRegisterRequestDto.getRecommendIds());
-            if (found.size() != popupRegisterRequestDto.getRecommendIds().size()) {
+        if (popupRegisterRequestDto.getRecommendIdList() != null && !popupRegisterRequestDto.getRecommendIdList().isEmpty()) {
+            List<Recommend> found = recommendRepository.findAllById(popupRegisterRequestDto.getRecommendIdList());
+            if (found.size() != popupRegisterRequestDto.getRecommendIdList().size()) {
                 throw new IllegalArgumentException("유효하지 않은 recommendId가 포함되어 있습니다. ");
             }
 
@@ -147,6 +147,72 @@ public class PopupService {
             }
             popupRecommendRepository.saveAll(popupRecommendList);
         }
+    }
+
+    @Transactional(readOnly = true)
+    public List<PopupResponseDto> getSearchPopupList(String q) {
+        String term = (q == null ? "" : q.trim());
+        if(term.isEmpty()) return List.of();
+
+        List<Popup> popupList = popupRepository.searchActivatedByKeyword(term);
+        if(popupList.isEmpty()) return List.of();
+
+        List<Long> popupIdList = new ArrayList<>();
+        for (Popup popup : popupList) {
+            popupIdList.add(popup.getId());
+        }
+
+        // popup 이미지 조회
+        List<PopupImage> popupImageList = popupImageRepository.findAllByPopup_IdInOrderByPopup_IdAscSortOrderAsc(popupIdList);
+
+        Map<Long, List<String>> imageMap = new HashMap<>();
+        for (PopupImage popupImage : popupImageList) {
+            Long popupId = popupImage.getPopup().getId();
+            imageMap.computeIfAbsent(popupId, k -> new ArrayList<>())
+                    .add(popupImage.getImageUrl());
+        }
+
+        // popup 추천 조회
+        List<PopupRecommend> popupRecommendList = popupRecommendRepository.findAllByPopup_IdIn(popupIdList);
+
+        Map<Long, String> recommendMap = new HashMap<>();
+        for (PopupRecommend popupRecommend : popupRecommendList) {
+            Long popupId = popupRecommend.getPopup().getId();
+            recommendMap.putIfAbsent(popupId, popupRecommend.getRecommend().getRecommendName());
+        }
+
+        List<PopupResponseDto> popupResponseDtoList = new ArrayList<>();
+        for (Popup popup : popupList) {
+            List<String> imageUrlList = imageMap.getOrDefault(popup.getId(), List.of());
+            String recommend = recommendMap.getOrDefault(popup.getId(), null);
+
+            popupResponseDtoList.add(PopupResponseDto.builder()
+                    .id((popup.getId()))
+                    .popupUuid(popup.getUuid())
+                    .name(popup.getName())
+                    .startDate(popup.getStartDate())
+                    .endDate(popup.getEndDate())
+                    .openTime(popup.getOpenTime())
+                    .closeTime(popup.getCloseTime())
+                    .address(popup.getAddress())
+                    .roadAddress(popup.getRoadAddress())
+                    .region(popup.getRegion())
+                    .latitude(popup.getLatitude())
+                    .longitude(popup.getLongitude())
+                    .geocodingQuery(popup.getGeocodingQuery())
+                    .instaPostId(popup.getInstaPostId())
+                    .instaPostUrl(popup.getInstaPostUrl())
+                    .likeCount(popup.getLikeCount())
+                    .captionSummary(popup.getCaptionSummary())
+                    .caption(popup.getCaption())
+                    .imageUrlList(imageUrlList)
+                    .mediaType(popup.getMediaType())
+                    .errorCode(popup.getErrorCode())
+                    .recommend(recommend)
+                    .build());
+        }
+
+        return popupResponseDtoList;
     }
 
 }
