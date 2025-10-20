@@ -1,13 +1,13 @@
 package com.poppang.be.domain.popup.dto.response;
 
 import com.poppang.be.domain.popup.entity.MediaType;
-import com.poppang.be.domain.popup.entity.Popup;
 import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 
 import java.time.LocalDate;
 import java.time.LocalTime;
+import java.util.List;
 
 @Getter
 @NoArgsConstructor
@@ -31,9 +31,11 @@ public class PopupResponseDto {
     private int likeCount;
     private String captionSummary;
     private String caption;
-    private String imageUrl;
+
+    private List<String> imageUrlList;
     private MediaType mediaType;
     private String errorCode;
+    private String recommend;
 
     @Builder
     public PopupResponseDto(Long id,
@@ -54,9 +56,10 @@ public class PopupResponseDto {
                             int likeCount,
                             String captionSummary,
                             String caption,
-                            String imageUrl,
+                            List<String> imageUrlList,
                             MediaType mediaType,
-                            String errorCode) {
+                            String errorCode,
+                            String recommend) {
         this.id = id;
         this.popupUuid = popupUuid;
         this.name = name;
@@ -75,35 +78,10 @@ public class PopupResponseDto {
         this.likeCount = likeCount;
         this.captionSummary = captionSummary;
         this.caption = caption;
-        this.imageUrl = imageUrl;
+        this.imageUrlList = imageUrlList;
         this.mediaType = mediaType;
         this.errorCode = errorCode;
-    }
-
-    public static PopupResponseDto from(Popup popup) {
-        return PopupResponseDto.builder()
-                .id(popup.getId())
-                .popupUuid(popup.getUuid())
-                .name(popup.getName())
-                .startDate(popup.getStartDate())
-                .endDate(popup.getEndDate())
-                .openTime(popup.getOpenTime())
-                .closeTime(popup.getCloseTime())
-                .address(popup.getAddress())
-                .roadAddress(popup.getRoadAddress())
-                .region(popup.getRegion())
-                .latitude(popup.getLatitude())
-                .longitude(popup.getLongitude())
-                .geocodingQuery(popup.getGeocodingQuery())
-                .instaPostId(popup.getInstaPostId())
-                .instaPostUrl(popup.getInstaPostUrl())
-                .likeCount(popup.getLikeCount())
-                .captionSummary(popup.getCaptionSummary())
-                .caption(popup.getCaption())
-                .imageUrl(popup.getImageUrl())
-                .mediaType(popup.getMediaType())
-                .errorCode(popup.getErrorCode())
-                .build();
+        this.recommend = recommend;
     }
 
 }
