@@ -38,6 +38,6 @@ public class PopupRegisterRequestDto {
     private Boolean isActive;
 
     private List<PopupImageUpsertRequestDto> imageList;
-    private List<Long> recommendIds;
+    private List<Long> recommendIdList;
 
 }
