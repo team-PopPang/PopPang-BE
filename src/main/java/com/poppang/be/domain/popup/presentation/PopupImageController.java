@@ -3,12 +3,14 @@ package com.poppang.be.domain.popup.presentation;
 import com.poppang.be.domain.popup.application.PopupImageService;
 import com.poppang.be.domain.popup.dto.request.PopupImageUpsertRequestDto;
 import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
 
+@Tag(name = "[POPUP] 공통", description = "팝업스토어 관련 API")
 @RestController
 @RequestMapping("/api/v1/popup")
 @RequiredArgsConstructor
@@ -18,8 +20,7 @@ public class PopupImageController {
 
     @Operation(
             summary = "팝업 이미지 등록/수정 (Upsert)",
-            description = "특정 팝업(UUID 기준)의 이미지를 등록 또는 수정합니다 ",
-            tags = {"[POPUP] 이미지 관리"}
+            description = "특정 팝업(UUID 기준)의 이미지를 등록 또는 수정합니다 "
     )
     @PutMapping("/{popupUuid}/images")
     public ResponseEntity<Void> upsertImage(
