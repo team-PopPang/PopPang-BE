@@ -69,6 +69,7 @@ public class PopupService {
                     .endDate(popup.getEndDate())
                     .openTime(popup.getOpenTime())
                     .closeTime(popup.getCloseTime())
+                    .address(popup.getAddress())
                     .roadAddress(popup.getRoadAddress())
                     .region(popup.getRegion())
                     .latitude(popup.getLatitude())
@@ -146,10 +147,10 @@ public class PopupService {
     @Transactional(readOnly = true)
     public List<PopupResponseDto> getSearchPopupList(String q) {
         String term = (q == null ? "" : q.trim());
-        if(term.isEmpty()) return List.of();
+        if (term.isEmpty()) return List.of();
 
         List<Popup> popupList = popupRepository.searchActivatedByKeyword(term);
-        if(popupList.isEmpty()) return List.of();
+        if (popupList.isEmpty()) return List.of();
 
         List<Long> popupIdList = new ArrayList<>();
         for (Popup popup : popupList) {
@@ -187,6 +188,7 @@ public class PopupService {
                     .endDate(popup.getEndDate())
                     .openTime(popup.getOpenTime())
                     .closeTime(popup.getCloseTime())
+                    .address(popup.getAddress())
                     .roadAddress(popup.getRoadAddress())
                     .region(popup.getRegion())
                     .latitude(popup.getLatitude())

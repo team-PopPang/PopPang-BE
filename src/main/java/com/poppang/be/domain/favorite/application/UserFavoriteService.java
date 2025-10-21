@@ -108,6 +108,7 @@ public class UserFavoriteService {
                     .endDate(popup.getEndDate())
                     .openTime(popup.getOpenTime())
                     .closeTime(popup.getCloseTime())
+                    .address(popup.getAddress())
                     .roadAddress(popup.getRoadAddress())
                     .region(popup.getRegion())
                     .latitude(popup.getLatitude())

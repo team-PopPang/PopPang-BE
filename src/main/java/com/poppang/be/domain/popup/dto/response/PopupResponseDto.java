@@ -27,6 +27,8 @@ public class PopupResponseDto {
     @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "HH:mm")
     @Schema(description = "운영 종료 시간", example = "22:00", type = "string", format = "time")
     private LocalTime closeTime;
+
+    private String address;
     private String roadAddress;
     private String region;
     private Double latitude;
@@ -46,6 +48,7 @@ public class PopupResponseDto {
                             LocalDate endDate,
                             LocalTime openTime,
                             LocalTime closeTime,
+                            String address,
                             String roadAddress,
                             String region,
                             Double latitude,
@@ -56,12 +59,14 @@ public class PopupResponseDto {
                             List<String> imageUrlList,
                             MediaType mediaType,
                             String recommend) {
+
         this.popupUuid = popupUuid;
         this.name = name;
         this.startDate = startDate;
         this.endDate = endDate;
         this.openTime = openTime;
         this.closeTime = closeTime;
+        this.address = address;
         this.roadAddress = roadAddress;
         this.region = region;
         this.latitude = latitude;
