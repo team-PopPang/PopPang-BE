@@ -102,27 +102,21 @@ public class UserFavoriteService {
             String recommend = recommendMap.getOrDefault(popup.getId(), null);
 
             userFavoritePopupResponseDtoList.add(UserFavoritePopupResponseDto.builder()
-                    .id((popup.getId()))
                     .popupUuid(popup.getUuid())
                     .name(popup.getName())
                     .startDate(popup.getStartDate())
                     .endDate(popup.getEndDate())
                     .openTime(popup.getOpenTime())
                     .closeTime(popup.getCloseTime())
-                    .address(popup.getAddress())
                     .roadAddress(popup.getRoadAddress())
                     .region(popup.getRegion())
                     .latitude(popup.getLatitude())
                     .longitude(popup.getLongitude())
-                    .geocodingQuery(popup.getGeocodingQuery())
                     .instaPostId(popup.getInstaPostId())
                     .instaPostUrl(popup.getInstaPostUrl())
-                    .likeCount(popup.getLikeCount())
                     .captionSummary(popup.getCaptionSummary())
-                    .caption(popup.getCaption())
                     .imageUrlList(imageUrlList)
                     .mediaType(popup.getMediaType())
-                    .errorCode(popup.getErrorCode())
                     .recommend(recommend)
                     .build());
         }
