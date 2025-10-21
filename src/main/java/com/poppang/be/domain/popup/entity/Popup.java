@@ -62,9 +62,6 @@ public class Popup extends BaseEntity {
     @Column(name = "insta_post_url", nullable = false, length = 255)
     private String instaPostUrl;
 
-    @Column(name = "like_count", nullable = false)
-    private int likeCount;
-
     @Column(name = "caption_summary", nullable = false, columnDefinition = "TEXT")
     private String captionSummary;
 
@@ -77,9 +74,6 @@ public class Popup extends BaseEntity {
 
     @Column(name = "is_active", nullable = false)
     private boolean activated;
-
-    @Column(name = "error_code", length = 255)
-    private String errorCode;
 
     @PrePersist
     private void ensureUuid() {
@@ -104,12 +98,10 @@ public class Popup extends BaseEntity {
                  String geocodingQuery,
                  String instaPostId,
                  String instaPostUrl,
-                 int likeCount,
                  String captionSummary,
                  String caption,
                  MediaType mediaType,
-                 boolean activated,
-                 String errorCode) {
+                 boolean activated) {
         this.id = id;
         this.uuid = uuid;
         this.name = name;
@@ -125,12 +117,10 @@ public class Popup extends BaseEntity {
         this.geocodingQuery = geocodingQuery;
         this.instaPostId = instaPostId;
         this.instaPostUrl = instaPostUrl;
-        this.likeCount = likeCount;
         this.captionSummary = captionSummary;
         this.caption = caption;
         this.mediaType = mediaType;
         this.activated = activated;
-        this.errorCode = errorCode;
     }
 
 }

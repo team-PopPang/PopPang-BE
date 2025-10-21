@@ -1,6 +1,8 @@
 package com.poppang.be.domain.favorite.dto.response;
 
+import com.fasterxml.jackson.annotation.JsonFormat;
 import com.poppang.be.domain.popup.entity.MediaType;
+import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
@@ -13,54 +15,51 @@ import java.util.List;
 @NoArgsConstructor
 public class UserFavoritePopupResponseDto {
 
-    private Long id;
     private String popupUuid;
     private String name;
     private LocalDate startDate;
     private LocalDate endDate;
+
+    @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "HH:mm")
+    @Schema(description = "운영 시작 시간", example = "10:30", type = "string", format = "time")
     private LocalTime openTime;
+
+    @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "HH:mm")
+    @Schema(description = "운영 종료 시간", example = "22:00", type = "string", format = "time")
     private LocalTime closeTime;
+
     private String address;
     private String roadAddress;
     private String region;
     private Double latitude;
     private Double longitude;
-    private String geocodingQuery;
     private String instaPostId;
     private String instaPostUrl;
-    private int likeCount;
     private String captionSummary;
-    private String caption;
 
     private List<String> imageUrlList;
     private MediaType mediaType;
-    private String errorCode;
     private String recommend;
 
     @Builder
-    public UserFavoritePopupResponseDto(Long id,
-                                        String popupUuid,
-                                        String name,
-                                        LocalDate startDate,
-                                        LocalDate endDate,
-                                        LocalTime openTime,
-                                        LocalTime closeTime,
-                                        String address,
-                                        String roadAddress,
-                                        String region,
-                                        Double latitude,
-                                        Double longitude,
-                                        String geocodingQuery,
-                                        String instaPostId,
-                                        String instaPostUrl,
-                                        int likeCount,
-                                        String captionSummary,
-                                        String caption,
-                                        List<String> imageUrlList,
-                                        MediaType mediaType,
-                                        String errorCode,
-                                        String recommend) {
-        this.id = id;
+    public UserFavoritePopupResponseDto(String popupUuid,
+                            String name,
+                            LocalDate startDate,
+                            LocalDate endDate,
+                            LocalTime openTime,
+                            LocalTime closeTime,
+                            String address,
+                            String roadAddress,
+                            String region,
+                            Double latitude,
+                            Double longitude,
+                            String instaPostId,
+                            String instaPostUrl,
+                            String captionSummary,
+                            List<String> imageUrlList,
+                            MediaType mediaType,
+                            String recommend) {
+
         this.popupUuid = popupUuid;
         this.name = name;
         this.startDate = startDate;
@@ -72,15 +71,11 @@ public class UserFavoritePopupResponseDto {
         this.region = region;
         this.latitude = latitude;
         this.longitude = longitude;
-        this.geocodingQuery = geocodingQuery;
         this.instaPostId = instaPostId;
         this.instaPostUrl = instaPostUrl;
-        this.likeCount = likeCount;
         this.captionSummary = captionSummary;
-        this.caption = caption;
         this.imageUrlList = imageUrlList;
         this.mediaType = mediaType;
-        this.errorCode = errorCode;
         this.recommend = recommend;
     }
 

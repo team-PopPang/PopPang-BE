@@ -63,7 +63,6 @@ public class PopupService {
             String recommend = recommendMap.getOrDefault(popup.getId(), null);
 
             popupResponseDtoList.add(PopupResponseDto.builder()
-                    .id((popup.getId()))
                     .popupUuid(popup.getUuid())
                     .name(popup.getName())
                     .startDate(popup.getStartDate())
@@ -75,15 +74,11 @@ public class PopupService {
                     .region(popup.getRegion())
                     .latitude(popup.getLatitude())
                     .longitude(popup.getLongitude())
-                    .geocodingQuery(popup.getGeocodingQuery())
                     .instaPostId(popup.getInstaPostId())
                     .instaPostUrl(popup.getInstaPostUrl())
-                    .likeCount(popup.getLikeCount())
                     .captionSummary(popup.getCaptionSummary())
-                    .caption(popup.getCaption())
                     .imageUrlList(imageUrlList)
                     .mediaType(popup.getMediaType())
-                    .errorCode(popup.getErrorCode())
                     .recommend(recommend)
                     .build());
         }
@@ -152,10 +147,10 @@ public class PopupService {
     @Transactional(readOnly = true)
     public List<PopupResponseDto> getSearchPopupList(String q) {
         String term = (q == null ? "" : q.trim());
-        if(term.isEmpty()) return List.of();
+        if (term.isEmpty()) return List.of();
 
         List<Popup> popupList = popupRepository.searchActivatedByKeyword(term);
-        if(popupList.isEmpty()) return List.of();
+        if (popupList.isEmpty()) return List.of();
 
         List<Long> popupIdList = new ArrayList<>();
         for (Popup popup : popupList) {
@@ -187,7 +182,6 @@ public class PopupService {
             String recommend = recommendMap.getOrDefault(popup.getId(), null);
 
             popupResponseDtoList.add(PopupResponseDto.builder()
-                    .id((popup.getId()))
                     .popupUuid(popup.getUuid())
                     .name(popup.getName())
                     .startDate(popup.getStartDate())
@@ -199,15 +193,11 @@ public class PopupService {
                     .region(popup.getRegion())
                     .latitude(popup.getLatitude())
                     .longitude(popup.getLongitude())
-                    .geocodingQuery(popup.getGeocodingQuery())
                     .instaPostId(popup.getInstaPostId())
                     .instaPostUrl(popup.getInstaPostUrl())
-                    .likeCount(popup.getLikeCount())
                     .captionSummary(popup.getCaptionSummary())
-                    .caption(popup.getCaption())
                     .imageUrlList(imageUrlList)
                     .mediaType(popup.getMediaType())
-                    .errorCode(popup.getErrorCode())
                     .recommend(recommend)
                     .build());
         }
