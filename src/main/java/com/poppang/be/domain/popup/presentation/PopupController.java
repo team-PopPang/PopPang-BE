@@ -4,6 +4,7 @@ import com.poppang.be.domain.popup.application.PopupService;
 import com.poppang.be.domain.popup.dto.request.PopupRegisterRequestDto;
 import com.poppang.be.domain.popup.dto.response.PopupResponseDto;
 import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
@@ -40,6 +41,20 @@ public class PopupController {
         List<PopupResponseDto> searchPopupList = popupService.getSearchPopupList(q);
 
         return ResponseEntity.ok(searchPopupList);
+    }
+
+    @Operation(
+            summary = "다가오는 팝업 조회 (D-1 ~ D-10)",
+            description = "오늘부터 10일 이내에 시작하는 팝업을 반환합니다.",
+            tags = {"[POPUP] 공통"}
+    )
+    @GetMapping("/upcoming")
+    public ResponseEntity<List<PopupResponseDto>> getUpcomingPopupList(
+            @Parameter(description = "며칠 뒤까지 조회 (기본 10)") @RequestParam(name = "upcomingDays", required = false) Integer upcomingDays
+    ) {
+        List<PopupResponseDto> upcomingPopupList = popupService.getUpcomingPopupList(upcomingDays);
+
+        return ResponseEntity.ok(upcomingPopupList);
     }
 
     @Operation(
