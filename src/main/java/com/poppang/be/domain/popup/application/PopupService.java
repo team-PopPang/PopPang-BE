@@ -16,6 +16,7 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -167,6 +168,66 @@ public class PopupService {
                     .add(popupImage.getImageUrl());
         }
 
+        // popup 추천 조회
+        List<PopupRecommend> popupRecommendList = popupRecommendRepository.findAllByPopup_IdIn(popupIdList);
+
+        Map<Long, String> recommendMap = new HashMap<>();
+        for (PopupRecommend popupRecommend : popupRecommendList) {
+            Long popupId = popupRecommend.getPopup().getId();
+            recommendMap.putIfAbsent(popupId, popupRecommend.getRecommend().getRecommendName());
+        }
+
+        List<PopupResponseDto> popupResponseDtoList = new ArrayList<>();
+        for (Popup popup : popupList) {
+            List<String> imageUrlList = imageMap.getOrDefault(popup.getId(), List.of());
+            String recommend = recommendMap.getOrDefault(popup.getId(), null);
+
+            popupResponseDtoList.add(PopupResponseDto.builder()
+                    .popupUuid(popup.getUuid())
+                    .name(popup.getName())
+                    .startDate(popup.getStartDate())
+                    .endDate(popup.getEndDate())
+                    .openTime(popup.getOpenTime())
+                    .closeTime(popup.getCloseTime())
+                    .address(popup.getAddress())
+                    .roadAddress(popup.getRoadAddress())
+                    .region(popup.getRegion())
+                    .latitude(popup.getLatitude())
+                    .longitude(popup.getLongitude())
+                    .instaPostId(popup.getInstaPostId())
+                    .instaPostUrl(popup.getInstaPostUrl())
+                    .captionSummary(popup.getCaptionSummary())
+                    .imageUrlList(imageUrlList)
+                    .mediaType(popup.getMediaType())
+                    .recommend(recommend)
+                    .build());
+        }
+
+        return popupResponseDtoList;
+    }
+
+    public List<PopupResponseDto> getUpcomingPopupList(Integer upcomingDays) {
+        int days = (upcomingDays == null || upcomingDays <= 0) ? 10 : upcomingDays;
+
+        LocalDate startDate = LocalDate.now().plusDays(1);
+        LocalDate endDate = startDate.plusDays(days);
+
+        List<Popup> popupList = popupRepository.findByActivatedTrueAndStartDateBetween(startDate, endDate);
+
+        List<Long> popupIdList = new ArrayList<>();
+        for (Popup popup : popupList) {
+            popupIdList.add(popup.getId());
+        }
+
+        // popup 이미지 조회
+        List<PopupImage> popupImageList = popupImageRepository.findAllByPopup_IdInOrderByPopup_IdAscSortOrderAsc(popupIdList);
+
+        Map<Long, List<String>> imageMap = new HashMap<>();
+        for (PopupImage popupImage : popupImageList) {
+            Long popupId = popupImage.getPopup().getId();
+            imageMap.computeIfAbsent(popupId, k -> new ArrayList<>())
+                    .add(popupImage.getImageUrl());
+        }
         // popup 추천 조회
         List<PopupRecommend> popupRecommendList = popupRecommendRepository.findAllByPopup_IdIn(popupIdList);
 
