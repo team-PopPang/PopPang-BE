@@ -3,6 +3,7 @@ package com.poppang.be.domain.users.entity;
 import com.poppang.be.common.entity.BaseEntity;
 import com.poppang.be.common.enums.Role;
 import com.poppang.be.domain.auth.kakao.dto.request.SignupRequestDto;
+import com.poppang.be.domain.users.dto.request.ChangeNicknameRequestDto;
 import jakarta.persistence.*;
 import lombok.AccessLevel;
 import lombok.Builder;
@@ -35,7 +36,7 @@ public class Users extends BaseEntity {
     @Column(name = "email", nullable = true, length = 255)
     private String email;
 
-    @Column(name = "nickname", nullable = true, length = 255)
+    @Column(name = "nickname", nullable = true, length = 255, unique = true)
     private String nickname;
 
     @Enumerated(EnumType.STRING)
@@ -86,6 +87,10 @@ public class Users extends BaseEntity {
         this.nickname = signupRequestDto.getNickname();
         this.alerted = signupRequestDto.isAlerted();
         this.fcmToken = signupRequestDto.getFcmToken();
+    }
+
+    public void changeNickname(ChangeNicknameRequestDto changeNicknameRequestDto) {
+        this.nickname = changeNicknameRequestDto.getNickname();
     }
 
 }
