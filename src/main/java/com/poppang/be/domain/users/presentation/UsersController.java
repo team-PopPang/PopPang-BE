@@ -42,4 +42,30 @@ public class UsersController {
         return ResponseEntity.ok().build();
     }
 
+    @Operation(
+            summary = "유저 탈퇴 기능 (soft-delete)",
+            description = "유저 회원탈퇴를 진행합니다. (soft-delete)라서 데이터는 복구 가능한 상태입니다. "
+    )
+    @PatchMapping("/{userUuid}/delete")
+    public ResponseEntity<Void> softDeleteUser(
+            @PathVariable String userUuid
+    ) {
+        usersService.softDeleteUser(userUuid);
+
+        return ResponseEntity.ok().build();
+    }
+
+    @Operation(
+            summary = "유저 복구 기능 (soft-delete 복구)",
+            description = "유저 복구를 진행합니다. 테스트 환경에서 사용하기 위한 API입니다. "
+    )
+    @PatchMapping("/{userUuid}/resotre")
+    public ResponseEntity<Void> restoreUser(
+            @PathVariable String userUuid
+    ) {
+        usersService.restoreUser(userUuid);
+
+        return ResponseEntity.ok().build();
+    }
+
 }
