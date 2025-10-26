@@ -93,4 +93,11 @@ public class Users extends BaseEntity {
         this.nickname = changeNicknameRequestDto.getNickname();
     }
 
+    public void softDelete() {
+        this.deleted = true;
+    }
+
+    public void restore() {
+        this.deleted = false;
+    }
 }

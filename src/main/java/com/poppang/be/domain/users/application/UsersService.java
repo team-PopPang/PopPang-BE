@@ -38,4 +38,22 @@ public class UsersService {
         user.changeNickname(changeNicknameRequestDto);
     }
 
+    @Transactional
+    public void softDeleteUser(String userUuid) {
+
+        Users user = usersRepository.findByUuid(userUuid)
+                .orElseThrow(() -> new IllegalArgumentException("유저를 찾을 수 없습니다."));
+
+        user.softDelete();
+    }
+
+    @Transactional
+    public void restoreUser(String userUuid) {
+
+        Users user = usersRepository.findByUuid(userUuid)
+                .orElseThrow(() -> new IllegalArgumentException("유저를 찾을 수 없습니다."));
+
+        user.restore();
+    }
+
 }
