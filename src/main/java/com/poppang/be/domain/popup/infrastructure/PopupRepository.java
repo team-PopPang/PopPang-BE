@@ -26,4 +26,14 @@ public interface PopupRepository extends JpaRepository<Popup, Long> {
 
     List<Popup> findByActivatedTrueAndStartDateBetween(LocalDate startDate, LocalDate endDate);
 
+    @Query("""
+            select p
+            from Popup p
+            where p.activated = true
+            and p.startDate <= CURRENT DATE 
+            and p.endDate >= CURRENT DATE 
+            order by p.startDate asc 
+             """)
+    List<Popup> findInProgressPopupList();
+
 }

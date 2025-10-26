@@ -58,12 +58,26 @@ public class PopupController {
     }
 
     @Operation(
+            summary = "진행 중인 팝업 조회",
+            description = "현재 날짜 기준으로 오픈 중(진행 중)인 모든 팝업스토어 정보를 조회합니다. " +
+                    "시작일(`start_date`)이 오늘 이전이거나 같고, 종료일(`end_date`)이 오늘 이후이거나 같은 팝업만 반환됩니다.",
+            tags = {"[POPUP] 공통"}
+    )
+    @GetMapping("/inProgress")
+    public ResponseEntity<List<PopupResponseDto>> getInProgressPopupList() {
+        List<PopupResponseDto> inProgressPopupList = popupService.getInProgressPopupList();
+
+        return ResponseEntity.ok(inProgressPopupList);
+    }
+
+    @Operation(
             summary = "팝업 등록",
             description = "크롤링 또는 관리자가 신규 팝업스토어 데이터를 등록합니다. " +
                     "이미지 리스트(`imageList`)와 추천 ID(`recommendIds`)를 함께 전달해야 합니다."
     )
     @PostMapping
     public ResponseEntity<Void> registerPopup(@RequestBody PopupRegisterRequestDto popupRegisterRequestDto) {
+
         popupService.registerPopup(popupRegisterRequestDto);
 
         return ResponseEntity.ok().build();
