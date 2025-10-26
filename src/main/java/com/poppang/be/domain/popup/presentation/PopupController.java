@@ -22,7 +22,7 @@ public class PopupController {
 
     @Operation(
             summary = "팝업 전체 조회",
-            description = "현재 활성화된 모든 팝업스토어 정보를 조회합니다."
+            description = "모든 팝업스토어 정보를 조회합니다. (비활성화된 팝업 포함)"
     )
     @GetMapping
     public ResponseEntity<List<PopupResponseDto>> getAllPopupList() {
