@@ -3,6 +3,7 @@ package com.poppang.be.domain.popup.presentation;
 import com.poppang.be.domain.popup.application.PopupService;
 import com.poppang.be.domain.popup.dto.request.PopupRegisterRequestDto;
 import com.poppang.be.domain.popup.dto.response.PopupResponseDto;
+import com.poppang.be.domain.popup.dto.response.RegionDistrictsResponse;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.tags.Tag;
@@ -77,10 +78,21 @@ public class PopupController {
     )
     @PostMapping
     public ResponseEntity<Void> registerPopup(@RequestBody PopupRegisterRequestDto popupRegisterRequestDto) {
-
         popupService.registerPopup(popupRegisterRequestDto);
 
         return ResponseEntity.ok().build();
+    }
+
+    @Operation(
+            summary = "지역/구 목록 조회",
+            description = "DB의 popup.road_address를 분석하여 지역별 구 목록을 반환합니다. "
+                    + "서울은 '전체'와 실제 'OO구'들을 포함하고, 서울 외 지역은 '전체'만 포함합니다."
+    )
+    @GetMapping("/regions/districts")
+    public ResponseEntity<List<RegionDistrictsResponse>> getRegionDistricts() {
+        List<RegionDistrictsResponse> regionDistrictsResponseList = popupService.getRegionDistricts();
+
+        return ResponseEntity.ok(regionDistrictsResponseList);
     }
 
 }
