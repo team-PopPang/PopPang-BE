@@ -1,8 +1,11 @@
 package com.poppang.be.domain.popup.application;
 
+import com.fasterxml.jackson.core.type.TypeReference;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import com.poppang.be.domain.popup.dto.request.PopupImageUpsertRequestDto;
 import com.poppang.be.domain.popup.dto.request.PopupRegisterRequestDto;
 import com.poppang.be.domain.popup.dto.response.PopupResponseDto;
+import com.poppang.be.domain.popup.dto.response.RegionDistrictsResponse;
 import com.poppang.be.domain.popup.entity.MediaType;
 import com.poppang.be.domain.popup.entity.Popup;
 import com.poppang.be.domain.popup.entity.PopupImage;
@@ -30,6 +33,7 @@ public class PopupService {
     private final PopupImageRepository popupImageRepository;
     private final RecommendRepository recommendRepository;
     private final PopupRecommendRepository popupRecommendRepository;
+    private final ObjectMapper objectMapper;
 
     public List<PopupResponseDto> getAllPopupList() {
         List<Popup> popupList = popupRepository.findAll();
@@ -318,6 +322,33 @@ public class PopupService {
         }
 
         return popupResponseDtoList;
+    }
+
+    @Transactional(readOnly = true)
+    public List<RegionDistrictsResponse> getRegionDistricts() {
+        List<PopupRepository.RegionDistrictsRaw> rawList = popupRepository.findRegionDistrictsJson();
+        List<RegionDistrictsResponse> regionDistrictsResponseList = new ArrayList<>();
+
+        for (PopupRepository.RegionDistrictsRaw regionDistrictsRaw : rawList) {
+            try {
+                List<String> districts = objectMapper.readValue(
+                        regionDistrictsRaw.getDistricts(),
+                        new TypeReference<List<String>>() {
+                        }
+                );
+
+                RegionDistrictsResponse regionDistrictsResponse = RegionDistrictsResponse.builder()
+                        .region(regionDistrictsRaw.getRegion())
+                        .districts(districts)
+                        .build();
+
+                regionDistrictsResponseList.add(regionDistrictsResponse);
+            } catch (Exception e) {
+                throw new RuntimeException("지역/구 JSON 파싱 오류: " + regionDistrictsRaw.getDistricts(), e);
+            }
+        }
+
+        return regionDistrictsResponseList;
     }
 
 }
