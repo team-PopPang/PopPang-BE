@@ -339,7 +339,7 @@ public class PopupService {
 
                 RegionDistrictsResponse regionDistrictsResponse = RegionDistrictsResponse.builder()
                         .region(regionDistrictsRaw.getRegion())
-                        .districts(districts)
+                        .districtList(districts)
                         .build();
 
                 regionDistrictsResponseList.add(regionDistrictsResponse);
