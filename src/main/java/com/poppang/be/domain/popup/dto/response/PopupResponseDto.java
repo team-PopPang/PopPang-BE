@@ -40,6 +40,8 @@ public class PopupResponseDto {
     private List<String> imageUrlList;
     private MediaType mediaType;
     private String recommend;
+    private long favoriteCount;
+    private long viewCount;
 
     @Builder
     public PopupResponseDto(String popupUuid,
@@ -58,7 +60,9 @@ public class PopupResponseDto {
                             String captionSummary,
                             List<String> imageUrlList,
                             MediaType mediaType,
-                            String recommend) {
+                            String recommend,
+                            long favoriteCount,
+                            long viewCount) {
 
         this.popupUuid = popupUuid;
         this.name = name;
@@ -77,6 +81,8 @@ public class PopupResponseDto {
         this.imageUrlList = imageUrlList;
         this.mediaType = mediaType;
         this.recommend = recommend;
+        this.favoriteCount = favoriteCount;
+        this.viewCount = viewCount;
     }
 
 }

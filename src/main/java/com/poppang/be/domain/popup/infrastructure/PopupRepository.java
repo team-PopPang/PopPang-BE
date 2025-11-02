@@ -38,9 +38,16 @@ public interface PopupRepository extends JpaRepository<Popup, Long> {
 
     // 네이티브 결과를 가볍게 받기 위한 Projection
     interface RegionDistrictsRaw {
-        String getRegion();     // SELECT 별칭: region
-        String getDistricts();  // SELECT 별칭: districts (JSON 문자열)
+        String getRegion();
+        String getDistricts();
     }
+
+    @Query("""
+            select p.uuid as uuid
+            from Popup p
+            where p.id in :ids
+            """)
+    List<String> findAllUuidByIdIn(@Param("ids") List<Long> ids);
 
     @Query(value = """
         SELECT
@@ -50,7 +57,10 @@ public interface PopupRepository extends JpaRepository<Popup, Long> {
                 GROUP_CONCAT(
                     DISTINCT CONCAT('"', district, '"')
                     ORDER BY
-                        CASE WHEN district = '전체' THEN 0 ELSE 1 END,
+                        CASE
+                            WHEN district = '전체' THEN 0
+                            ELSE 1
+                        END,
                         district
                     SEPARATOR ','
                 ),
@@ -58,7 +68,6 @@ public interface PopupRepository extends JpaRepository<Popup, Long> {
             ) AS districts
         FROM (
             SELECT '전체' AS region, '전체' AS district
-
             UNION ALL
             SELECT '서울' AS region, '전체' AS district
             UNION ALL
@@ -71,7 +80,6 @@ public interface PopupRepository extends JpaRepository<Popup, Long> {
             FROM popup
             WHERE road_address LIKE '%구%'
               AND SUBSTRING_INDEX(road_address, ' ', 1) = '서울'
-
             UNION ALL
             SELECT DISTINCT
                 SUBSTRING_INDEX(road_address, ' ', 1) AS region,
@@ -83,7 +91,10 @@ public interface PopupRepository extends JpaRepository<Popup, Long> {
         WHERE district <> '구'
         GROUP BY region
         ORDER BY
-            CASE WHEN region = '전체' THEN 0 ELSE 1 END,
+            CASE
+                WHEN region = '전체' THEN 0
+                ELSE 1
+            END,
             region
         """, nativeQuery = true)
     List<RegionDistrictsRaw> findRegionDistrictsJson();

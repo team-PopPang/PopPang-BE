@@ -3,15 +3,16 @@ package com.poppang.be.domain.favorite.application;
 import com.poppang.be.domain.favorite.dto.request.UserFavoriteDeleteRequestDto;
 import com.poppang.be.domain.favorite.dto.request.UserFavoriteRegisterRequestDto;
 import com.poppang.be.domain.favorite.dto.response.FavoriteCountResponseDto;
-import com.poppang.be.domain.favorite.dto.response.UserFavoritePopupResponseDto;
 import com.poppang.be.domain.favorite.entity.UserFavorite;
 import com.poppang.be.domain.favorite.infrastructure.UserFavoriteRepository;
+import com.poppang.be.domain.popup.dto.response.PopupResponseDto;
 import com.poppang.be.domain.popup.entity.Popup;
 import com.poppang.be.domain.popup.entity.PopupImage;
 import com.poppang.be.domain.popup.entity.PopupRecommend;
 import com.poppang.be.domain.popup.infrastructure.PopupImageRepository;
 import com.poppang.be.domain.popup.infrastructure.PopupRecommendRepository;
 import com.poppang.be.domain.popup.infrastructure.PopupRepository;
+import com.poppang.be.domain.popup.infrastructure.PopupTotalViewCountRepository;
 import com.poppang.be.domain.users.entity.Users;
 import com.poppang.be.domain.users.infrastructure.UsersRepository;
 import lombok.RequiredArgsConstructor;
@@ -32,6 +33,8 @@ public class UserFavoriteService {
     private final UserFavoriteRepository userFavoriteRepository;
     private final PopupImageRepository popupImageRepository;
     private final PopupRecommendRepository popupRecommendRepository;
+    private final PopupTotalViewCountRepository popupTotalViewCountRepository;
+
 
     @Transactional
     public void registerFavorite(UserFavoriteRegisterRequestDto userFavoriteRegisterRequestDto) {
@@ -66,7 +69,7 @@ public class UserFavoriteService {
         return FavoriteCountResponseDto.from(count);
     }
 
-    public List<UserFavoritePopupResponseDto> getFavoritePopupList(String userUuid) {
+    public List<PopupResponseDto> getFavoritePopupList(String userUuid) {
         Users user = usersRepository.findByUuid(userUuid)
                 .orElseThrow(() -> new IllegalArgumentException("유저를 찾을 수 없습니다."));
 
@@ -76,32 +79,40 @@ public class UserFavoriteService {
                 .map(userFavorite -> userFavorite.getPopup().getId())
                 .toList();
 
-        // popup 이미지 조회
-        List<PopupImage> popupImageList = popupImageRepository.findAllByPopup_IdInOrderByPopup_IdAscSortOrderAsc(popupIdList);
+        List<Popup> popupList = popupRepository.findAllById(popupIdList);
+        List<String> popupUuidList = popupRepository.findAllUuidByIdIn(popupIdList);
 
+        // 팝업 이미지
+        List<PopupImage> images = popupImageRepository.findAllByPopup_IdInOrderByPopup_IdAscSortOrderAsc(popupIdList);
         Map<Long, List<String>> imageMap = new HashMap<>();
-        for (PopupImage popupImage : popupImageList) {
-            Long popupId = popupImage.getPopup().getId();
-            imageMap.computeIfAbsent(popupId, k -> new ArrayList<>())
-                    .add(popupImage.getImageUrl());
+        for (PopupImage img : images) {
+            imageMap.computeIfAbsent(img.getPopup().getId(), k -> new ArrayList<>()).add(img.getImageUrl());
         }
 
-        // popup 추천 조회
-        List<PopupRecommend> popupRecommendList = popupRecommendRepository.findAllByPopup_IdIn(popupIdList);
-
+        // 추천
+        List<PopupRecommend> recs = popupRecommendRepository.findAllByPopup_IdIn(popupIdList);
         Map<Long, String> recommendMap = new HashMap<>();
-        for (PopupRecommend popupRecommend : popupRecommendList) {
-            Long popupId = popupRecommend.getPopup().getId();
-            recommendMap.putIfAbsent(popupId, popupRecommend.getRecommend().getRecommendName());
+        for (PopupRecommend r : recs) {
+            recommendMap.putIfAbsent(r.getPopup().getId(), r.getRecommend().getRecommendName());
         }
 
-        List<UserFavoritePopupResponseDto> userFavoritePopupResponseDtoList = new ArrayList<>();
-        for (UserFavorite userFavorite : userFavoriteList) {
-            Popup popup = userFavorite.getPopup();
-            List<String> imageUrlList = imageMap.getOrDefault(popup.getId(), List.of());
-            String recommend = recommendMap.getOrDefault(popup.getId(), null);
+        // 좋아요 수 배치
+        Map<Long, Long> favoriteCountMap = new HashMap<>();
+        for (var row : userFavoriteRepository.countAllByPopupIds(popupIdList)) {
+            favoriteCountMap.put(row.getPopupId(), row.getCnt());
+        }
 
-            userFavoritePopupResponseDtoList.add(UserFavoritePopupResponseDto.builder()
+        // 조회수 배치
+        Map<String, Long> viewCountMap = new HashMap<>();
+        for (var row : popupTotalViewCountRepository.findAllViewCounts(popupUuidList)) {
+            viewCountMap.put(row.getPopupUuid(),
+                    row.getViewCount() == null ? 0L : row.getViewCount());
+        }
+
+        // DTO 조립
+        List<PopupResponseDto> popupResponseDtoList = new ArrayList<>(popupList.size());
+        for (Popup popup : popupList) {
+            popupResponseDtoList.add(PopupResponseDto.builder()
                     .popupUuid(popup.getUuid())
                     .name(popup.getName())
                     .startDate(popup.getStartDate())
@@ -116,13 +127,14 @@ public class UserFavoriteService {
                     .instaPostId(popup.getInstaPostId())
                     .instaPostUrl(popup.getInstaPostUrl())
                     .captionSummary(popup.getCaptionSummary())
-                    .imageUrlList(imageUrlList)
+                    .imageUrlList(imageMap.getOrDefault(popup.getId(), List.of()))
                     .mediaType(popup.getMediaType())
-                    .recommend(recommend)
+                    .recommend(recommendMap.getOrDefault(popup.getId(), null))
+                    .favoriteCount(favoriteCountMap.getOrDefault(popup.getId(), 0L))
+                    .viewCount(viewCountMap.getOrDefault(popup.getUuid(), 0L))
                     .build());
         }
 
-        return userFavoritePopupResponseDtoList;
+        return popupResponseDtoList;
     }
-
 }

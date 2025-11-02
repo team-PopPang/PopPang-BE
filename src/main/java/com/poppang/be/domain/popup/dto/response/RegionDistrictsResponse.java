@@ -11,13 +11,13 @@ import java.util.List;
 public class RegionDistrictsResponse {
 
     private String region;
-    private List<String> districts;
+    private List<String> districtList;
 
     @Builder
     public RegionDistrictsResponse(String region,
-                                   List<String> districts) {
+                                   List<String> districtList) {
         this.region = region;
-        this.districts = districts;
+        this.districtList = districtList;
     }
 
 }

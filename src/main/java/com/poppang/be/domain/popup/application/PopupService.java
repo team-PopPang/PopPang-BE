@@ -2,6 +2,7 @@ package com.poppang.be.domain.popup.application;
 
 import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.poppang.be.domain.favorite.infrastructure.UserFavoriteRepository;
 import com.poppang.be.domain.popup.dto.request.PopupImageUpsertRequestDto;
 import com.poppang.be.domain.popup.dto.request.PopupRegisterRequestDto;
 import com.poppang.be.domain.popup.dto.response.PopupResponseDto;
@@ -13,6 +14,7 @@ import com.poppang.be.domain.popup.entity.PopupRecommend;
 import com.poppang.be.domain.popup.infrastructure.PopupImageRepository;
 import com.poppang.be.domain.popup.infrastructure.PopupRecommendRepository;
 import com.poppang.be.domain.popup.infrastructure.PopupRepository;
+import com.poppang.be.domain.popup.infrastructure.PopupTotalViewCountRepository;
 import com.poppang.be.domain.recommend.entity.Recommend;
 import com.poppang.be.domain.recommend.infrastructure.RecommendRepository;
 import lombok.RequiredArgsConstructor;
@@ -33,40 +35,51 @@ public class PopupService {
     private final PopupImageRepository popupImageRepository;
     private final RecommendRepository recommendRepository;
     private final PopupRecommendRepository popupRecommendRepository;
+    private final UserFavoriteRepository userFavoriteRepository;
+    private final PopupTotalViewCountRepository popupTotalViewCountRepository;
     private final ObjectMapper objectMapper;
 
     public List<PopupResponseDto> getAllPopupList() {
         List<Popup> popupList = popupRepository.findAll();
 
-        List<Long> popupIdList = new ArrayList<>();
+        // id/uuid 수집
+        List<Long> popupIdList = new ArrayList<>(popupList.size());
+        List<String> popupUuidList = new ArrayList<>(popupList.size());
         for (Popup popup : popupList) {
             popupIdList.add(popup.getId());
+            popupUuidList.add(popup.getUuid());
         }
 
-        // popup 이미지 조회
-        List<PopupImage> popupImageList = popupImageRepository.findAllByPopup_IdInOrderByPopup_IdAscSortOrderAsc(popupIdList);
-
+        // 팝업 이미지
+        List<PopupImage> images = popupImageRepository.findAllByPopup_IdInOrderByPopup_IdAscSortOrderAsc(popupIdList);
         Map<Long, List<String>> imageMap = new HashMap<>();
-        for (PopupImage popupImage : popupImageList) {
-            Long popupId = popupImage.getPopup().getId();
-            imageMap.computeIfAbsent(popupId, k -> new ArrayList<>())
-                    .add(popupImage.getImageUrl());
+        for (PopupImage img : images) {
+            imageMap.computeIfAbsent(img.getPopup().getId(), k -> new ArrayList<>()).add(img.getImageUrl());
         }
 
-        // popup 추천 조회
-        List<PopupRecommend> popupRecommendList = popupRecommendRepository.findAllByPopup_IdIn(popupIdList);
-
+        // 추천
+        List<PopupRecommend> recs = popupRecommendRepository.findAllByPopup_IdIn(popupIdList);
         Map<Long, String> recommendMap = new HashMap<>();
-        for (PopupRecommend popupRecommend : popupRecommendList) {
-            Long popupId = popupRecommend.getPopup().getId();
-            recommendMap.putIfAbsent(popupId, popupRecommend.getRecommend().getRecommendName());
+        for (PopupRecommend r : recs) {
+            recommendMap.putIfAbsent(r.getPopup().getId(), r.getRecommend().getRecommendName());
         }
 
-        List<PopupResponseDto> popupResponseDtoList = new ArrayList<>();
-        for (Popup popup : popupList) {
-            List<String> imageUrlList = imageMap.getOrDefault(popup.getId(), List.of());
-            String recommend = recommendMap.getOrDefault(popup.getId(), null);
+        // 좋아요 수 배치
+        Map<Long, Long> favoriteCountMap = new HashMap<>();
+        for (var row : userFavoriteRepository.countAllByPopupIds(popupIdList)) {
+            favoriteCountMap.put(row.getPopupId(), row.getCnt());
+        }
 
+        // 조회수 배치
+        Map<String, Long> viewCountMap = new HashMap<>();
+        for (var row : popupTotalViewCountRepository.findAllViewCounts(popupUuidList)) {
+            viewCountMap.put(row.getPopupUuid(),
+                    row.getViewCount() == null ? 0L : row.getViewCount());
+        }
+
+        // DTO 조립
+        List<PopupResponseDto> popupResponseDtoList = new ArrayList<>(popupList.size());
+        for (Popup popup : popupList) {
             popupResponseDtoList.add(PopupResponseDto.builder()
                     .popupUuid(popup.getUuid())
                     .name(popup.getName())
@@ -82,12 +95,13 @@ public class PopupService {
                     .instaPostId(popup.getInstaPostId())
                     .instaPostUrl(popup.getInstaPostUrl())
                     .captionSummary(popup.getCaptionSummary())
-                    .imageUrlList(imageUrlList)
+                    .imageUrlList(imageMap.getOrDefault(popup.getId(), List.of()))
                     .mediaType(popup.getMediaType())
-                    .recommend(recommend)
+                    .recommend(recommendMap.getOrDefault(popup.getId(), null))
+                    .favoriteCount(favoriteCountMap.getOrDefault(popup.getId(), 0L))
+                    .viewCount(viewCountMap.getOrDefault(popup.getUuid(), 0L))
                     .build());
         }
-
         return popupResponseDtoList;
 
     }
@@ -158,34 +172,42 @@ public class PopupService {
         if (popupList.isEmpty()) return List.of();
 
         List<Long> popupIdList = new ArrayList<>();
+        List<String> popupUuidList = new ArrayList<>();
         for (Popup popup : popupList) {
             popupIdList.add(popup.getId());
+            popupUuidList.add(popup.getUuid());
         }
 
-        // popup 이미지 조회
-        List<PopupImage> popupImageList = popupImageRepository.findAllByPopup_IdInOrderByPopup_IdAscSortOrderAsc(popupIdList);
-
+        // 팝업 이미지
+        List<PopupImage> images = popupImageRepository.findAllByPopup_IdInOrderByPopup_IdAscSortOrderAsc(popupIdList);
         Map<Long, List<String>> imageMap = new HashMap<>();
-        for (PopupImage popupImage : popupImageList) {
-            Long popupId = popupImage.getPopup().getId();
-            imageMap.computeIfAbsent(popupId, k -> new ArrayList<>())
-                    .add(popupImage.getImageUrl());
+        for (PopupImage img : images) {
+            imageMap.computeIfAbsent(img.getPopup().getId(), k -> new ArrayList<>()).add(img.getImageUrl());
         }
 
-        // popup 추천 조회
-        List<PopupRecommend> popupRecommendList = popupRecommendRepository.findAllByPopup_IdIn(popupIdList);
-
+        // 추천
+        List<PopupRecommend> recs = popupRecommendRepository.findAllByPopup_IdIn(popupIdList);
         Map<Long, String> recommendMap = new HashMap<>();
-        for (PopupRecommend popupRecommend : popupRecommendList) {
-            Long popupId = popupRecommend.getPopup().getId();
-            recommendMap.putIfAbsent(popupId, popupRecommend.getRecommend().getRecommendName());
+        for (PopupRecommend r : recs) {
+            recommendMap.putIfAbsent(r.getPopup().getId(), r.getRecommend().getRecommendName());
         }
 
-        List<PopupResponseDto> popupResponseDtoList = new ArrayList<>();
-        for (Popup popup : popupList) {
-            List<String> imageUrlList = imageMap.getOrDefault(popup.getId(), List.of());
-            String recommend = recommendMap.getOrDefault(popup.getId(), null);
+        // 좋아요 수 배치
+        Map<Long, Long> favoriteCountMap = new HashMap<>();
+        for (var row : userFavoriteRepository.countAllByPopupIds(popupIdList)) {
+            favoriteCountMap.put(row.getPopupId(), row.getCnt());
+        }
 
+        // 조회수 배치
+        Map<String, Long> viewCountMap = new HashMap<>();
+        for (var row : popupTotalViewCountRepository.findAllViewCounts(popupUuidList)) {
+            viewCountMap.put(row.getPopupUuid(),
+                    row.getViewCount() == null ? 0L : row.getViewCount());
+        }
+
+        // DTO 조립
+        List<PopupResponseDto> popupResponseDtoList = new ArrayList<>(popupList.size());
+        for (Popup popup : popupList) {
             popupResponseDtoList.add(PopupResponseDto.builder()
                     .popupUuid(popup.getUuid())
                     .name(popup.getName())
@@ -201,9 +223,11 @@ public class PopupService {
                     .instaPostId(popup.getInstaPostId())
                     .instaPostUrl(popup.getInstaPostUrl())
                     .captionSummary(popup.getCaptionSummary())
-                    .imageUrlList(imageUrlList)
+                    .imageUrlList(imageMap.getOrDefault(popup.getId(), List.of()))
                     .mediaType(popup.getMediaType())
-                    .recommend(recommend)
+                    .recommend(recommendMap.getOrDefault(popup.getId(), null))
+                    .favoriteCount(favoriteCountMap.getOrDefault(popup.getId(), 0L))
+                    .viewCount(viewCountMap.getOrDefault(popup.getUuid(), 0L))
                     .build());
         }
 
@@ -219,33 +243,42 @@ public class PopupService {
         List<Popup> popupList = popupRepository.findByActivatedTrueAndStartDateBetween(startDate, endDate);
 
         List<Long> popupIdList = new ArrayList<>();
+        List<String> popupUuidList = new ArrayList<>();
         for (Popup popup : popupList) {
             popupIdList.add(popup.getId());
+            popupUuidList.add(popup.getUuid());
         }
 
-        // popup 이미지 조회
-        List<PopupImage> popupImageList = popupImageRepository.findAllByPopup_IdInOrderByPopup_IdAscSortOrderAsc(popupIdList);
-
+        // 팝업 이미지
+        List<PopupImage> images = popupImageRepository.findAllByPopup_IdInOrderByPopup_IdAscSortOrderAsc(popupIdList);
         Map<Long, List<String>> imageMap = new HashMap<>();
-        for (PopupImage popupImage : popupImageList) {
-            Long popupId = popupImage.getPopup().getId();
-            imageMap.computeIfAbsent(popupId, k -> new ArrayList<>())
-                    .add(popupImage.getImageUrl());
+        for (PopupImage img : images) {
+            imageMap.computeIfAbsent(img.getPopup().getId(), k -> new ArrayList<>()).add(img.getImageUrl());
         }
-        // popup 추천 조회
-        List<PopupRecommend> popupRecommendList = popupRecommendRepository.findAllByPopup_IdIn(popupIdList);
 
+        // 추천
+        List<PopupRecommend> recs = popupRecommendRepository.findAllByPopup_IdIn(popupIdList);
         Map<Long, String> recommendMap = new HashMap<>();
-        for (PopupRecommend popupRecommend : popupRecommendList) {
-            Long popupId = popupRecommend.getPopup().getId();
-            recommendMap.putIfAbsent(popupId, popupRecommend.getRecommend().getRecommendName());
+        for (PopupRecommend r : recs) {
+            recommendMap.putIfAbsent(r.getPopup().getId(), r.getRecommend().getRecommendName());
         }
 
-        List<PopupResponseDto> popupResponseDtoList = new ArrayList<>();
-        for (Popup popup : popupList) {
-            List<String> imageUrlList = imageMap.getOrDefault(popup.getId(), List.of());
-            String recommend = recommendMap.getOrDefault(popup.getId(), null);
+        // 좋아요 수 배치
+        Map<Long, Long> favoriteCountMap = new HashMap<>();
+        for (var row : userFavoriteRepository.countAllByPopupIds(popupIdList)) {
+            favoriteCountMap.put(row.getPopupId(), row.getCnt());
+        }
 
+        // 조회수 배치
+        Map<String, Long> viewCountMap = new HashMap<>();
+        for (var row : popupTotalViewCountRepository.findAllViewCounts(popupUuidList)) {
+            viewCountMap.put(row.getPopupUuid(),
+                    row.getViewCount() == null ? 0L : row.getViewCount());
+        }
+
+        // DTO 조립
+        List<PopupResponseDto> popupResponseDtoList = new ArrayList<>(popupList.size());
+        for (Popup popup : popupList) {
             popupResponseDtoList.add(PopupResponseDto.builder()
                     .popupUuid(popup.getUuid())
                     .name(popup.getName())
@@ -261,45 +294,56 @@ public class PopupService {
                     .instaPostId(popup.getInstaPostId())
                     .instaPostUrl(popup.getInstaPostUrl())
                     .captionSummary(popup.getCaptionSummary())
-                    .imageUrlList(imageUrlList)
+                    .imageUrlList(imageMap.getOrDefault(popup.getId(), List.of()))
                     .mediaType(popup.getMediaType())
-                    .recommend(recommend)
+                    .recommend(recommendMap.getOrDefault(popup.getId(), null))
+                    .favoriteCount(favoriteCountMap.getOrDefault(popup.getId(), 0L))
+                    .viewCount(viewCountMap.getOrDefault(popup.getUuid(), 0L))
                     .build());
         }
-
         return popupResponseDtoList;
+
     }
 
     public List<PopupResponseDto> getInProgressPopupList() {
-        List<Popup> inProgressPopupList = popupRepository.findInProgressPopupList();
+        List<Popup> popupList = popupRepository.findInProgressPopupList();
         List<Long> popupIdList = new ArrayList<>();
-        for (Popup popup : inProgressPopupList) {
+        List<String> popupUuidList = new ArrayList<>();
+        for (Popup popup : popupList) {
             popupIdList.add(popup.getId());
+            popupUuidList.add(popup.getUuid());
         }
 
-        // popup 이미지 조회
-        List<PopupImage> popupImageList = popupImageRepository.findAllByPopup_IdInOrderByPopup_IdAscSortOrderAsc(popupIdList);
-
+        // 팝업 이미지
+        List<PopupImage> images = popupImageRepository.findAllByPopup_IdInOrderByPopup_IdAscSortOrderAsc(popupIdList);
         Map<Long, List<String>> imageMap = new HashMap<>();
-        for (PopupImage popupImage : popupImageList) {
-            Long popupId = popupImage.getPopup().getId();
-            imageMap.computeIfAbsent(popupId, k -> new ArrayList<>())
-                    .add(popupImage.getImageUrl());
+        for (PopupImage img : images) {
+            imageMap.computeIfAbsent(img.getPopup().getId(), k -> new ArrayList<>()).add(img.getImageUrl());
         }
-        // popup 추천 조회
-        List<PopupRecommend> popupRecommendList = popupRecommendRepository.findAllByPopup_IdIn(popupIdList);
 
+        // 추천
+        List<PopupRecommend> recs = popupRecommendRepository.findAllByPopup_IdIn(popupIdList);
         Map<Long, String> recommendMap = new HashMap<>();
-        for (PopupRecommend popupRecommend : popupRecommendList) {
-            Long popupId = popupRecommend.getPopup().getId();
-            recommendMap.putIfAbsent(popupId, popupRecommend.getRecommend().getRecommendName());
+        for (PopupRecommend r : recs) {
+            recommendMap.putIfAbsent(r.getPopup().getId(), r.getRecommend().getRecommendName());
         }
 
-        List<PopupResponseDto> popupResponseDtoList = new ArrayList<>();
-        for (Popup popup : inProgressPopupList) {
-            List<String> imageUrlList = imageMap.getOrDefault(popup.getId(), List.of());
-            String recommend = recommendMap.getOrDefault(popup.getId(), null);
+        // 좋아요 수 배치
+        Map<Long, Long> favoriteCountMap = new HashMap<>();
+        for (var row : userFavoriteRepository.countAllByPopupIds(popupIdList)) {
+            favoriteCountMap.put(row.getPopupId(), row.getCnt());
+        }
 
+        // 조회수 배치
+        Map<String, Long> viewCountMap = new HashMap<>();
+        for (var row : popupTotalViewCountRepository.findAllViewCounts(popupUuidList)) {
+            viewCountMap.put(row.getPopupUuid(),
+                    row.getViewCount() == null ? 0L : row.getViewCount());
+        }
+
+        // DTO 조립
+        List<PopupResponseDto> popupResponseDtoList = new ArrayList<>(popupList.size());
+        for (Popup popup : popupList) {
             popupResponseDtoList.add(PopupResponseDto.builder()
                     .popupUuid(popup.getUuid())
                     .name(popup.getName())
@@ -315,12 +359,14 @@ public class PopupService {
                     .instaPostId(popup.getInstaPostId())
                     .instaPostUrl(popup.getInstaPostUrl())
                     .captionSummary(popup.getCaptionSummary())
-                    .imageUrlList(imageUrlList)
+                    .imageUrlList(imageMap.getOrDefault(popup.getId(), List.of()))
                     .mediaType(popup.getMediaType())
-                    .recommend(recommend)
+                    .recommend(recommendMap.getOrDefault(popup.getId(), null))
+                    .favoriteCount(favoriteCountMap.getOrDefault(popup.getId(), 0L))
+                    .viewCount(viewCountMap.getOrDefault(popup.getUuid(), 0L))
                     .build());
         }
-
+        
         return popupResponseDtoList;
     }
 
@@ -339,7 +385,7 @@ public class PopupService {
 
                 RegionDistrictsResponse regionDistrictsResponse = RegionDistrictsResponse.builder()
                         .region(regionDistrictsRaw.getRegion())
-                        .districts(districts)
+                        .districtList(districts)
                         .build();
 
                 regionDistrictsResponseList.add(regionDistrictsResponse);
@@ -349,6 +395,73 @@ public class PopupService {
         }
 
         return regionDistrictsResponseList;
+    }
+
+    @Transactional(readOnly = true)
+    public List<PopupResponseDto> getAllPopupListNew() {
+        List<Popup> popupList = popupRepository.findAll();
+
+        // id/uuid 수집
+        List<Long> popupIdList = new ArrayList<>(popupList.size());
+        List<String> popupUuidList = new ArrayList<>(popupList.size());
+        for (Popup p : popupList) {
+            popupIdList.add(p.getId());
+            popupUuidList.add(p.getUuid());
+        }
+
+        // 팝업 이미지
+        List<PopupImage> images = popupImageRepository.findAllByPopup_IdInOrderByPopup_IdAscSortOrderAsc(popupIdList);
+        Map<Long, List<String>> imageMap = new HashMap<>();
+        for (PopupImage img : images) {
+            imageMap.computeIfAbsent(img.getPopup().getId(), k -> new ArrayList<>()).add(img.getImageUrl());
+        }
+
+        // 추천
+        List<PopupRecommend> recs = popupRecommendRepository.findAllByPopup_IdIn(popupIdList);
+        Map<Long, String> recommendMap = new HashMap<>();
+        for (PopupRecommend r : recs) {
+            recommendMap.putIfAbsent(r.getPopup().getId(), r.getRecommend().getRecommendName());
+        }
+
+        // 좋아요 수 배치
+        Map<Long, Long> favoriteCountMap = new HashMap<>();
+        for (var row : userFavoriteRepository.countAllByPopupIds(popupIdList)) {
+            favoriteCountMap.put(row.getPopupId(), row.getCnt());
+        }
+
+        // 조회수 배치
+        Map<String, Long> viewCountMap = new HashMap<>();
+        for (var row : popupTotalViewCountRepository.findAllViewCounts(popupUuidList)) {
+            viewCountMap.put(row.getPopupUuid(),
+                    row.getViewCount() == null ? 0L : row.getViewCount());
+        }
+
+        // DTO 조립
+        List<PopupResponseDto> dto = new ArrayList<>(popupList.size());
+        for (Popup popup : popupList) {
+            dto.add(PopupResponseDto.builder()
+                    .popupUuid(popup.getUuid())
+                    .name(popup.getName())
+                    .startDate(popup.getStartDate())
+                    .endDate(popup.getEndDate())
+                    .openTime(popup.getOpenTime())
+                    .closeTime(popup.getCloseTime())
+                    .address(popup.getAddress())
+                    .roadAddress(popup.getRoadAddress())
+                    .region(popup.getRegion())
+                    .latitude(popup.getLatitude())
+                    .longitude(popup.getLongitude())
+                    .instaPostId(popup.getInstaPostId())
+                    .instaPostUrl(popup.getInstaPostUrl())
+                    .captionSummary(popup.getCaptionSummary())
+                    .imageUrlList(imageMap.getOrDefault(popup.getId(), List.of()))
+                    .mediaType(popup.getMediaType())
+                    .recommend(recommendMap.getOrDefault(popup.getId(), null))
+                    .favoriteCount(favoriteCountMap.getOrDefault(popup.getId(), 0L))
+                    .viewCount(viewCountMap.getOrDefault(popup.getUuid(), 0L))
+                    .build());
+        }
+        return dto;
     }
 
 }
