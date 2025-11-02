@@ -3,12 +3,14 @@ package com.poppang.be.domain.popup.presentation;
 import com.poppang.be.domain.popup.application.PopupTotalViewCountService;
 import com.poppang.be.domain.popup.dto.response.PopupTotalViewCountResponseDto;
 import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.Map;
 
+@Tag(name = "[POPUP] Redis 조회수", description = "팝업스토어 Redis 관련 API")
 @RestController
 @RequestMapping("/api/v1/popup")
 @RequiredArgsConstructor
