@@ -100,4 +100,9 @@ public class Users extends BaseEntity {
     public void restore() {
         this.deleted = false;
     }
+
+    public void updateFcmToken(String fcmToken) {
+        this.fcmToken = fcmToken;
+    }
+
 }

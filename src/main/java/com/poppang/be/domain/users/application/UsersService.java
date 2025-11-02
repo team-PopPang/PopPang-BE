@@ -1,5 +1,6 @@
 package com.poppang.be.domain.users.application;
 
+import com.poppang.be.domain.popup.dto.response.UserUpdateFcmTokenResquestDto;
 import com.poppang.be.domain.users.dto.request.ChangeNicknameRequestDto;
 import com.poppang.be.domain.users.dto.response.NicknameDuplicateResponseDto;
 import com.poppang.be.domain.users.entity.Users;
@@ -54,6 +55,29 @@ public class UsersService {
                 .orElseThrow(() -> new IllegalArgumentException("유저를 찾을 수 없습니다."));
 
         user.restore();
+    }
+
+    @Transactional(readOnly = true)
+    public boolean isFcmTokenDuplicated(String userUuid, String fcmToken) {
+        Users user = usersRepository.findByUuid(userUuid)
+                .orElseThrow(() -> new IllegalArgumentException("유저를 찾을 수 없습니다. "));
+
+        String savedToken = user.getFcmToken();
+
+        if (savedToken == null) {
+            return false;
+        }
+        boolean duplicated = savedToken.equals(fcmToken);
+
+        return duplicated;
+    }
+
+    @Transactional
+    public void updateFcmToken(String userUuid, UserUpdateFcmTokenResquestDto userUpdateFcmTokenResquestDto) {
+        Users user = usersRepository.findByUuid(userUuid)
+                .orElseThrow(() -> new IllegalArgumentException("유저를 찾을 수 없습니다. "));
+
+        user.updateFcmToken(userUpdateFcmTokenResquestDto.getFcmToken());
     }
 
 }

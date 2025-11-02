@@ -1,5 +1,6 @@
 package com.poppang.be.domain.users.presentation;
 
+import com.poppang.be.domain.popup.dto.response.UserUpdateFcmTokenResquestDto;
 import com.poppang.be.domain.users.application.UsersService;
 import com.poppang.be.domain.users.dto.request.ChangeNicknameRequestDto;
 import com.poppang.be.domain.users.dto.response.NicknameDuplicateResponseDto;
@@ -64,6 +65,33 @@ public class UsersController {
             @PathVariable String userUuid
     ) {
         usersService.restoreUser(userUuid);
+
+        return ResponseEntity.ok().build();
+    }
+
+    @Operation(
+            summary = "사용자의 FCM 토큰 중복 여부 확인",
+            description = "특정 사용자의 기존 FCM 토큰과 입력받은 FCM 토큰이 동일한지 여부를 확인합니다."
+    )
+    @GetMapping("/{userUuid}/fcm-token/duplicate-check")
+    public ResponseEntity<Boolean> isFcmTokenDuplicated(
+            @PathVariable String userUuid,
+            @RequestParam String fcmToken) {
+        boolean fcmTokenDuplicated = usersService.isFcmTokenDuplicated(userUuid, fcmToken);
+
+        return ResponseEntity.ok(fcmTokenDuplicated);
+    }
+
+    @Operation(
+            summary = "사용자의 FCM 토큰 갱신",
+            description = "해당 사용자의 FCM 토큰을 새로운 값으로 업데이트합니다. 같은 요청을 여러 번 보내도 결과는 동일합니다."
+    )
+    @PutMapping("/{userUuid}/fcm-token/update")
+    public ResponseEntity<Void> updateFcmToken(
+            @PathVariable String userUuid,
+            @RequestBody UserUpdateFcmTokenResquestDto userUpdateFcmTokenResquestDto
+    ) {
+        usersService.updateFcmToken(userUuid, userUpdateFcmTokenResquestDto);
 
         return ResponseEntity.ok().build();
     }
