@@ -2,9 +2,8 @@ package com.poppang.be.domain.users.application;
 
 import com.poppang.be.domain.popup.dto.response.UserUpdateFcmTokenResquestDto;
 import com.poppang.be.domain.users.dto.request.ChangeNicknameRequestDto;
-import com.poppang.be.domain.users.dto.response.NicknameDuplicateResponseDto;
-import com.poppang.be.domain.users.dto.response.UserWithKeywordListResponseDto;
-import com.poppang.be.domain.users.dto.response.UserWithKeywordListResponseDtoB;
+import com.poppang.be.domain.users.dto.request.UpdateAlertStatusRequestDto;
+import com.poppang.be.domain.users.dto.response.*;
 import com.poppang.be.domain.users.entity.Users;
 import com.poppang.be.domain.users.infrastructure.UsersRepository;
 import lombok.RequiredArgsConstructor;
@@ -119,6 +118,31 @@ public class UsersService {
                         .toList();
 
         return userWithKeywordListResponseDtoBList;
+    }
+
+    @Transactional(readOnly = true)
+    public GetUserResponseDto getUserInfo(String userUuid) {
+        Users user = usersRepository.findByUuid(userUuid)
+                .orElseThrow(() -> new IllegalArgumentException("유저를 찾을 수 없습니다. "));
+
+        GetUserResponseDto getUserResponseDto = GetUserResponseDto.from(user);
+
+        return getUserResponseDto;
+    }
+
+    @Transactional
+    public UpdateAlertStatusResponseDto updateAlertStatus(String userUuid, UpdateAlertStatusRequestDto updateAlertStatusRequestDto) {
+        Users user = usersRepository.findByUuid(userUuid)
+                .orElseThrow(() -> new IllegalArgumentException("유저를 찾을 수 없습니다. "));
+
+        user.updateAlerted(updateAlertStatusRequestDto.isAlerted());
+
+        UpdateAlertStatusResponseDto updateAlertStatusResponseDto = UpdateAlertStatusResponseDto.builder()
+                .userUuid(userUuid)
+                .alerted(user.isAlerted())
+                .build();
+
+        return updateAlertStatusResponseDto;
     }
 
 }
