@@ -4,11 +4,15 @@ import com.poppang.be.domain.popup.dto.response.UserUpdateFcmTokenResquestDto;
 import com.poppang.be.domain.users.application.UsersService;
 import com.poppang.be.domain.users.dto.request.ChangeNicknameRequestDto;
 import com.poppang.be.domain.users.dto.response.NicknameDuplicateResponseDto;
+import com.poppang.be.domain.users.dto.response.UserWithKeywordListResponseDto;
+import com.poppang.be.domain.users.dto.response.UserWithKeywordListResponseDtoB;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
+
+import java.util.List;
 
 @Tag(name = "[USER] 공통", description = "유저 관련 API")
 @RestController
@@ -94,6 +98,26 @@ public class UsersController {
         usersService.updateFcmToken(userUuid, userUpdateFcmTokenResquestDto);
 
         return ResponseEntity.ok().build();
+    }
+
+    @Operation(
+            summary = "cron(알림 서비스)에 필요한 유저 정보 + 알림 키워드 a안"
+    )
+    @GetMapping("/with-alert-keyword/a")
+    public ResponseEntity<List<UserWithKeywordListResponseDto>> getUserWithKeywordList() {
+        List<UserWithKeywordListResponseDto> userWithKeywordListResponseDtoList = usersService.getUserWithKeywordList();
+
+        return ResponseEntity.ok(userWithKeywordListResponseDtoList);
+    }
+
+    @Operation(
+            summary = "cron(알림 서비스)에 필요한 유저 정보 + 알림 키워드 b안"
+    )
+    @GetMapping("/with-alert-keyword/b")
+    public ResponseEntity<List<UserWithKeywordListResponseDtoB>> getUserWithKeywordListB() {
+        List<UserWithKeywordListResponseDtoB> userWithKeywordListResponseDtoBList = usersService.getUserWithKeywordListB();
+
+        return ResponseEntity.ok(userWithKeywordListResponseDtoBList);
     }
 
 }

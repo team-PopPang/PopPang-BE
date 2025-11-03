@@ -3,11 +3,16 @@ package com.poppang.be.domain.users.application;
 import com.poppang.be.domain.popup.dto.response.UserUpdateFcmTokenResquestDto;
 import com.poppang.be.domain.users.dto.request.ChangeNicknameRequestDto;
 import com.poppang.be.domain.users.dto.response.NicknameDuplicateResponseDto;
+import com.poppang.be.domain.users.dto.response.UserWithKeywordListResponseDto;
+import com.poppang.be.domain.users.dto.response.UserWithKeywordListResponseDtoB;
 import com.poppang.be.domain.users.entity.Users;
 import com.poppang.be.domain.users.infrastructure.UsersRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+
+import java.util.Arrays;
+import java.util.List;
 
 @Service
 @RequiredArgsConstructor
@@ -78,6 +83,42 @@ public class UsersService {
                 .orElseThrow(() -> new IllegalArgumentException("유저를 찾을 수 없습니다. "));
 
         user.updateFcmToken(userUpdateFcmTokenResquestDto.getFcmToken());
+    }
+
+    @Transactional(readOnly = true)
+    public List<UserWithKeywordListResponseDto> getUserWithKeywordList() {
+        List<UserWithKeywordListResponseDto> userWithKeywordListResponseDtoList = usersRepository.findUserWithAlertKeywordList()
+                .stream()
+                .map(r -> UserWithKeywordListResponseDto.builder()
+                        .userId(r.getUserId())
+                        .nickname(r.getNickname())
+                        .fcmToken(r.getFcmToken())
+                        .keyword(r.getKeyword())
+                        .build())
+                .toList();
+
+        return userWithKeywordListResponseDtoList;
+    }
+
+    public List<UserWithKeywordListResponseDtoB> getUserWithKeywordListB() {
+        List<UserWithKeywordListResponseDtoB> userWithKeywordListResponseDtoBList = usersRepository.findUserWithAlertKeywordListB()
+                .stream()
+                .map(r -> UserWithKeywordListResponseDtoB.builder()
+                        .userId(r.getUserId())
+                        .nickname(r.getNickname())
+                        .fcmToken(r.getFcmToken())
+                        .keywordList(
+                                (r.getKeywordList() == null || r.getKeywordList().isBlank())
+                                        ? List.of()
+                                        : Arrays.stream(r.getKeywordList().split(","))
+                                        .map(String::trim)
+                                        .filter(s -> !s.isBlank())
+                                        .toList()
+                        )
+                        .build())
+                        .toList();
+
+        return userWithKeywordListResponseDtoBList;
     }
 
 }
