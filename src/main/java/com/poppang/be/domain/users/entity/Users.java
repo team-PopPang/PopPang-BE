@@ -105,4 +105,8 @@ public class Users extends BaseEntity {
         this.fcmToken = fcmToken;
     }
 
+    public void updateAlerted(boolean alerted) {
+        this.alerted = alerted;
+    }
+
 }

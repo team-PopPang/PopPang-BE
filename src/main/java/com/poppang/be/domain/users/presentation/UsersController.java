@@ -3,9 +3,8 @@ package com.poppang.be.domain.users.presentation;
 import com.poppang.be.domain.popup.dto.response.UserUpdateFcmTokenResquestDto;
 import com.poppang.be.domain.users.application.UsersService;
 import com.poppang.be.domain.users.dto.request.ChangeNicknameRequestDto;
-import com.poppang.be.domain.users.dto.response.NicknameDuplicateResponseDto;
-import com.poppang.be.domain.users.dto.response.UserWithKeywordListResponseDto;
-import com.poppang.be.domain.users.dto.response.UserWithKeywordListResponseDtoB;
+import com.poppang.be.domain.users.dto.request.UpdateAlertStatusRequestDto;
+import com.poppang.be.domain.users.dto.response.*;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.RequiredArgsConstructor;
@@ -21,6 +20,34 @@ import java.util.List;
 public class UsersController {
 
     private final UsersService usersService;
+
+    @Operation(
+            summary = "유저 정보 조회",
+            description = "userUuid를 기준으로 유저의 기본 정보를 조회합니다."
+    )
+    @GetMapping("/{userUuid}")
+    public ResponseEntity<GetUserResponseDto> getUserInfo(@PathVariable String userUuid) {
+        GetUserResponseDto getUserResponseDto = usersService.getUserInfo(userUuid);
+
+        return ResponseEntity.ok(getUserResponseDto);
+    }
+
+    @Operation(
+            summary = "사용자 알림 상태 수정 (isAlerted)",
+            description = """
+                특정 사용자의 알림 수신 상태(alerted)를 변경합니다.  
+                PATCH 메서드를 사용하여 부분 업데이트를 수행합니다.  
+                예를 들어, 알림을 켜려면 `true`, 끄려면 `false`로 요청합니다.
+                """)
+    @PatchMapping("{userUuid}/alert-status")
+    public ResponseEntity<UpdateAlertStatusResponseDto> updateAlertStatus(
+            @PathVariable String userUuid,
+            @RequestBody UpdateAlertStatusRequestDto updateAlertStatusRequestDto
+    ) {
+        UpdateAlertStatusResponseDto updateAlertStatusResponseDto = usersService.updateAlertStatus(userUuid, updateAlertStatusRequestDto);
+
+        return ResponseEntity.ok(updateAlertStatusResponseDto);
+    }
 
     @Operation(
             summary = "닉네임 중복 검사",
