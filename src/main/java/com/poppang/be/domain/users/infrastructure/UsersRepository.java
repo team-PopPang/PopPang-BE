@@ -29,6 +29,7 @@ public interface UsersRepository extends JpaRepository<Users, Long> {
     FROM users u
     JOIN user_alert_keyword k ON u.id = k.users_id
     WHERE u.is_deleted = 0
+    AND u.is_alerted = 1
     ORDER BY u.id, k.alert_keyword
     """, nativeQuery = true)
     List<UserWithKeywordProjection> findUserWithAlertKeywordList();
@@ -50,6 +51,7 @@ public interface UsersRepository extends JpaRepository<Users, Long> {
         JOIN user_alert_keyword k 
             ON u.id = k.users_id
         WHERE u.is_deleted = 0
+        AND u.is_alerted = 1
         GROUP BY u.id, u.nickname, u.fcm_token
         ORDER BY u.id
         """, nativeQuery = true)
