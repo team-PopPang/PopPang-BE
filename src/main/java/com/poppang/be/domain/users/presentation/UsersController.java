@@ -75,10 +75,23 @@ public class UsersController {
     }
 
     @Operation(
-            summary = "유저 탈퇴 기능 (soft-delete)",
+            summary = "유저 탈퇴 기능 (hard-delete)",
+            description = "유저 회원탈퇴를 진행합니다. (hard-delete)라서 데이터는 복구할 수 없습니다."
+    )
+    @DeleteMapping("{userUuid}/hard-delete")
+    public ResponseEntity<Void> hardDeleteUser(
+            @PathVariable String userUuid
+    ) {
+        usersService.hardDeleteUser(userUuid);
+
+        return ResponseEntity.ok().build();
+    }
+
+    @Operation(
+            summary = "[미사용]유저 탈퇴 기능 (soft-delete)",
             description = "유저 회원탈퇴를 진행합니다. (soft-delete)라서 데이터는 복구 가능한 상태입니다. "
     )
-    @PatchMapping("/{userUuid}/delete")
+    @PatchMapping("/{userUuid}/soft-delete")
     public ResponseEntity<Void> softDeleteUser(
             @PathVariable String userUuid
     ) {

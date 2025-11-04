@@ -145,4 +145,11 @@ public class UsersService {
         return updateAlertStatusResponseDto;
     }
 
+    @Transactional
+    public void hardDeleteUser(String userUuid) {
+        Users user = usersRepository.findByUuid(userUuid)
+                .orElseThrow(() -> new IllegalArgumentException("유저를 찾을 수 없습니다. "));
+
+        usersRepository.deleteById(user.getId());
+    }
 }
