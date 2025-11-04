@@ -99,6 +99,7 @@ public class UsersService {
         return userWithKeywordListResponseDtoList;
     }
 
+    @Transactional(readOnly = true)
     public List<UserWithKeywordListResponseDtoB> getUserWithKeywordListB() {
         List<UserWithKeywordListResponseDtoB> userWithKeywordListResponseDtoBList = usersRepository.findUserWithAlertKeywordListB()
                 .stream()
