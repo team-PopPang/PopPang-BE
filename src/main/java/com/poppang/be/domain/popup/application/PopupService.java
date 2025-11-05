@@ -2,15 +2,13 @@ package com.poppang.be.domain.popup.application;
 
 import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.poppang.be.common.util.StringNormalizer;
 import com.poppang.be.domain.favorite.infrastructure.UserFavoriteRepository;
 import com.poppang.be.domain.popup.dto.request.PopupImageUpsertRequestDto;
 import com.poppang.be.domain.popup.dto.request.PopupRegisterRequestDto;
 import com.poppang.be.domain.popup.dto.response.PopupResponseDto;
 import com.poppang.be.domain.popup.dto.response.RegionDistrictsResponse;
-import com.poppang.be.domain.popup.entity.MediaType;
-import com.poppang.be.domain.popup.entity.Popup;
-import com.poppang.be.domain.popup.entity.PopupImage;
-import com.poppang.be.domain.popup.entity.PopupRecommend;
+import com.poppang.be.domain.popup.entity.*;
 import com.poppang.be.domain.popup.infrastructure.PopupImageRepository;
 import com.poppang.be.domain.popup.infrastructure.PopupRecommendRepository;
 import com.poppang.be.domain.popup.infrastructure.PopupRepository;
@@ -464,4 +462,141 @@ public class PopupService {
         return dto;
     }
 
+    @Transactional(readOnly = true)
+    public List<PopupResponseDto> getFilteredPopupList(String region, String district, SortStandard sortStandard, Double latitude, Double longitude) {
+        String normalizedDistrict = StringNormalizer.normalizeDistrict(district);
+
+        if (sortStandard == SortStandard.LIKES) {
+            // region + district + 좋아요 수 기준 정렬
+            List<Popup> popupList = popupRepository.findPopupListByRegionAndLikes(region, normalizedDistrict);
+            // id/uuid 수집
+            List<Long> popupIdList = new ArrayList<>(popupList.size());
+            List<String> popupUuidList = new ArrayList<>(popupList.size());
+            for (Popup p : popupList) {
+                popupIdList.add(p.getId());
+                popupUuidList.add(p.getUuid());
+            }
+
+            // 팝업 이미지
+            List<PopupImage> images = popupImageRepository.findAllByPopup_IdInOrderByPopup_IdAscSortOrderAsc(popupIdList);
+            Map<Long, List<String>> imageMap = new HashMap<>();
+            for (PopupImage img : images) {
+                imageMap.computeIfAbsent(img.getPopup().getId(), k -> new ArrayList<>()).add(img.getImageUrl());
+            }
+            System.out.println("imageMap = " + imageMap);
+
+            // 추천
+            List<PopupRecommend> recs = popupRecommendRepository.findAllByPopup_IdIn(popupIdList);
+            Map<Long, String> recommendMap = new HashMap<>();
+            for (PopupRecommend r : recs) {
+                recommendMap.putIfAbsent(r.getPopup().getId(), r.getRecommend().getRecommendName());
+            }
+
+            // 좋아요 수 배치
+            Map<Long, Long> favoriteCountMap = new HashMap<>();
+            for (var row : userFavoriteRepository.countAllByPopupIds(popupIdList)) {
+                favoriteCountMap.put(row.getPopupId(), row.getCnt());
+            }
+
+            // 조회수 배치
+            Map<String, Long> viewCountMap = new HashMap<>();
+            for (var row : popupTotalViewCountRepository.findAllViewCounts(popupUuidList)) {
+                viewCountMap.put(row.getPopupUuid(),
+                        row.getViewCount() == null ? 0L : row.getViewCount());
+            }
+
+            // DTO 조립
+            List<PopupResponseDto> dto = new ArrayList<>(popupList.size());
+            for (Popup popup : popupList) {
+                dto.add(PopupResponseDto.builder()
+                        .popupUuid(popup.getUuid())
+                        .name(popup.getName())
+                        .startDate(popup.getStartDate())
+                        .endDate(popup.getEndDate())
+                        .openTime(popup.getOpenTime())
+                        .closeTime(popup.getCloseTime())
+                        .address(popup.getAddress())
+                        .roadAddress(popup.getRoadAddress())
+                        .region(popup.getRegion())
+                        .latitude(popup.getLatitude())
+                        .longitude(popup.getLongitude())
+                        .instaPostId(popup.getInstaPostId())
+                        .instaPostUrl(popup.getInstaPostUrl())
+                        .captionSummary(popup.getCaptionSummary())
+                        .imageUrlList(imageMap.getOrDefault(popup.getId(), List.of()))
+                        .mediaType(popup.getMediaType())
+                        .recommend(recommendMap.getOrDefault(popup.getId(), null))
+                        .favoriteCount(favoriteCountMap.getOrDefault(popup.getId(), 0L))
+                        .viewCount(viewCountMap.getOrDefault(popup.getUuid(), 0L))
+                        .build());
+            }
+            return dto;
+
+        }else{
+            // region + district + 위.경도로 가까운 순 정렬
+            List<Popup> popupList = popupRepository.findPopupListByRegionAndDistance(region, normalizedDistrict, latitude, longitude);
+            // id/uuid 수집
+            List<Long> popupIdList = new ArrayList<>(popupList.size());
+            List<String> popupUuidList = new ArrayList<>(popupList.size());
+            for (Popup p : popupList) {
+                popupIdList.add(p.getId());
+                popupUuidList.add(p.getUuid());
+            }
+
+            // 팝업 이미지
+            List<PopupImage> images = popupImageRepository.findAllByPopup_IdInOrderByPopup_IdAscSortOrderAsc(popupIdList);
+            Map<Long, List<String>> imageMap = new HashMap<>();
+            for (PopupImage img : images) {
+                imageMap.computeIfAbsent(img.getPopup().getId(), k -> new ArrayList<>()).add(img.getImageUrl());
+            }
+
+            // 추천
+            List<PopupRecommend> recs = popupRecommendRepository.findAllByPopup_IdIn(popupIdList);
+            Map<Long, String> recommendMap = new HashMap<>();
+            for (PopupRecommend r : recs) {
+                recommendMap.putIfAbsent(r.getPopup().getId(), r.getRecommend().getRecommendName());
+            }
+
+            // 좋아요 수 배치
+            Map<Long, Long> favoriteCountMap = new HashMap<>();
+            for (var row : userFavoriteRepository.countAllByPopupIds(popupIdList)) {
+                favoriteCountMap.put(row.getPopupId(), row.getCnt());
+            }
+
+            // 조회수 배치
+            Map<String, Long> viewCountMap = new HashMap<>();
+            for (var row : popupTotalViewCountRepository.findAllViewCounts(popupUuidList)) {
+                viewCountMap.put(row.getPopupUuid(),
+                        row.getViewCount() == null ? 0L : row.getViewCount());
+            }
+
+            // DTO 조립
+            List<PopupResponseDto> dto = new ArrayList<>(popupList.size());
+            for (Popup popup : popupList) {
+                dto.add(PopupResponseDto.builder()
+                        .popupUuid(popup.getUuid())
+                        .name(popup.getName())
+                        .startDate(popup.getStartDate())
+                        .endDate(popup.getEndDate())
+                        .openTime(popup.getOpenTime())
+                        .closeTime(popup.getCloseTime())
+                        .address(popup.getAddress())
+                        .roadAddress(popup.getRoadAddress())
+                        .region(popup.getRegion())
+                        .latitude(popup.getLatitude())
+                        .longitude(popup.getLongitude())
+                        .instaPostId(popup.getInstaPostId())
+                        .instaPostUrl(popup.getInstaPostUrl())
+                        .captionSummary(popup.getCaptionSummary())
+                        .imageUrlList(imageMap.getOrDefault(popup.getId(), List.of()))
+                        .mediaType(popup.getMediaType())
+                        .recommend(recommendMap.getOrDefault(popup.getId(), null))
+                        .favoriteCount(favoriteCountMap.getOrDefault(popup.getId(), 0L))
+                        .viewCount(viewCountMap.getOrDefault(popup.getUuid(), 0L))
+                        .build());
+            }
+            return dto;
+        }
+
+    }
 }
