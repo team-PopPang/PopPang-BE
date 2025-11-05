@@ -4,6 +4,7 @@ import com.poppang.be.domain.popup.application.PopupService;
 import com.poppang.be.domain.popup.dto.request.PopupRegisterRequestDto;
 import com.poppang.be.domain.popup.dto.response.PopupResponseDto;
 import com.poppang.be.domain.popup.dto.response.RegionDistrictsResponse;
+import com.poppang.be.domain.popup.entity.SortStandard;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.tags.Tag;
@@ -93,6 +94,27 @@ public class PopupController {
         List<RegionDistrictsResponse> regionDistrictsResponseList = popupService.getRegionDistricts();
 
         return ResponseEntity.ok(regionDistrictsResponseList);
+    }
+
+    @Operation(
+            summary = "팝업 필터 조회 API",
+            description = """
+    지역(region), 구(district), 정렬 기준(sortStandard), 좌표(latitude, longitude)에 따라 팝업 리스트를 필터링합니다.
+    - sortStandard: LIKES(좋아요 순), DISTANCE(가까운 순)
+    - district는 '전체'로 요청하면 전체 지역을 의미합니다.
+    - latitude, longitude는 가까운순 정렬 시 필수값입니다.
+    """)
+    @GetMapping("/filtered")
+    public List<PopupResponseDto> getFilteredPopupList(
+            @RequestParam String region,
+            @RequestParam(required = false) String district,
+            @RequestParam(defaultValue = "LIKES") SortStandard sortStandard,
+            @RequestParam(required = false) Double latitude,
+            @RequestParam(required = false) Double longitude
+    ) {
+        List<PopupResponseDto> filteredPopupList = popupService.getFilteredPopupList(region, district, sortStandard, latitude, longitude);
+
+        return filteredPopupList;
     }
 
 }
