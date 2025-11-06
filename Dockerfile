@@ -6,6 +6,6 @@ COPY build/libs/*.jar app.jar
 
 ENV TZ=Asia/Seoul
 
-EXPOSE 8500
+EXPOSE 8080
 
 ENTRYPOINT ["java","-jar","app.jar"]
