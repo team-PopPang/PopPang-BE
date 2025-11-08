@@ -364,7 +364,7 @@ public class PopupService {
                     .viewCount(viewCountMap.getOrDefault(popup.getUuid(), 0L))
                     .build());
         }
-        
+
         return popupResponseDtoList;
     }
 
@@ -532,7 +532,7 @@ public class PopupService {
             }
             return dto;
 
-        }else{
+        } else {
             // region + district + 위.경도로 가까운 순 정렬
             List<Popup> popupList = popupRepository.findPopupListByRegionAndDistance(region, normalizedDistrict, latitude, longitude);
             // id/uuid 수집
@@ -599,4 +599,52 @@ public class PopupService {
         }
 
     }
+
+    public PopupResponseDto getPopupByUuid(String popupUuid) {
+        Popup popup = popupRepository.findByUuid(popupUuid)
+                .orElseThrow(() -> new IllegalArgumentException("팝업을 찾을 수 없습니다. "));
+
+        // 팝업 이미지
+        List<String> imageUrlList = popupImageRepository
+                .findAllByPopup_IdOrderByPopup_IdAscSortOrderAsc(popup.getId())
+                .stream()
+                .map(PopupImage::getImageUrl)
+                .toList();
+
+        // 추천
+        PopupRecommend popupRecommend = popupRecommendRepository.findFirstByPopup_Id(popup.getId());
+        String recommendName = (popupRecommend != null) ? popupRecommend.getRecommend().getRecommendName() : null;
+
+        //좋아요 수
+        Long favoriteCount = userFavoriteRepository.countByPopupUuid(popup.getUuid());
+
+        // 조회 수
+        Long viewCount = popupTotalViewCountRepository.getViewCountByPopupUuid(popup.getUuid());
+
+        // DTO 조립
+        PopupResponseDto popupResponseDto = PopupResponseDto.builder()
+                .popupUuid(popup.getUuid())
+                .name(popup.getName())
+                .startDate(popup.getStartDate())
+                .endDate(popup.getEndDate())
+                .openTime(popup.getOpenTime())
+                .closeTime(popup.getCloseTime())
+                .address(popup.getAddress())
+                .roadAddress(popup.getRoadAddress())
+                .region(popup.getRegion())
+                .latitude(popup.getLatitude())
+                .longitude(popup.getLongitude())
+                .instaPostId(popup.getInstaPostId())
+                .instaPostUrl(popup.getInstaPostUrl())
+                .captionSummary(popup.getCaptionSummary())
+                .imageUrlList(imageUrlList)
+                .mediaType(popup.getMediaType())
+                .recommend(recommendName)
+                .favoriteCount(favoriteCount)
+                .viewCount(viewCount)
+                .build();
+
+        return popupResponseDto;
+    }
+
 }

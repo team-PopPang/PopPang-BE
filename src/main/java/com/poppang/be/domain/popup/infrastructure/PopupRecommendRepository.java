@@ -12,4 +12,6 @@ public interface PopupRecommendRepository extends JpaRepository<PopupRecommend, 
 
     List<PopupRecommend> findAllByPopup_IdIn(List<Long> popupIdList);
 
+    PopupRecommend findFirstByPopup_Id(Long id);
+
 }
