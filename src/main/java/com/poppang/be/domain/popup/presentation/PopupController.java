@@ -34,6 +34,20 @@ public class PopupController {
     }
 
     @Operation(
+            summary = "팝업 단건 조회",
+            description = "popupUuid로 단건 팝업 조회합니다. "
+    )
+    @GetMapping("/{popupUuid}")
+    public ResponseEntity<PopupResponseDto> getPopupByUuid(
+            @PathVariable String popupUuid
+    ) {
+        PopupResponseDto popupResponseDto = popupService.getPopupByUuid(popupUuid);
+
+        return ResponseEntity.ok(popupResponseDto);
+
+    }
+
+    @Operation(
             summary = "팝업 검색",
             description = "특정 키워드로 팝업스토어를 검색합니다."
     )
@@ -99,11 +113,11 @@ public class PopupController {
     @Operation(
             summary = "팝업 필터 조회 API",
             description = """
-    지역(region), 구(district), 정렬 기준(sortStandard), 좌표(latitude, longitude)에 따라 팝업 리스트를 필터링합니다.
-    - sortStandard: LIKES(좋아요 순), DISTANCE(가까운 순)
-    - district는 '전체'로 요청하면 전체 지역을 의미합니다.
-    - latitude, longitude는 가까운순 정렬 시 필수값입니다.
-    """)
+                    지역(region), 구(district), 정렬 기준(sortStandard), 좌표(latitude, longitude)에 따라 팝업 리스트를 필터링합니다.
+                    - sortStandard: LIKES(좋아요 순), DISTANCE(가까운 순)
+                    - district는 '전체'로 요청하면 전체 지역을 의미합니다.
+                    - latitude, longitude는 가까운순 정렬 시 필수값입니다.
+                    """)
     @GetMapping("/filtered")
     public List<PopupResponseDto> getFilteredPopupList(
             @RequestParam String region,

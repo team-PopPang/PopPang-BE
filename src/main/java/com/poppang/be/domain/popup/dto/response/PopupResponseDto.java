@@ -2,6 +2,7 @@ package com.poppang.be.domain.popup.dto.response;
 
 import com.fasterxml.jackson.annotation.JsonFormat;
 import com.poppang.be.domain.popup.entity.MediaType;
+import com.poppang.be.domain.popup.entity.Popup;
 import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.Builder;
 import lombok.Getter;
@@ -83,6 +84,24 @@ public class PopupResponseDto {
         this.recommend = recommend;
         this.favoriteCount = favoriteCount;
         this.viewCount = viewCount;
+    }
+
+    public static PopupResponseDto from(Popup popup) {
+        return PopupResponseDto.builder()
+                .popupUuid(popup.getUuid())
+                .name(popup.getName())
+                .startDate(popup.getStartDate())
+                .endDate(popup.getEndDate())
+                .openTime(popup.getOpenTime())
+                .closeTime(popup.getCloseTime())
+                .address(popup.getAddress())
+                .roadAddress(popup.getRoadAddress())
+                .region(popup.getRegion())
+                .latitude(popup.getLatitude())
+                .longitude(popup.getLongitude())
+                .instaPostId(popup.getInstaPostId())
+                .instaPostUrl(popup.getInstaPostUrl())
+                .build();
     }
 
 }
