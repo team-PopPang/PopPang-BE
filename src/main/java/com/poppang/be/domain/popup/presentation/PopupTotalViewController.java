@@ -41,8 +41,10 @@ public class PopupTotalViewController {
 
     @Operation(
             summary = "redis에 있는 조회수 조회",
-            description = "1분간 redis에만 저장되는 조회수를 반환합니다.."
-    )    @GetMapping("/{popupUuid}/view-count")
+            description = "1분간 redis에만 저장되는 조회수를 반환합니다..",
+            deprecated = true
+    )
+    @GetMapping("/{popupUuid}/view-count")
     public ResponseEntity<Map<String,Long>> getViewCount(@PathVariable String popupUuid) {
         return ResponseEntity.ok(Map.of("viewCount", popupTotalViewCountService.getDelta(popupUuid)));
     }

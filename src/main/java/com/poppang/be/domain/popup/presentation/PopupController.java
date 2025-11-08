@@ -86,6 +86,7 @@ public class PopupController {
         return ResponseEntity.ok(inProgressPopupList);
     }
 
+    @Tag(name = "[CRON]", description = "CRON 관련 API")
     @Operation(
             summary = "팝업 등록",
             description = "크롤링 또는 관리자가 신규 팝업스토어 데이터를 등록합니다. " +
