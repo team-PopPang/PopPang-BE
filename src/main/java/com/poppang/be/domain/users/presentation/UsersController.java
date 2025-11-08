@@ -88,8 +88,9 @@ public class UsersController {
     }
 
     @Operation(
-            summary = "[미사용]유저 탈퇴 기능 (soft-delete)",
-            description = "유저 회원탈퇴를 진행합니다. (soft-delete)라서 데이터는 복구 가능한 상태입니다. "
+            summary = "유저 탈퇴 기능 (soft-delete)",
+            description = "유저 회원탈퇴를 진행합니다. (soft-delete)라서 데이터는 복구 가능한 상태입니다. ",
+            deprecated = true
     )
     @PatchMapping("/{userUuid}/soft-delete")
     public ResponseEntity<Void> softDeleteUser(
@@ -102,7 +103,8 @@ public class UsersController {
 
     @Operation(
             summary = "유저 복구 기능 (soft-delete 복구)",
-            description = "유저 복구를 진행합니다. 테스트 환경에서 사용하기 위한 API입니다. "
+            description = "유저 복구를 진행합니다. 테스트 환경에서 사용하기 위한 API입니다. ",
+            deprecated = true
     )
     @PatchMapping("/{userUuid}/resotre")
     public ResponseEntity<Void> restoreUser(
@@ -140,6 +142,7 @@ public class UsersController {
         return ResponseEntity.ok().build();
     }
 
+    @Tag(name = "[CRON]", description = "CRON 관련 API")
     @Operation(
             summary = "cron(알림 서비스)에 필요한 유저 정보 + 알림 키워드 a안"
     )
@@ -150,6 +153,7 @@ public class UsersController {
         return ResponseEntity.ok(userWithKeywordListResponseDtoList);
     }
 
+    @Tag(name = "[CRON]", description = "CRON 관련 API")
     @Operation(
             summary = "cron(알림 서비스)에 필요한 유저 정보 + 알림 키워드 b안"
     )
