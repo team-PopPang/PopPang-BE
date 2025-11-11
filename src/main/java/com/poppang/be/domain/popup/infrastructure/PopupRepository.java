@@ -38,6 +38,7 @@ public interface PopupRepository extends JpaRepository<Popup, Long> {
 
     interface RegionDistrictsRaw {
         String getRegion();
+
         String getDistricts();
     }
 
@@ -128,4 +129,62 @@ public interface PopupRepository extends JpaRepository<Popup, Long> {
             """, nativeQuery = true)
     List<Popup> findPopupListByRegionAndDistance(String region, String district, Double latitude, Double longitude);
 
+    @Query("""
+            SELECT p
+            FROM Popup p
+            WHERE p.activated = true
+            AND p.startDate <= CURRENT_DATE
+            AND p.endDate >= CURRENT_DATE
+            AND (:region IS NULL OR p.region = :region)
+            AND (:district IS NULL OR p.roadAddress LIKE CONCAT('%', :district, '%'))
+            ORDER BY p.startDate DESC
+            """)
+    List<Popup> findActiveByNewest(@Param("region") String region,
+                                   @Param("district") String district);
+
+    @Query("""
+            SELECT p
+            FROM Popup p
+            WHERE p.activated = true
+            AND p.startDate <= CURRENT_DATE
+            AND p.endDate >= CURRENT_DATE
+            AND (:region IS NULL OR p.region = :region)
+            AND (:district IS NULL OR p.roadAddress LIKE CONCAT('%', :district, '%'))
+            ORDER BY p.endDate ASC, p.startDate ASC
+            """)
+    List<Popup> findActiveByClosingSoon(@Param("region") String region,
+                                        @Param("district") String district);
+
+    @Query(value = """
+            SELECT p.*
+            FROM popup p
+            LEFT JOIN (
+                SELECT popup_id, COUNT(*) AS fav_cnt
+                FROM user_favorite
+                GROUP BY popup_id
+            ) uf ON uf.popup_id = p.id
+            WHERE p.is_active = 1
+              AND p.start_date <= CURRENT_DATE
+              AND p.end_date >= CURRENT_DATE
+              AND (:region IS NULL OR p.region = :region)
+              AND (:district IS NULL OR p.road_address LIKE CONCAT('%', :district, '%'))
+            ORDER BY COALESCE(uf.fav_cnt, 0) DESC, p.created_at DESC
+            """, nativeQuery = true)
+    List<Popup> findActiveByMostFavorited(@Param("region") String region,
+                                          @Param("district") String district);
+
+    @Query(value = """
+            SELECT p.*
+            FROM popup p
+            LEFT JOIN popup_total_view_count v
+                ON v.popup_uuid = p.uuid
+            WHERE p.is_active = 1
+              AND p.start_date <= CURRENT_DATE
+              AND p.end_date >= CURRENT_DATE
+              AND (:region IS NULL OR p.region = :region)
+              AND (:district IS NULL OR p.road_address LIKE CONCAT('%', :district, '%'))
+            ORDER BY COALESCE(v.view_count, 0) DESC, p.created_at DESC
+            """, nativeQuery = true)
+    List<Popup> findActiveByMostViewed(@Param("region") String region,
+                                       @Param("district") String district);
 }

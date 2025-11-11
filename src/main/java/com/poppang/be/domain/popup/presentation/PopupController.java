@@ -4,7 +4,8 @@ import com.poppang.be.domain.popup.application.PopupService;
 import com.poppang.be.domain.popup.dto.request.PopupRegisterRequestDto;
 import com.poppang.be.domain.popup.dto.response.PopupResponseDto;
 import com.poppang.be.domain.popup.dto.response.RegionDistrictsResponse;
-import com.poppang.be.domain.popup.entity.SortStandard;
+import com.poppang.be.domain.popup.enums.HomeSortStandard;
+import com.poppang.be.domain.popup.enums.SortStandard;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.tags.Tag;
@@ -118,7 +119,9 @@ public class PopupController {
                     - sortStandard: LIKES(좋아요 순), DISTANCE(가까운 순)
                     - district는 '전체'로 요청하면 전체 지역을 의미합니다.
                     - latitude, longitude는 가까운순 정렬 시 필수값입니다.
-                    """)
+                    """,
+            deprecated = true
+    )
     @GetMapping("/filtered")
     public List<PopupResponseDto> getFilteredPopupList(
             @RequestParam String region,
@@ -130,6 +133,31 @@ public class PopupController {
         List<PopupResponseDto> filteredPopupList = popupService.getFilteredPopupList(region, district, sortStandard, latitude, longitude);
 
         return filteredPopupList;
+    }
+
+    @Operation(
+            summary = "홈 화면용 팝업 필터 조회",
+            description = """
+                    홈 화면에서 지역(region), 구(district), 정렬 기준(homeSortStandard)에 따라 팝업 리스트를 조회합니다.
+                    - homeSortStandard:
+                      • NEWEST : 최근 오픈 순
+                      • CLOSING_SOON : 곧 종료될 순
+                      • MOST_FAVORITED : 좋아요 많은 순
+                      • MOST_VIEWED : 조회수 많은 순
+                    - region, district는 선택된 지역과 구를 의미하며,
+                      district가 '전체'일 경우 해당 지역 내 모든 팝업을 조회합니다.
+                    - 반환되는 리스트는 진행 중(is_active = true, 날짜 유효)인 팝업만 포함합니다.
+                    """
+    )
+    @GetMapping("/filtered/home")
+    public List<PopupResponseDto> getFilteredHomePopupList(
+            @RequestParam String region,
+            @RequestParam String district,
+            @RequestParam HomeSortStandard homeSortStandard
+    ) {
+        List<PopupResponseDto> filteredHomePopupList = popupService.getFilteredHomePopupList(region, district, homeSortStandard);
+
+        return filteredHomePopupList;
     }
 
 }
