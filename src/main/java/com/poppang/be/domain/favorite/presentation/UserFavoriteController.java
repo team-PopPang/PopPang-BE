@@ -6,6 +6,7 @@ import com.poppang.be.domain.favorite.dto.request.UserFavoriteRegisterRequestDto
 import com.poppang.be.domain.favorite.dto.response.FavoriteCountResponseDto;
 import com.poppang.be.domain.favorite.dto.response.UserFavoritePopupResponseDto;
 import com.poppang.be.domain.popup.dto.response.PopupResponseDto;
+import com.poppang.be.domain.popup.dto.response.PopupUserResponseDto;
 import io.swagger.v3.oas.annotations.Operation;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
@@ -62,8 +63,9 @@ public class UserFavoriteController {
             tags = {"[FAVORITE] 공통"}
     )
     @GetMapping("/popup/{userUuid}")
-    public ResponseEntity<List<PopupResponseDto>> getFavoritePopupList(@PathVariable("userUuid") String userUuid) {
-        List<PopupResponseDto> userFavoritePopupResponseDtoList = userFavoriteService.getFavoritePopupList(userUuid);
+    public ResponseEntity<List<PopupUserResponseDto>> getFavoritePopupList(
+            @PathVariable("userUuid") String userUuid) {
+        List<PopupUserResponseDto> userFavoritePopupResponseDtoList = userFavoriteService.getFavoritePopupList(userUuid);
 
         return ResponseEntity.ok(userFavoritePopupResponseDtoList);
     }

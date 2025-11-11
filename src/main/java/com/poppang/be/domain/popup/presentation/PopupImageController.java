@@ -10,7 +10,6 @@ import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
 
-@Tag(name = "[POPUP] 공통", description = "팝업스토어 관련 API")
 @RestController
 @RequestMapping("/api/v1/popup")
 @RequiredArgsConstructor
@@ -18,6 +17,7 @@ public class PopupImageController {
 
     private final PopupImageService popupImageService;
 
+    @Tag(name = "[CRON]", description = "CRON 관련 API")
     @Operation(
             summary = "팝업 이미지 등록/수정 (Upsert)",
             description = "특정 팝업(UUID 기준)의 이미지를 등록 또는 수정합니다 "

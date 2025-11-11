@@ -31,8 +31,11 @@ public interface UserFavoriteRepository extends JpaRepository<UserFavorite, Long
     List<FavoriteCountRow> countAllByPopupIds(@Param("popupIds") List<Long> popupIds);
 
     interface FavoriteCountRow {
+
         Long getPopupId();
         Long getCnt();
     }
+
+    boolean existsByUser_UuidAndPopup_Uuid(String userUuid, String popupUuid);
 
 }

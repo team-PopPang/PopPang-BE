@@ -45,7 +45,6 @@ public class PopupController {
         PopupResponseDto popupResponseDto = popupService.getPopupByUuid(popupUuid);
 
         return ResponseEntity.ok(popupResponseDto);
-
     }
 
     @Operation(

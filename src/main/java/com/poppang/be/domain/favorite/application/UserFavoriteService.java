@@ -5,13 +5,13 @@ import com.poppang.be.domain.favorite.dto.request.UserFavoriteRegisterRequestDto
 import com.poppang.be.domain.favorite.dto.response.FavoriteCountResponseDto;
 import com.poppang.be.domain.favorite.entity.UserFavorite;
 import com.poppang.be.domain.favorite.infrastructure.UserFavoriteRepository;
-import com.poppang.be.domain.popup.dto.response.PopupResponseDto;
+import com.poppang.be.domain.popup.dto.response.PopupUserResponseDto;
 import com.poppang.be.domain.popup.entity.Popup;
 import com.poppang.be.domain.popup.infrastructure.PopupImageRepository;
 import com.poppang.be.domain.popup.infrastructure.PopupRecommendRepository;
 import com.poppang.be.domain.popup.infrastructure.PopupRepository;
 import com.poppang.be.domain.popup.infrastructure.PopupTotalViewCountRepository;
-import com.poppang.be.domain.popup.mapper.PopupResponseDtoMapper;
+import com.poppang.be.domain.popup.mapper.PopupUserResponseDtoMapper;
 import com.poppang.be.domain.users.entity.Users;
 import com.poppang.be.domain.users.infrastructure.UsersRepository;
 import lombok.RequiredArgsConstructor;
@@ -19,6 +19,8 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
+import java.util.Set;
+import java.util.stream.Collectors;
 
 @Service
 @RequiredArgsConstructor
@@ -30,7 +32,7 @@ public class UserFavoriteService {
     private final PopupImageRepository popupImageRepository;
     private final PopupRecommendRepository popupRecommendRepository;
     private final PopupTotalViewCountRepository popupTotalViewCountRepository;
-    private final PopupResponseDtoMapper popupResponseDtoMapper;
+    private final PopupUserResponseDtoMapper popupUserResponseDtoMapper;
 
 
     @Transactional
@@ -67,19 +69,23 @@ public class UserFavoriteService {
     }
 
     @Transactional(readOnly = true)
-    public List<PopupResponseDto> getFavoritePopupList(String userUuid) {
+    public List<PopupUserResponseDto> getFavoritePopupList(String userUuid) {
         Users user = usersRepository.findByUuid(userUuid)
                 .orElseThrow(() -> new IllegalArgumentException("유저를 찾을 수 없습니다."));
 
         List<UserFavorite> userFavoriteList = userFavoriteRepository.findAllByUserUuid(userUuid);
+        if (userFavoriteList.isEmpty()) {
+            return List.of();
+        }
 
-        List<Long> popupIdList = userFavoriteList.stream()
-                .map(userFavorite -> userFavorite.getPopup().getId())
-                .toList();
+        Set<Long> favoritedPopupIdList = userFavoriteList
+                .stream()
+                .map(f -> f.getPopup().getId())
+                .collect(Collectors.toSet());
 
-        List<Popup> popupList = popupRepository.findAllById(popupIdList);
+        List<Popup> popupList = popupRepository.findAllById(favoritedPopupIdList);
 
-        return popupResponseDtoMapper.toPopupResponseDtoList(popupList);
+        return popupUserResponseDtoMapper.toPopupUserResponseDtoList(popupList, favoritedPopupIdList);
     }
 
 }

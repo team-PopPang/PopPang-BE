@@ -121,6 +121,7 @@ public class PopupService {
 
     }
 
+    @Transactional(readOnly = true)
     public PopupResponseDto getPopupByUuid(String popupUuid) {
         Popup popup = popupRepository.findByUuid(popupUuid)
                 .orElseThrow(() -> new IllegalArgumentException("팝업을 찾을 수 없습니다. "));
