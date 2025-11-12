@@ -171,22 +171,23 @@ public class PopupService {
     }
 
     public List<PopupResponseDto> getFilteredHomePopupList(String region, String district, HomeSortStandard homeSortStandard) {
+        String normalizedRegion = StringNormalizer.normalizeRegion(region);
         String normalizedDistrict = StringNormalizer.normalizeDistrict(district);
 
         if (homeSortStandard == HomeSortStandard.NEWEST) {
-            List<Popup> popupList = popupRepository.findActiveByNewest(region, normalizedDistrict);
+            List<Popup> popupList = popupRepository.findActiveByNewest(normalizedRegion, normalizedDistrict);
 
             return popupResponseDtoMapper.toPopupResponseDtoList(popupList);
         } else if (homeSortStandard == HomeSortStandard.CLOSING_SOON) {
-            List<Popup> popupList = popupRepository.findActiveByClosingSoon(region, normalizedDistrict);
+            List<Popup> popupList = popupRepository.findActiveByClosingSoon(normalizedRegion, normalizedDistrict);
 
             return popupResponseDtoMapper.toPopupResponseDtoList(popupList);
         } else if (homeSortStandard == HomeSortStandard.MOST_FAVORITED) {
-            List<Popup> popupList = popupRepository.findActiveByMostFavorited(region, normalizedDistrict);
+            List<Popup> popupList = popupRepository.findActiveByMostFavorited(normalizedRegion, normalizedDistrict);
 
             return popupResponseDtoMapper.toPopupResponseDtoList(popupList);
         } else if (homeSortStandard == HomeSortStandard.MOST_VIEWED) {
-            List<Popup> popupList = popupRepository.findActiveByMostViewed(region, normalizedDistrict);
+            List<Popup> popupList = popupRepository.findActiveByMostViewed(normalizedRegion, normalizedDistrict);
 
             return popupResponseDtoMapper.toPopupResponseDtoList(popupList);
         } else {
@@ -195,26 +196,27 @@ public class PopupService {
     }
 
     public List<PopupResponseDto> getFilteredMapPopupList(String region, String district, Double latitude, Double longitude, MapSortStandard mapSortStandard) {
+        String normalizedRegion = StringNormalizer.normalizeRegion(region);
         String normalizedDistrict = StringNormalizer.normalizeDistrict(district);
 
         if (mapSortStandard == MapSortStandard.CLOSEST) {
-            List<Popup> popupList = popupRepository.findActiveByClosest(region, normalizedDistrict, latitude, longitude);
+            List<Popup> popupList = popupRepository.findActiveByClosest(normalizedRegion, normalizedDistrict, latitude, longitude);
 
             return popupResponseDtoMapper.toPopupResponseDtoList(popupList);
         } else if (mapSortStandard == MapSortStandard.NEWEST) {
-            List<Popup> popupList = popupRepository.findActiveByNewest(region, normalizedDistrict);
+            List<Popup> popupList = popupRepository.findActiveByNewest(normalizedRegion, normalizedDistrict);
 
             return popupResponseDtoMapper.toPopupResponseDtoList(popupList);
         } else if (mapSortStandard == MapSortStandard.CLOSING_SOON) {
-            List<Popup> popupList = popupRepository.findActiveByClosingSoon(region, normalizedDistrict);
+            List<Popup> popupList = popupRepository.findActiveByClosingSoon(normalizedRegion, normalizedDistrict);
 
             return popupResponseDtoMapper.toPopupResponseDtoList(popupList);
         } else if (mapSortStandard == MapSortStandard.MOST_FAVORITED) {
-            List<Popup> popupList = popupRepository.findActiveByMostViewed(region, normalizedDistrict);
+            List<Popup> popupList = popupRepository.findActiveByMostViewed(normalizedRegion, normalizedDistrict);
 
             return popupResponseDtoMapper.toPopupResponseDtoList(popupList);
         } else if (mapSortStandard == MapSortStandard.MOST_VIEWED) {
-            List<Popup> popupList = popupRepository.findActiveByMostViewed(region, normalizedDistrict);
+            List<Popup> popupList = popupRepository.findActiveByMostViewed(normalizedRegion, normalizedDistrict);
 
             return popupResponseDtoMapper.toPopupResponseDtoList(popupList);
         } else {

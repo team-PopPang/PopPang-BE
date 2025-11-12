@@ -148,7 +148,7 @@ public class PopupUserService {
     }
 
     public List<PopupUserResponseDto> getFilteredHomePopupList(String userUuid, String region, String district, HomeSortStandard homeSortStandard) {
-
+        String normalizedRegion = StringNormalizer.normalizeRegion(region);
         String normalizedDistrict = StringNormalizer.normalizeDistrict(district);
 
         Set<Long> favoritedPopupIdList = userFavoriteRepository.findAllByUserUuid(userUuid)
@@ -157,19 +157,19 @@ public class PopupUserService {
                 .collect(Collectors.toSet());
 
         if (homeSortStandard == HomeSortStandard.NEWEST) {
-            List<Popup> popupList = popupRepository.findActiveByNewest(region, normalizedDistrict);
+            List<Popup> popupList = popupRepository.findActiveByNewest(normalizedRegion, normalizedDistrict);
 
             return popupUserResponseDtoMapper.toPopupUserResponseDtoList(popupList, favoritedPopupIdList);
         } else if (homeSortStandard == HomeSortStandard.CLOSING_SOON) {
-            List<Popup> popupList = popupRepository.findActiveByClosingSoon(region, normalizedDistrict);
+            List<Popup> popupList = popupRepository.findActiveByClosingSoon(normalizedRegion, normalizedDistrict);
 
             return popupUserResponseDtoMapper.toPopupUserResponseDtoList(popupList, favoritedPopupIdList);
         } else if (homeSortStandard == HomeSortStandard.MOST_FAVORITED) {
-            List<Popup> popupList = popupRepository.findActiveByMostFavorited(region, normalizedDistrict);
+            List<Popup> popupList = popupRepository.findActiveByMostFavorited(normalizedRegion, normalizedDistrict);
 
             return popupUserResponseDtoMapper.toPopupUserResponseDtoList(popupList, favoritedPopupIdList);
         } else if (homeSortStandard == HomeSortStandard.MOST_VIEWED) {
-            List<Popup> popupList = popupRepository.findActiveByMostViewed(region, normalizedDistrict);
+            List<Popup> popupList = popupRepository.findActiveByMostViewed(normalizedRegion, normalizedDistrict);
 
             return popupUserResponseDtoMapper.toPopupUserResponseDtoList(popupList, favoritedPopupIdList);
         } else {
@@ -179,7 +179,7 @@ public class PopupUserService {
     }
 
     public List<PopupUserResponseDto> getFilteredMapPopupList(String userUuid, String region, String district, Double latitude, Double longitude, MapSortStandard mapSortStandard) {
-
+        String normalizedRegion = StringNormalizer.normalizeRegion(region);
         String normalizedDistrict = StringNormalizer.normalizeDistrict(district);
 
         Set<Long> favoritedPopupIdList = userFavoriteRepository.findAllByUserUuid(userUuid)
@@ -188,23 +188,23 @@ public class PopupUserService {
                 .collect(Collectors.toSet());
 
         if (mapSortStandard == MapSortStandard.CLOSEST) {
-            List<Popup> popupList = popupRepository.findActiveByClosest(region, normalizedDistrict, latitude, longitude);
+            List<Popup> popupList = popupRepository.findActiveByClosest(normalizedRegion, normalizedDistrict, latitude, longitude);
 
             return popupUserResponseDtoMapper.toPopupUserResponseDtoList(popupList, favoritedPopupIdList);
         } else if (mapSortStandard == MapSortStandard.NEWEST) {
-            List<Popup> popupList = popupRepository.findActiveByNewest(region, normalizedDistrict);
+            List<Popup> popupList = popupRepository.findActiveByNewest(normalizedRegion, normalizedDistrict);
 
             return popupUserResponseDtoMapper.toPopupUserResponseDtoList(popupList, favoritedPopupIdList);
         } else if (mapSortStandard == MapSortStandard.CLOSING_SOON) {
-            List<Popup> popupList = popupRepository.findActiveByClosingSoon(region, normalizedDistrict);
+            List<Popup> popupList = popupRepository.findActiveByClosingSoon(normalizedRegion, normalizedDistrict);
 
             return popupUserResponseDtoMapper.toPopupUserResponseDtoList(popupList, favoritedPopupIdList);
         } else if (mapSortStandard == MapSortStandard.MOST_FAVORITED) {
-            List<Popup> popupList = popupRepository.findActiveByMostViewed(region, normalizedDistrict);
+            List<Popup> popupList = popupRepository.findActiveByMostViewed(normalizedRegion, normalizedDistrict);
 
             return popupUserResponseDtoMapper.toPopupUserResponseDtoList(popupList, favoritedPopupIdList);
         } else if (mapSortStandard == MapSortStandard.MOST_VIEWED) {
-            List<Popup> popupList = popupRepository.findActiveByMostViewed(region, normalizedDistrict);
+            List<Popup> popupList = popupRepository.findActiveByMostViewed(normalizedRegion, normalizedDistrict);
 
             return popupUserResponseDtoMapper.toPopupUserResponseDtoList(popupList, favoritedPopupIdList);
         } else {
