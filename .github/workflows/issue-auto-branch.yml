@@ -19,7 +19,7 @@ jobs:
     runs-on: ubuntu-latest  # GitHub에서 제공하는 Ubuntu 가상 환경에서 실행
     steps:
       - name: Create Issue Branch  # 스텝 이름
-        uses: robvanderleek/create-issue-branch@main  # 오픈소스 액션 사용 (이슈에서 자동으로 브랜치 생성)
+        uses: robvanderleek/create-issue-branch@v3  # 오픈소스 액션 사용 (이슈에서 자동으로 브랜치 생성)
         env:
           GITHUB_TOKEN: ${{ secrets.PERSONAL_ACCESS_TOKEN }}  # 인증용 토큰 (권한 있는 토큰 사용)
 
