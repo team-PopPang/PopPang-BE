@@ -4,6 +4,7 @@ import com.poppang.be.domain.popup.application.PopupUserService;
 import com.poppang.be.domain.popup.dto.response.PopupResponseDto;
 import com.poppang.be.domain.popup.dto.response.PopupUserResponseDto;
 import com.poppang.be.domain.popup.enums.HomeSortStandard;
+import com.poppang.be.domain.popup.enums.MapSortStandard;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.tags.Tag;
@@ -91,7 +92,7 @@ public class PopupUserController {
     }
 
     @Operation(
-            summary = "홈 화면용 팝업 필터 조회",
+            summary = "[홈 뷰] 팝업 필터 조회",
             description = """
                     홈 화면에서 지역(region), 구(district), 정렬 기준(homeSortStandard)에 따라 팝업 리스트를 조회합니다.
                     - homeSortStandard:
@@ -115,6 +116,38 @@ public class PopupUserController {
 
         return filteredHomePopupList;
     }
+
+    @Operation(
+            summary = "[지도뷰] 팝업 필터 조회 API",
+            description = """
+                지역(region), 구(district), 정렬 기준(mapSortStandard), 좌표(latitude, longitude)에 따라 팝업 리스트를 필터링합니다.
+                
+                • mapSortStandard:
+                  - NEAREST(가까운 순)  ← 이 경우 latitude/longitude 필수
+                  - MOST_FAVORITED(찜순)
+                  - MOST_VIEWED(조회수순)
+                  - NEWEST(최신순)
+                  - CLOSING_SOON(마감임박순)
+                
+                • district는 '전체'로 요청하면 전체 지역을 의미합니다.
+                • latitude, longitude는 가까운순 정렬 시 필수값입니다.
+                """
+    )
+    @GetMapping("/filtered/map")
+    public ResponseEntity<List<PopupUserResponseDto>> getFilteredMapPopupList(
+            @PathVariable String userUuid,
+            @RequestParam String region,
+            @RequestParam String district,
+            @RequestParam(required = false) Double latitude,
+            @RequestParam(required = false) Double longitude,
+            @RequestParam MapSortStandard mapSortStandard
+    ) {
+        List<PopupUserResponseDto> filteredMapPopupList = popupUserService.getFilteredMapPopupList(userUuid, region, district, latitude, longitude, mapSortStandard);
+
+        return ResponseEntity.ok(filteredMapPopupList);
+    }
+
+
 
 
 }

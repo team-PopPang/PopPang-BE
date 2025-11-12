@@ -7,6 +7,7 @@ import com.poppang.be.domain.popup.entity.Popup;
 import com.poppang.be.domain.popup.entity.PopupImage;
 import com.poppang.be.domain.popup.entity.PopupRecommend;
 import com.poppang.be.domain.popup.enums.HomeSortStandard;
+import com.poppang.be.domain.popup.enums.MapSortStandard;
 import com.poppang.be.domain.popup.infrastructure.PopupImageRepository;
 import com.poppang.be.domain.popup.infrastructure.PopupRecommendRepository;
 import com.poppang.be.domain.popup.infrastructure.PopupRepository;
@@ -176,5 +177,39 @@ public class PopupUserService {
         }
 
     }
-    
+
+    public List<PopupUserResponseDto> getFilteredMapPopupList(String userUuid, String region, String district, Double latitude, Double longitude, MapSortStandard mapSortStandard) {
+
+        String normalizedDistrict = StringNormalizer.normalizeDistrict(district);
+
+        Set<Long> favoritedPopupIdList = userFavoriteRepository.findAllByUserUuid(userUuid)
+                .stream()
+                .map(f -> f.getPopup().getId())
+                .collect(Collectors.toSet());
+
+        if (mapSortStandard == MapSortStandard.CLOSEST) {
+            List<Popup> popupList = popupRepository.findActiveByClosest(region, normalizedDistrict, latitude, longitude);
+
+            return popupUserResponseDtoMapper.toPopupUserResponseDtoList(popupList, favoritedPopupIdList);
+        } else if (mapSortStandard == MapSortStandard.NEWEST) {
+            List<Popup> popupList = popupRepository.findActiveByNewest(region, normalizedDistrict);
+
+            return popupUserResponseDtoMapper.toPopupUserResponseDtoList(popupList, favoritedPopupIdList);
+        } else if (mapSortStandard == MapSortStandard.CLOSING_SOON) {
+            List<Popup> popupList = popupRepository.findActiveByClosingSoon(region, normalizedDistrict);
+
+            return popupUserResponseDtoMapper.toPopupUserResponseDtoList(popupList, favoritedPopupIdList);
+        } else if (mapSortStandard == MapSortStandard.MOST_FAVORITED) {
+            List<Popup> popupList = popupRepository.findActiveByMostViewed(region, normalizedDistrict);
+
+            return popupUserResponseDtoMapper.toPopupUserResponseDtoList(popupList, favoritedPopupIdList);
+        } else if (mapSortStandard == MapSortStandard.MOST_VIEWED) {
+            List<Popup> popupList = popupRepository.findActiveByMostViewed(region, normalizedDistrict);
+
+            return popupUserResponseDtoMapper.toPopupUserResponseDtoList(popupList, favoritedPopupIdList);
+        } else {
+            throw new IllegalArgumentException("지원하지 않는 정렬 기준입니다.: " + mapSortStandard);
+        }
+    }
+
 }

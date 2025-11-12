@@ -36,6 +36,29 @@ public interface PopupRepository extends JpaRepository<Popup, Long> {
              """)
     List<Popup> findInProgressPopupList();
 
+    @Query(value = """
+            SELECT
+              p.*,
+              (6371 * ACOS(
+                 COS(RADIANS(:lat)) * COS(RADIANS(p.latitude)) *
+                 COS(RADIANS(p.longitude) - RADIANS(:lng)) +
+                 SIN(RADIANS(:lat)) * SIN(RADIANS(p.latitude))
+              )) AS distance_km
+            FROM popup p
+            WHERE p.is_active = 1
+              AND p.start_date <= CURRENT_DATE
+              AND p.end_date >= CURRENT_DATE
+              AND (:region IS NULL OR p.region = :region)
+              AND (:district IS NULL OR p.road_address LIKE CONCAT('%', :district, '%'))
+            ORDER BY distance_km ASC, p.created_at DESC
+            """, nativeQuery = true)
+    List<Popup> findActiveByClosest(
+            @Param("region") String region,
+            @Param("district") String district,
+            @Param("lat") Double latitude,
+            @Param("lng") Double longitude
+    );
+
     interface RegionDistrictsRaw {
         String getRegion();
 

@@ -5,6 +5,7 @@ import com.poppang.be.domain.popup.dto.request.PopupRegisterRequestDto;
 import com.poppang.be.domain.popup.dto.response.PopupResponseDto;
 import com.poppang.be.domain.popup.dto.response.RegionDistrictsResponse;
 import com.poppang.be.domain.popup.enums.HomeSortStandard;
+import com.poppang.be.domain.popup.enums.MapSortStandard;
 import com.poppang.be.domain.popup.enums.SortStandard;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
@@ -122,7 +123,7 @@ public class PopupController {
             deprecated = true
     )
     @GetMapping("/filtered")
-    public List<PopupResponseDto> getFilteredPopupList(
+    public ResponseEntity<List<PopupResponseDto>> getFilteredPopupList(
             @RequestParam String region,
             @RequestParam(required = false) String district,
             @RequestParam(defaultValue = "LIKES") SortStandard sortStandard,
@@ -131,11 +132,11 @@ public class PopupController {
     ) {
         List<PopupResponseDto> filteredPopupList = popupService.getFilteredPopupList(region, district, sortStandard, latitude, longitude);
 
-        return filteredPopupList;
+        return ResponseEntity.ok(filteredPopupList);
     }
 
     @Operation(
-            summary = "홈 화면용 팝업 필터 조회",
+            summary = "[홈 뷰] 팝업 필터 조회",
             description = """
                     홈 화면에서 지역(region), 구(district), 정렬 기준(homeSortStandard)에 따라 팝업 리스트를 조회합니다.
                     - homeSortStandard:
@@ -149,14 +150,43 @@ public class PopupController {
                     """
     )
     @GetMapping("/filtered/home")
-    public List<PopupResponseDto> getFilteredHomePopupList(
+    public ResponseEntity<List<PopupResponseDto>> getFilteredHomePopupList(
             @RequestParam String region,
             @RequestParam String district,
             @RequestParam HomeSortStandard homeSortStandard
     ) {
         List<PopupResponseDto> filteredHomePopupList = popupService.getFilteredHomePopupList(region, district, homeSortStandard);
 
-        return filteredHomePopupList;
+        return ResponseEntity.ok(filteredHomePopupList);
+    }
+
+    @Operation(
+            summary = "[지도뷰] 팝업 필터 조회 API",
+            description = """
+                지역(region), 구(district), 정렬 기준(mapSortStandard), 좌표(latitude, longitude)에 따라 팝업 리스트를 필터링합니다.
+                
+                • mapSortStandard:
+                  - NEAREST(가까운 순)  ← 이 경우 latitude/longitude 필수
+                  - MOST_FAVORITED(찜순)
+                  - MOST_VIEWED(조회수순)
+                  - NEWEST(최신순)
+                  - CLOSING_SOON(마감임박순)
+                
+                • district는 '전체'로 요청하면 전체 지역을 의미합니다.
+                • latitude, longitude는 가까운순 정렬 시 필수값입니다.
+                """
+    )
+    @GetMapping("/filtered/map")
+    public ResponseEntity<List<PopupResponseDto>> getFilteredMapPopupList(
+            @RequestParam String region,
+            @RequestParam String district,
+            @RequestParam(required = false) Double latitude,
+            @RequestParam(required = false) Double longitude,
+            @RequestParam MapSortStandard mapSortStandard
+    ) {
+        List<PopupResponseDto> filteredMapPopupList = popupService.getFilteredMapPopupList(region, district, latitude, longitude, mapSortStandard);
+
+        return ResponseEntity.ok(filteredMapPopupList);
     }
 
 }
