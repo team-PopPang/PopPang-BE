@@ -1,7 +1,6 @@
 package com.poppang.be.domain.popup.presentation;
 
 import com.poppang.be.domain.popup.application.PopupUserService;
-import com.poppang.be.domain.popup.dto.response.PopupResponseDto;
 import com.poppang.be.domain.popup.dto.response.PopupUserResponseDto;
 import com.poppang.be.domain.popup.enums.HomeSortStandard;
 import com.poppang.be.domain.popup.enums.MapSortStandard;
@@ -63,6 +62,25 @@ public class PopupUserController {
         return ResponseEntity.ok(upcomingPopupUserList);
     }
 
+    @Operation(
+            summary = "유저별 개인화 추천 팝업 조회 API",
+            description = """
+                    사용자의 관심 키워드(UserRecommend)에 기반하여 개인화된 추천 팝업 10개를 반환합니다.
+
+                    추천 로직:
+                    • 유저 관심 키워드별로 최대 2개씩 추천 팝업을 수집
+                    • 총 10개가 되지 않으면 ‘현재 운영 중(start_date ≤ today ≤ end_date)’ 팝업 중 무작위로 채움
+                    • 중복 제거하여 최대 10개 구성
+
+                    개인화 정보 포함:
+                    • is_favorited: 사용자가 해당 팝업을 찜했는지 여부
+                    • favoriteCount, viewCount 등 팝업 상세 정보 포함
+
+                    참고:
+                    • 유저 추천 키워드가 없으면 랜덤 추천으로만 구성됨
+                    • 이미 선택된 팝업은 제외 처리하여 중복되지 않음
+                    """
+    )
     @GetMapping("/recommend")
     public ResponseEntity<List<PopupUserResponseDto>> getRecommendPopupList(
             @PathVariable String userUuid
@@ -129,18 +147,18 @@ public class PopupUserController {
     @Operation(
             summary = "[지도뷰] 팝업 필터 조회 API",
             description = """
-                지역(region), 구(district), 정렬 기준(mapSortStandard), 좌표(latitude, longitude)에 따라 팝업 리스트를 필터링합니다.
-                
-                • mapSortStandard:
-                  - NEAREST(가까운 순)  ← 이 경우 latitude/longitude 필수
-                  - MOST_FAVORITED(찜순)
-                  - MOST_VIEWED(조회수순)
-                  - NEWEST(최신순)
-                  - CLOSING_SOON(마감임박순)
-                
-                • district는 '전체'로 요청하면 전체 지역을 의미합니다.
-                • latitude, longitude는 가까운순 정렬 시 필수값입니다.
-                """
+                    지역(region), 구(district), 정렬 기준(mapSortStandard), 좌표(latitude, longitude)에 따라 팝업 리스트를 필터링합니다.
+                                    
+                    • mapSortStandard:
+                      - NEAREST(가까운 순)  ← 이 경우 latitude/longitude 필수
+                      - MOST_FAVORITED(찜순)
+                      - MOST_VIEWED(조회수순)
+                      - NEWEST(최신순)
+                      - CLOSING_SOON(마감임박순)
+                                    
+                    • district는 '전체'로 요청하면 전체 지역을 의미합니다.
+                    • latitude, longitude는 가까운순 정렬 시 필수값입니다.
+                    """
     )
     @GetMapping("/filtered/map")
     public ResponseEntity<List<PopupUserResponseDto>> getFilteredMapPopupList(
@@ -155,8 +173,6 @@ public class PopupUserController {
 
         return ResponseEntity.ok(filteredMapPopupList);
     }
-
-
 
 
 }

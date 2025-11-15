@@ -209,7 +209,7 @@ public class PopupUserService {
 
             return popupUserResponseDtoMapper.toPopupUserResponseDtoList(popupList, favoritedPopupIdList);
         } else if (mapSortStandard == MapSortStandard.MOST_FAVORITED) {
-            List<Popup> popupList = popupRepository.findActiveByMostViewed(normalizedRegion, normalizedDistrict);
+            List<Popup> popupList = popupRepository.findActiveByMostFavorited(normalizedRegion, normalizedDistrict);
 
             return popupUserResponseDtoMapper.toPopupUserResponseDtoList(popupList, favoritedPopupIdList);
         } else if (mapSortStandard == MapSortStandard.MOST_VIEWED) {

@@ -221,7 +221,7 @@ public class PopupService {
 
             return popupResponseDtoMapper.toPopupResponseDtoList(popupList);
         } else if (mapSortStandard == MapSortStandard.MOST_FAVORITED) {
-            List<Popup> popupList = popupRepository.findActiveByMostViewed(normalizedRegion, normalizedDistrict);
+            List<Popup> popupList = popupRepository.findActiveByMostFavorited(normalizedRegion, normalizedDistrict);
 
             return popupResponseDtoMapper.toPopupResponseDtoList(popupList);
         } else if (mapSortStandard == MapSortStandard.MOST_VIEWED) {
