@@ -120,6 +120,8 @@ public interface PopupRepository extends JpaRepository<Popup, Long> {
                 FROM popup
                 WHERE road_address LIKE '%구%'
                   AND SUBSTRING_INDEX(road_address, ' ', 1) = '서울'
+                  AND start_date <= CURRENT_DATE
+                  AND end_date >= CURRENT_DATE
                 UNION ALL
                 SELECT DISTINCT
                     SUBSTRING_INDEX(road_address, ' ', 1) AS region,
@@ -127,6 +129,8 @@ public interface PopupRepository extends JpaRepository<Popup, Long> {
                 FROM popup
                 WHERE road_address LIKE '%구%'
                   AND SUBSTRING_INDEX(road_address, ' ', 1) <> '서울'
+                  AND start_date <= CURRENT_DATE
+                  AND end_date >= CURRENT_DATE
             ) t
             WHERE district <> '구'
             GROUP BY region
@@ -135,8 +139,8 @@ public interface PopupRepository extends JpaRepository<Popup, Long> {
                     WHEN region = '전체' THEN 0
                     ELSE 1
                 END,
-                region
-            """, nativeQuery = true)
+                region;
+                        """, nativeQuery = true)
     List<RegionDistrictsRaw> findRegionDistrictsJson();
 
     @Query(value = """
