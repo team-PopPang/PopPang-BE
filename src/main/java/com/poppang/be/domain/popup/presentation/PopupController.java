@@ -74,6 +74,15 @@ public class PopupController {
         return ResponseEntity.ok(upcomingPopupList);
     }
 
+    @GetMapping("/{userUuid}/recommend")
+    public ResponseEntity<List<PopupResponseDto>> getRecommendPopupList(
+            @PathVariable String userUuid
+    ) {
+        List<PopupResponseDto> recommendPopupList = popupService.getRecommendPopupList(userUuid);
+
+        return ResponseEntity.ok(recommendPopupList);
+    }
+
     @Operation(
             summary = "진행 중인 팝업 조회",
             description = "현재 날짜 기준으로 오픈 중(진행 중)인 모든 팝업스토어 정보를 조회합니다. " +
