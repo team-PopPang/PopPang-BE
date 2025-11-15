@@ -74,6 +74,21 @@ public class PopupController {
         return ResponseEntity.ok(upcomingPopupList);
     }
 
+    @Operation(
+            summary = "유저별 추천 팝업 조회 API",
+            description = """
+                    사용자의 관심 키워드(UserRecommend)에 기반하여 추천 팝업 10개를 반환합니다.
+
+                    추천 로직:
+                    • 유저 키워드별로 최대 2개씩 추천 팝업을 수집
+                    • 총 10개가 되지 않으면 활성 팝업 중에서 랜덤으로 채움
+                    • start_date ≤ today ≤ end_date 조건의 ‘현재 운영 중’ 팝업만 추천 대상
+
+                    참고:
+                    • 유저가 설정한 추천 키워드(UserRecommend)가 없으면 → 전부 랜덤 추천
+                    • 이미 추천된 팝업은 중복되지 않도록 제외 처리
+                    """
+    )
     @GetMapping("/{userUuid}/recommend")
     public ResponseEntity<List<PopupResponseDto>> getRecommendPopupList(
             @PathVariable String userUuid
@@ -172,18 +187,18 @@ public class PopupController {
     @Operation(
             summary = "[지도뷰] 팝업 필터 조회 API",
             description = """
-                지역(region), 구(district), 정렬 기준(mapSortStandard), 좌표(latitude, longitude)에 따라 팝업 리스트를 필터링합니다.
-                
-                • mapSortStandard:
-                  - NEAREST(가까운 순)  ← 이 경우 latitude/longitude 필수
-                  - MOST_FAVORITED(찜순)
-                  - MOST_VIEWED(조회수순)
-                  - NEWEST(최신순)
-                  - CLOSING_SOON(마감임박순)
-                
-                • district는 '전체'로 요청하면 전체 지역을 의미합니다.
-                • latitude, longitude는 가까운순 정렬 시 필수값입니다.
-                """
+                    지역(region), 구(district), 정렬 기준(mapSortStandard), 좌표(latitude, longitude)에 따라 팝업 리스트를 필터링합니다.
+                                    
+                    • mapSortStandard:
+                      - NEAREST(가까운 순)  ← 이 경우 latitude/longitude 필수
+                      - MOST_FAVORITED(찜순)
+                      - MOST_VIEWED(조회수순)
+                      - NEWEST(최신순)
+                      - CLOSING_SOON(마감임박순)
+                                    
+                    • district는 '전체'로 요청하면 전체 지역을 의미합니다.
+                    • latitude, longitude는 가까운순 정렬 시 필수값입니다.
+                    """
     )
     @GetMapping("/filtered/map")
     public ResponseEntity<List<PopupResponseDto>> getFilteredMapPopupList(
