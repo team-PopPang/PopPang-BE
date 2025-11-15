@@ -59,6 +59,23 @@ public interface PopupRepository extends JpaRepository<Popup, Long> {
             @Param("lng") Double longitude
     );
 
+    @Query(value = """
+            SELECT *
+            FROM popup p
+            WHERE p.is_active = 1
+              AND p.start_date <= CURRENT_DATE
+              AND p.end_date >= CURRENT_DATE
+              AND (:excludeSize = 0 OR p.id NOT IN (:excludeIds))
+            ORDER BY RAND()
+            LIMIT :limit
+            """, nativeQuery = true)
+    List<Popup> findRandomActivePopupsExcluding(
+            @Param("excludeIds") List<Long> excludeIds,
+            @Param("excludeSize") int excludeSize,
+            @Param("limit") int limit
+    );
+
+
     interface RegionDistrictsRaw {
         String getRegion();
 
