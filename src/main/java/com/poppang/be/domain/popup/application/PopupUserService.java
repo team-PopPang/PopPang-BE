@@ -13,12 +13,19 @@ import com.poppang.be.domain.popup.infrastructure.PopupRecommendRepository;
 import com.poppang.be.domain.popup.infrastructure.PopupRepository;
 import com.poppang.be.domain.popup.infrastructure.PopupTotalViewCountRepository;
 import com.poppang.be.domain.popup.mapper.PopupUserResponseDtoMapper;
+import com.poppang.be.domain.recommend.entity.UserRecommend;
 import com.poppang.be.domain.recommend.infrastructure.RecommendRepository;
+import com.poppang.be.domain.recommend.infrastructure.UserRecommendRepository;
+import com.poppang.be.domain.users.entity.Users;
+import com.poppang.be.domain.users.infrastructure.UsersRepository;
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.domain.PageRequest;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.time.LocalDate;
+import java.util.ArrayList;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 import java.util.stream.Collectors;
@@ -33,6 +40,8 @@ public class PopupUserService {
     private final PopupRecommendRepository popupRecommendRepository;
     private final UserFavoriteRepository userFavoriteRepository;
     private final PopupTotalViewCountRepository popupTotalViewCountRepository;
+    private final UsersRepository usersRepository;
+    private final UserRecommendRepository userRecommendRepository;
     private final PopupUserResponseDtoMapper popupUserResponseDtoMapper;
 
     @Transactional(readOnly = true)
@@ -210,6 +219,59 @@ public class PopupUserService {
         } else {
             throw new IllegalArgumentException("지원하지 않는 정렬 기준입니다.: " + mapSortStandard);
         }
+    }
+
+    public List<PopupUserResponseDto> getRecommendPopupList(String userUuid) {
+        Users user = usersRepository.findByUuid(userUuid)
+                .orElseThrow(() -> new IllegalArgumentException("유저를 찾을 수 없습니다."));
+
+        List<UserRecommend> userRecommendList = userRecommendRepository.findAllByUser_Uuid(userUuid);
+
+        Set<Long> pickedPopupIdSetList = new HashSet<>();
+        List<Popup> popupList = new ArrayList<>(10);
+
+        for (UserRecommend userRecommend : userRecommendList) {
+            Long recommendId = userRecommend.getRecommend().getId();
+
+            List<Popup> matchedPopupList = popupRecommendRepository.findActivePopupsByRecommendId(recommendId, PageRequest.of(0, 2));
+
+            for (Popup popup : matchedPopupList) {
+                if (pickedPopupIdSetList.add(popup.getId())) { // 중복 제거
+                    popupList.add(popup);
+                    if (popupList.size() == 10) {
+                        break; // 10개 채우면 바로 종료
+                    }
+                }
+            }
+
+            if (popupList.size() == 10) {
+                break;
+            }
+        }
+
+        if (popupList.size() < 10) {
+            int remain = 10 - popupList.size();
+
+            List<Long> excludeIds = new ArrayList<>(pickedPopupIdSetList); // 이미 뽑은 것 제외
+            List<Popup> randomPopups = popupRepository.findRandomActivePopupsExcluding(
+                    excludeIds,
+                    excludeIds.size(),
+                    remain
+            );
+
+            for (Popup popup : randomPopups) {
+                if (pickedPopupIdSetList.add(popup.getId())) {
+                    popupList.add(popup);
+                }
+            }
+        }
+
+        Set<Long> favoritedPopupIdList = userFavoriteRepository.findAllByUserUuid(userUuid)
+                .stream()
+                .map(f -> f.getPopup().getId())
+                .collect(Collectors.toSet());
+
+        return popupUserResponseDtoMapper.toPopupUserResponseDtoList(popupList, favoritedPopupIdList);
     }
 
 }

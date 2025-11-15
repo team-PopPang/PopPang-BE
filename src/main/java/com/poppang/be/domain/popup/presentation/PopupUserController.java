@@ -63,6 +63,15 @@ public class PopupUserController {
         return ResponseEntity.ok(upcomingPopupUserList);
     }
 
+    @GetMapping("/recommend")
+    public ResponseEntity<List<PopupUserResponseDto>> getRecommendPopupList(
+            @PathVariable String userUuid
+    ) {
+        List<PopupUserResponseDto> recommendPopupList = popupUserService.getRecommendPopupList(userUuid);
+
+        return ResponseEntity.ok(recommendPopupList);
+    }
+
     @Operation(
             summary = "팝업 검색",
             description = "특정 키워드로 팝업스토어를 검색합니다."
