@@ -107,10 +107,32 @@ public interface PopupRepository extends JpaRepository<Popup, Long> {
                     ']'
                 ) AS districts
             FROM (
+                -- 1) 전체(All) region: 활성 팝업이 하나라도 있을 때만 추가
                 SELECT '전체' AS region, '전체' AS district
+                FROM dual
+                WHERE EXISTS (
+                    SELECT 1
+                    FROM popup
+                    WHERE start_date <= CURRENT_DATE
+                      AND end_date >= CURRENT_DATE
+                )
+
                 UNION ALL
+
+                -- 2) 서울 전체: 서울에 활성 팝업이 있을 때만 '전체' 추가
                 SELECT '서울' AS region, '전체' AS district
+                FROM dual
+                WHERE EXISTS (
+                    SELECT 1
+                    FROM popup
+                    WHERE SUBSTRING_INDEX(road_address, ' ', 1) = '서울'
+                      AND start_date <= CURRENT_DATE
+                      AND end_date >= CURRENT_DATE
+                )
+
                 UNION ALL
+
+                -- 3) 서울의 구 리스트 (마포구, 강남구 등) - 활성 팝업 기준
                 SELECT
                     '서울' AS region,
                     CONCAT(
@@ -122,13 +144,17 @@ public interface PopupRepository extends JpaRepository<Popup, Long> {
                   AND SUBSTRING_INDEX(road_address, ' ', 1) = '서울'
                   AND start_date <= CURRENT_DATE
                   AND end_date >= CURRENT_DATE
+
                 UNION ALL
+
+                -- 4) 서울 이외 지역: 활성 팝업이 있는 "시"마다 '전체' 하나씩
+                --   예) 부산 기장군, 부산 해운대구 → region='부산', district='전체' 한 줄
+                --       대전 기장읍 → region='대전', district='전체' 한 줄
                 SELECT DISTINCT
                     SUBSTRING_INDEX(road_address, ' ', 1) AS region,
                     '전체' AS district
                 FROM popup
-                WHERE road_address LIKE '%구%'
-                  AND SUBSTRING_INDEX(road_address, ' ', 1) <> '서울'
+                WHERE SUBSTRING_INDEX(road_address, ' ', 1) <> '서울'
                   AND start_date <= CURRENT_DATE
                   AND end_date >= CURRENT_DATE
             ) t
@@ -139,8 +165,8 @@ public interface PopupRepository extends JpaRepository<Popup, Long> {
                     WHEN region = '전체' THEN 0
                     ELSE 1
                 END,
-                region;
-                        """, nativeQuery = true)
+                region
+            """, nativeQuery = true)
     List<RegionDistrictsRaw> findRegionDistrictsJson();
 
     @Query(value = """
