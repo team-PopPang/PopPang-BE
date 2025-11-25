@@ -174,5 +174,33 @@ public class PopupUserController {
         return ResponseEntity.ok(filteredMapPopupList);
     }
 
+    @Operation(
+            summary = "유저별 연관 팝업 추천 조회",
+            description = """
+                    특정 유저가 보고 있는 팝업과 동일한 추천 태그(recommend)를 기반으로
+                    최대 10개의 연관 팝업을 반환합니다.
+
+                    동작 방식:
+                    - popupUuid로 추천 태그(recommend) 조회
+                    - 동일 recommend를 가진 활성 팝업 추출
+                    - 현재 팝업은 결과에서 제외
+                    - 10개가 부족하면 활성 팝업에서 랜덤 보충
+
+                    포함 정보:
+                    - is_favorited: 해당 유저가 찜했는지 여부
+                    - favoriteCount, viewCount 포함
+                    - 이미지 리스트 포함
+                    """
+    )
+    @GetMapping("/{popupUuid}/related")
+    public ResponseEntity<List<PopupUserResponseDto>> getRelatedPopupList(
+            @PathVariable String userUuid,
+            @PathVariable String popupUuid
+    ) {
+        List<PopupUserResponseDto> relatedPopupList = popupUserService.getRelatedPopupList(userUuid, popupUuid);
+
+        return ResponseEntity.ok(relatedPopupList);
+    }
+
 
 }

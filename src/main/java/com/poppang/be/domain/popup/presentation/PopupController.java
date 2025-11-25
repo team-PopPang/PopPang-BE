@@ -213,4 +213,32 @@ public class PopupController {
         return ResponseEntity.ok(filteredMapPopupList);
     }
 
+    @Operation(
+            summary = "연관 팝업 추천 조회",
+            description = """
+                특정 팝업과 동일한 추천 태그(recommend)를 기반으로
+                최대 10개의 연관 팝업을 반환합니다.
+
+                동작 방식:
+                - 현재 팝업의 recommend 값 조회
+                - 같은 recommend를 가진 활성 팝업에서 최대 10개 반환
+                - 현재 팝업은 결과에서 제외
+                - 부족할 경우 활성 팝업 중 랜덤으로 채움
+
+                반환 조건:
+                - is_active = true
+                - start_date ≤ 오늘 ≤ end_date
+                - 최대 10개
+                - 중복 제거
+                """
+    )
+    @GetMapping("/{popupUuid}/related")
+    public ResponseEntity<List<PopupResponseDto>> getRelatedPopupList(
+            @PathVariable String popupUuid
+    ) {
+        List<PopupResponseDto> relatedPopupList = popupService.getRelatedPopupList(popupUuid);
+
+        return ResponseEntity.ok(relatedPopupList);
+    }
+
 }

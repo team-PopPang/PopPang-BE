@@ -339,4 +339,46 @@ public class PopupService {
 
         return popupResponseDtoMapper.toPopupResponseDtoList(popupList);
     }
+
+    @Transactional(readOnly = true)
+    public List<PopupResponseDto> getRelatedPopupList(String popupUuid) {
+
+        Popup popup = popupRepository.findByUuid(popupUuid)
+                .orElseThrow(() -> new IllegalArgumentException("팝업을 찾을 수 없습니다. "));
+
+        PopupRecommend popupRecommend = popupRecommendRepository.findByPopupId(popup.getId())
+                .orElseThrow(() -> new IllegalArgumentException("해당 팝업에는 추천 값이 존재하지 않습니다. "));//entty 말고 id로 조회하는 것부터 시작
+
+        Long recommendId = popupRecommend.getRecommend().getId();
+
+        List<Popup> relatedPopupList = popupRecommendRepository.findRelatedActivePopupList(recommendId);
+        relatedPopupList.removeIf(p -> p.getId().equals(popup.getId()));
+
+        List<Popup> popupList = relatedPopupList.stream()
+                .distinct()
+                .limit(10)
+                .toList();
+
+        if (popupList.size() == 10) {
+            return popupResponseDtoMapper.toPopupResponseDtoList(popupList);
+        }
+
+        int remain = 10 - popupList.size();
+        List<Long> excludeIds = popupList.stream() // 이미 뽑은 것 제외
+                .map(Popup::getId)
+                .toList();
+
+        List<Popup> randomPopups = popupRepository.findRandomActivePopupsExcluding(
+                excludeIds,
+                excludeIds.size(),
+                remain
+        );
+
+        List<Popup> finalPopupList = new ArrayList<>(10);
+        finalPopupList.addAll(popupList);
+        finalPopupList.addAll(randomPopups);
+
+        return popupResponseDtoMapper.toPopupResponseDtoList(finalPopupList);
+    }
+
 }
