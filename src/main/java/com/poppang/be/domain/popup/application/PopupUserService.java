@@ -342,4 +342,18 @@ public class PopupUserService {
         return popupUserResponseDtoMapper.toPopupUserResponseDtoList(finalPopupList, favoritedPopupIdList);
     }
 
+    public List<PopupUserResponseDto> getRandomPopupList(String userUuid) {
+        Users user = usersRepository.findByUuid(userUuid)
+                .orElseThrow(() -> new IllegalArgumentException("유저를 찾을 수 없습니다."));
+
+        Set<Long> favoritedPopupIdList = userFavoriteRepository.findAllByUserUuid(userUuid)
+                .stream()
+                .map(f -> f.getPopup().getId())
+                .collect(Collectors.toSet());
+
+        List<Popup> popupList = popupRepository.findRandomActivePopups();
+
+        return popupUserResponseDtoMapper.toPopupUserResponseDtoList(popupList, favoritedPopupIdList);
+    }
+
 }

@@ -75,7 +75,6 @@ public interface PopupRepository extends JpaRepository<Popup, Long> {
             @Param("limit") int limit
     );
 
-
     interface RegionDistrictsRaw {
         String getRegion();
 
@@ -259,5 +258,16 @@ public interface PopupRepository extends JpaRepository<Popup, Long> {
             """, nativeQuery = true)
     List<Popup> findActiveByMostViewed(@Param("region") String region,
                                        @Param("district") String district);
+
+    @Query(value = """
+                SELECT *
+                FROM popup p
+                WHERE p.is_active = 1
+                AND p.start_date <= CURRENT_DATE
+                AND p.end_date >= CURRENT_DATE
+                ORDER BY RAND()
+                LIMIT 10
+            """, nativeQuery = true)
+    List<Popup> findRandomActivePopups();
 
 }
