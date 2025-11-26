@@ -381,4 +381,12 @@ public class PopupService {
         return popupResponseDtoMapper.toPopupResponseDtoList(finalPopupList);
     }
 
+    @Transactional(readOnly = true)
+    public List<PopupResponseDto> getRandomPopupList() {
+
+        List<Popup> popupList = popupRepository.findRandomActivePopups();
+
+        return popupResponseDtoMapper.toPopupResponseDtoList(popupList);
+    }
+
 }

@@ -241,4 +241,26 @@ public class PopupController {
         return ResponseEntity.ok(relatedPopupList);
     }
 
+    @Operation(
+            summary = "랜덤 팝업 10개 조회",
+            description = """
+                활성 상태이며 현재 운영 중인 팝업 중에서
+                랜덤하게 10개를 반환합니다.
+
+                조건:
+                • is_active = true
+                • start_date ≤ 오늘 ≤ end_date
+
+                참고:
+                • 데이터가 10개 미만이면 가능한 만큼만 반환됩니다.
+                • 동일 결과가 매 요청마다 달라질 수 있습니다.
+                """
+    )
+    @GetMapping("/random")
+    public ResponseEntity<List<PopupResponseDto>> getRandomPopupList() {
+        List<PopupResponseDto> randomPopupList = popupService.getRandomPopupList();
+
+        return ResponseEntity.ok(randomPopupList);
+    }
+
 }
