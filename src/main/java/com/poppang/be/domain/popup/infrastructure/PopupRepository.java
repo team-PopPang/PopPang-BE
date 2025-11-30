@@ -17,10 +17,12 @@ public interface PopupRepository extends JpaRepository<Popup, Long> {
             select p
             from Popup p
             where p.activated = true
-            and(
-                lower(p.name) like lower(concat('%', :q, '%')) 
-                or lower(p.captionSummary) like lower(concat('%', :q, '%') )
-            )
+              and p.startDate <= CURRENT_DATE
+              and p.endDate >= CURRENT_DATE
+              and (
+                    lower(p.name) like lower(concat('%', :q, '%'))
+                    or lower(p.captionSummary) like lower(concat('%', :q, '%'))
+                  )
             """)
     List<Popup> searchActivatedByKeyword(@Param("q") String q);
 
@@ -30,8 +32,8 @@ public interface PopupRepository extends JpaRepository<Popup, Long> {
             select p
             from Popup p
             where p.activated = true
-            and p.startDate <= CURRENT DATE 
-            and p.endDate >= CURRENT DATE 
+            and p.startDate <= CURRENT_DATE
+            and p.endDate >= CURRENT_DATE
             order by p.startDate asc 
              """)
     List<Popup> findInProgressPopupList();

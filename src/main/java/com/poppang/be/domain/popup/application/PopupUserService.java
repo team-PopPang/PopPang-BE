@@ -78,8 +78,10 @@ public class PopupUserService {
                 .toList();
 
         // 추천
-        PopupRecommend popupRecommend = popupRecommendRepository.findFirstByPopup_Id(popup.getId());
-        String recommendName = (popupRecommend != null) ? popupRecommend.getRecommend().getRecommendName() : null;
+        List<String> recommendNameList = popupRecommendRepository.findAllByPopup_Id(popup.getId())
+                .stream()
+                .map(r -> r.getRecommend().getRecommendName())
+                .toList();
 
         //좋아요 수
         Long favoriteCount = userFavoriteRepository.countByPopupUuid(popup.getUuid());
@@ -108,7 +110,7 @@ public class PopupUserService {
                 .captionSummary(popup.getCaptionSummary())
                 .imageUrlList(imageUrlList)
                 .mediaType(popup.getMediaType())
-                .recommend(recommendName)
+                .recommendList(recommendNameList)
                 .favoriteCount(favoriteCount)
                 .viewCount(viewCount)
                 .favorited(isFavorited)
