@@ -8,6 +8,7 @@ import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 import org.springframework.stereotype.Repository;
 
+import java.util.Collection;
 import java.util.List;
 import java.util.Optional;
 
@@ -40,5 +41,7 @@ public interface PopupRecommendRepository extends JpaRepository<PopupRecommend, 
                 AND pr.popup.endDate >= CURRENT_DATE
             """)
     List<Popup> findRelatedActivePopupList(@Param("recommendId") Long recommendId);
+
+    List<PopupRecommend> findAllByPopup_Id(Long popupId);
 
 }
