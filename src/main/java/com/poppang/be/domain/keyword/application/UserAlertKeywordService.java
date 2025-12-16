@@ -1,5 +1,7 @@
 package com.poppang.be.domain.keyword.application;
 
+import com.poppang.be.common.exception.BaseException;
+import com.poppang.be.common.exception.ErrorCode;
 import com.poppang.be.domain.keyword.dto.request.UserAlertKeywordDeleteDto;
 import com.poppang.be.domain.keyword.dto.request.UserAlertKeywordRegisterRequestDto;
 import com.poppang.be.domain.keyword.dto.response.UserAlertKeywordResponseDto;
@@ -36,7 +38,7 @@ public class UserAlertKeywordService {
     @Transactional
     public void registerAlertKeyword(UserAlertKeywordRegisterRequestDto userAlertKeywordRegisterRequestDto) {
         Users user = usersRepository.findByUuid(userAlertKeywordRegisterRequestDto.getUserUuid())
-                .orElseThrow(() -> new IllegalArgumentException("유저를 찾을 수 없습니다. "));
+                .orElseThrow(() -> new BaseException(ErrorCode.USER_NOT_FOUND));
 
         UserAlertKeyword userAlertKeyword = UserAlertKeyword.from(user, userAlertKeywordRegisterRequestDto.getNewAlertKeyword());
 
@@ -46,10 +48,10 @@ public class UserAlertKeywordService {
     @Transactional
     public void deleteAlertKeyword(UserAlertKeywordDeleteDto userAlertKeywordDeleteDto) {
         Users user = usersRepository.findByUuid(userAlertKeywordDeleteDto.getUserUuid())
-                .orElseThrow(() -> new IllegalArgumentException("유저를 찾을 수 없습니다. "));
+                .orElseThrow(() -> new BaseException(ErrorCode.USER_NOT_FOUND));
 
         UserAlertKeyword userAlertKeyword = userAlertKeywordRepository.findByUserUuidAndAlertKeyword(userAlertKeywordDeleteDto.getUserUuid(), userAlertKeywordDeleteDto.getDeleteAlertKeyword())
-                .orElseThrow(() -> new IllegalArgumentException("해당 키워드가 존재하지 않습니다. "));
+                .orElseThrow(() -> new BaseException(ErrorCode.ALERT_KEYWORD_NOT_FOUND));
 
         userAlertKeywordRepository.delete(userAlertKeyword);
     }
