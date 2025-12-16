@@ -1,5 +1,7 @@
 package com.poppang.be.domain.favorite.application;
 
+import com.poppang.be.common.exception.BaseException;
+import com.poppang.be.common.exception.ErrorCode;
 import com.poppang.be.domain.favorite.dto.request.UserFavoriteDeleteRequestDto;
 import com.poppang.be.domain.favorite.dto.request.UserFavoriteRegisterRequestDto;
 import com.poppang.be.domain.favorite.dto.response.FavoriteCountResponseDto;
@@ -38,14 +40,14 @@ public class UserFavoriteService {
     @Transactional
     public void registerFavorite(UserFavoriteRegisterRequestDto userFavoriteRegisterRequestDto) {
         Users user = usersRepository.findByUuid(userFavoriteRegisterRequestDto.getUserUuid())
-                .orElseThrow(() -> new IllegalArgumentException("유저를 찾을 수 없습니다. "));
+                .orElseThrow(() -> new BaseException(ErrorCode.USER_NOT_FOUND));
 
         Popup popup = popupRepository.findByUuid(userFavoriteRegisterRequestDto.getPopupUuid())
-                .orElseThrow(() -> new IllegalArgumentException("팝업을 찾을 수 없습니다. "));
+                .orElseThrow(() -> new BaseException(ErrorCode.POPUP_NOT_FOUND));
 
         boolean exists = userFavoriteRepository.existsByUserAndPopup(user, popup);
         if (exists) {
-            throw new IllegalStateException("이미 찜한 팝업입니다. ");
+            throw new BaseException(ErrorCode.FAVORITE_ALREADY_EXISTS);
         }
 
         UserFavorite userFavorite = new UserFavorite(user, popup);
@@ -56,7 +58,7 @@ public class UserFavoriteService {
     @Transactional
     public void deleteFavorite(UserFavoriteDeleteRequestDto userFavoriteDeleteRequestDto) {
         UserFavorite userFavorite = userFavoriteRepository.findByUserUuidAndPopupUuid(userFavoriteDeleteRequestDto.getUserUuid(), userFavoriteDeleteRequestDto.getPopupUuid())
-                .orElseThrow(() -> new IllegalStateException("해당 찜 기록이 없습니다. "));
+                .orElseThrow(() -> new BaseException(ErrorCode.FAVORITE_NOT_FOUND));
 
         userFavoriteRepository.delete(userFavorite);
     }
@@ -71,7 +73,7 @@ public class UserFavoriteService {
     @Transactional(readOnly = true)
     public List<PopupUserResponseDto> getFavoritePopupList(String userUuid) {
         Users user = usersRepository.findByUuid(userUuid)
-                .orElseThrow(() -> new IllegalArgumentException("유저를 찾을 수 없습니다."));
+                .orElseThrow(() -> new BaseException(ErrorCode.USER_NOT_FOUND));
 
         List<UserFavorite> userFavoriteList = userFavoriteRepository.findAllByUserUuid(userUuid);
         if (userFavoriteList.isEmpty()) {
