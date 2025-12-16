@@ -1,5 +1,7 @@
 package com.poppang.be.domain.popup.application;
 
+import com.poppang.be.common.exception.BaseException;
+import com.poppang.be.common.exception.ErrorCode;
 import com.poppang.be.common.util.StringNormalizer;
 import com.poppang.be.domain.favorite.infrastructure.UserFavoriteRepository;
 import com.poppang.be.domain.popup.dto.response.PopupUserResponseDto;
@@ -47,7 +49,7 @@ public class PopupUserService {
     @Transactional(readOnly = true)
     public List<PopupUserResponseDto> getAllPopupList(String userUuid) {
         Users user = usersRepository.findByUuid(userUuid)
-                .orElseThrow(() -> new IllegalArgumentException("유저를 찾을 수 없습니다."));
+                .orElseThrow(() -> new BaseException(ErrorCode.USER_NOT_FOUND));
 
         List<Popup> popupList = popupRepository.findAll();
         if (popupList.isEmpty()) {
@@ -65,10 +67,10 @@ public class PopupUserService {
     @Transactional(readOnly = true)
     public PopupUserResponseDto getPopupByUuid(String userUuid, String popupUuid) {
         Users user = usersRepository.findByUuid(userUuid)
-                .orElseThrow(() -> new IllegalArgumentException("유저를 찾을 수 없습니다."));
+                .orElseThrow(() -> new BaseException(ErrorCode.USER_NOT_FOUND));
 
         Popup popup = popupRepository.findByUuid(popupUuid)
-                .orElseThrow(() -> new IllegalArgumentException("팝업을 찾을 수 없습니다. "));
+                .orElseThrow(() -> new BaseException(ErrorCode.POPUP_NOT_FOUND));
 
         // 팝업 이미지
         List<String> imageUrlList = popupImageRepository
@@ -122,7 +124,7 @@ public class PopupUserService {
     @Transactional(readOnly = true)
     public List<PopupUserResponseDto> getUpcomingPopupList(String userUuid, Integer upcomingDays) {
         Users user = usersRepository.findByUuid(userUuid)
-                .orElseThrow(() -> new IllegalArgumentException("유저를 찾을 수 없습니다."));
+                .orElseThrow(() -> new BaseException(ErrorCode.USER_NOT_FOUND));
 
         int days = (upcomingDays == null || upcomingDays <= 0) ? 10 : upcomingDays;
 
@@ -142,7 +144,7 @@ public class PopupUserService {
     public List<PopupUserResponseDto> getSearchPopupList(String userUuid, String q) {
 
         Users user = usersRepository.findByUuid(userUuid)
-                .orElseThrow(() -> new IllegalArgumentException("유저를 찾을 수 없습니다."));
+                .orElseThrow(() -> new BaseException(ErrorCode.USER_NOT_FOUND));
 
         String term = (q == null ? "" : q.trim());
         if (term.isEmpty()) return List.of();
@@ -160,7 +162,7 @@ public class PopupUserService {
 
     public List<PopupUserResponseDto> getInProgressPopupList(String userUuid) {
         Users user = usersRepository.findByUuid(userUuid)
-                .orElseThrow(() -> new IllegalArgumentException("유저를 찾을 수 없습니다."));
+                .orElseThrow(() -> new BaseException(ErrorCode.USER_NOT_FOUND));
 
         List<Popup> popupList = popupRepository.findInProgressPopupList();
 
@@ -174,7 +176,7 @@ public class PopupUserService {
 
     public List<PopupUserResponseDto> getFilteredHomePopupList(String userUuid, String region, String district, HomeSortStandard homeSortStandard) {
         Users user = usersRepository.findByUuid(userUuid)
-                .orElseThrow(() -> new IllegalArgumentException("유저를 찾을 수 없습니다."));
+                .orElseThrow(() -> new BaseException(ErrorCode.USER_NOT_FOUND));
 
         String normalizedRegion = StringNormalizer.normalizeRegion(region);
         String normalizedDistrict = StringNormalizer.normalizeDistrict(district);
@@ -201,14 +203,14 @@ public class PopupUserService {
 
             return popupUserResponseDtoMapper.toPopupUserResponseDtoList(popupList, favoritedPopupIdList);
         } else {
-            throw new IllegalArgumentException("지원하지 않는 정렬 기준입니다: " + homeSortStandard);
+            throw new BaseException(ErrorCode.INVALID_SORT_STANDARD);
         }
 
     }
 
     public List<PopupUserResponseDto> getFilteredMapPopupList(String userUuid, String region, String district, Double latitude, Double longitude, MapSortStandard mapSortStandard) {
         Users user = usersRepository.findByUuid(userUuid)
-                .orElseThrow(() -> new IllegalArgumentException("유저를 찾을 수 없습니다."));
+                .orElseThrow(() -> new BaseException(ErrorCode.USER_NOT_FOUND));
 
         String normalizedRegion = StringNormalizer.normalizeRegion(region);
         String normalizedDistrict = StringNormalizer.normalizeDistrict(district);
@@ -239,13 +241,13 @@ public class PopupUserService {
 
             return popupUserResponseDtoMapper.toPopupUserResponseDtoList(popupList, favoritedPopupIdList);
         } else {
-            throw new IllegalArgumentException("지원하지 않는 정렬 기준입니다.: " + mapSortStandard);
+            throw new BaseException(ErrorCode.INVALID_SORT_STANDARD);
         }
     }
 
     public List<PopupUserResponseDto> getRecommendPopupList(String userUuid) {
         Users user = usersRepository.findByUuid(userUuid)
-                .orElseThrow(() -> new IllegalArgumentException("유저를 찾을 수 없습니다."));
+                .orElseThrow(() -> new BaseException(ErrorCode.USER_NOT_FOUND));
 
         List<UserRecommend> userRecommendList = userRecommendRepository.findAllByUser_Uuid(userUuid);
 
@@ -299,7 +301,7 @@ public class PopupUserService {
     @Transactional(readOnly = true)
     public List<PopupUserResponseDto> getRelatedPopupList(String userUuid, String popupUuid) {
         Users user = usersRepository.findByUuid(userUuid)
-                .orElseThrow(() -> new IllegalArgumentException("유저를 찾을 수 없습니다."));
+                .orElseThrow(() -> new BaseException(ErrorCode.USER_NOT_FOUND));
 
         Set<Long> favoritedPopupIdList = userFavoriteRepository.findAllByUserUuid(userUuid)
                 .stream()
@@ -307,10 +309,10 @@ public class PopupUserService {
                 .collect(Collectors.toSet());
 
         Popup popup = popupRepository.findByUuid(popupUuid)
-                .orElseThrow(() -> new IllegalArgumentException("팝업을 찾을 수 없습니다. "));
+                .orElseThrow(() -> new BaseException(ErrorCode.POPUP_NOT_FOUND));
 
         PopupRecommend popupRecommend = popupRecommendRepository.findByPopupId(popup.getId())
-                .orElseThrow(() -> new IllegalArgumentException("해당 팝업에는 추천 값이 존재하지 않습니다. "));//entty 말고 id로 조회하는 것부터 시작
+                .orElseThrow(() -> new BaseException(ErrorCode.POPUP_RECOMMEND_NOT_FOUND));
 
         Long recommendId = popupRecommend.getRecommend().getId();
 
@@ -346,7 +348,7 @@ public class PopupUserService {
 
     public List<PopupUserResponseDto> getRandomPopupList(String userUuid) {
         Users user = usersRepository.findByUuid(userUuid)
-                .orElseThrow(() -> new IllegalArgumentException("유저를 찾을 수 없습니다."));
+                .orElseThrow(() -> new BaseException(ErrorCode.USER_NOT_FOUND));
 
         Set<Long> favoritedPopupIdList = userFavoriteRepository.findAllByUserUuid(userUuid)
                 .stream()

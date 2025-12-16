@@ -1,5 +1,7 @@
 package com.poppang.be.domain.popup.application;
 
+import com.poppang.be.common.exception.BaseException;
+import com.poppang.be.common.exception.ErrorCode;
 import com.poppang.be.domain.popup.dto.request.PopupImageUpsertRequestDto;
 import com.poppang.be.domain.popup.entity.Popup;
 import com.poppang.be.domain.popup.entity.PopupImage;
@@ -23,7 +25,7 @@ public class PopupImageService {
     public void upsertImages(String popupUuid, List<PopupImageUpsertRequestDto> popupImageUpsertRequestDtoList) {
 
         Popup popup = popupRepository.findByUuid(popupUuid)
-                .orElseThrow(() -> new IllegalArgumentException("팝업을 찾을 수 없습니다. "));
+                .orElseThrow(() -> new BaseException(ErrorCode.POPUP_NOT_FOUND));
 
         popupImageRepository.deleteByPopup_Id(popup.getId());
 
