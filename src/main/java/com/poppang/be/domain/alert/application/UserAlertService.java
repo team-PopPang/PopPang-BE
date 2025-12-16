@@ -1,5 +1,7 @@
 package com.poppang.be.domain.alert.application;
 
+import com.poppang.be.common.exception.BaseException;
+import com.poppang.be.common.exception.ErrorCode;
 import com.poppang.be.domain.alert.dto.request.UserAlertDeleteRequestDto;
 import com.poppang.be.domain.alert.dto.request.UserAlertRegisterRequestDto;
 import com.poppang.be.domain.alert.dto.response.UserAlertResponseDto;
@@ -35,13 +37,13 @@ public class UserAlertService {
     @Transactional
     public void registerUserAlert(String userUuid, UserAlertRegisterRequestDto userAlertRegisterRequestDto) {
         Users user = usersRepository.findByUuid(userUuid)
-                .orElseThrow(() -> new IllegalArgumentException("유저를 찾을 수 없습니다. uuid=" + userUuid));
+                .orElseThrow(() -> new BaseException(ErrorCode.USER_NOT_FOUND));
 
         Popup popup = popupRepository.findByUuid(userAlertRegisterRequestDto.getPopupUuid())
-                .orElseThrow(() -> new IllegalArgumentException("팝업을 찾을 수 없습니다. uuid=" + userAlertRegisterRequestDto.getPopupUuid()));
+                .orElseThrow(() -> new BaseException(ErrorCode.POPUP_NOT_FOUND));
 
         if (userAlertRepository.existsByUser_IdAndPopup_Id(user.getId(), popup.getId())) {
-            throw new IllegalStateException("이미 해당 팝업에 대한 알림 기록이 존재합니다.");
+            throw new BaseException(ErrorCode.USER_ALERT_ALREADY_EXISTS);
         }
 
         UserAlert userAlert = UserAlert.builder()
@@ -57,16 +59,14 @@ public class UserAlertService {
     @Transactional
     public void deleteUserAlert(String userUuid, UserAlertDeleteRequestDto userAlertDeleteRequestDto) {
         Users user = usersRepository.findByUuid(userUuid)
-                .orElseThrow(() -> new IllegalArgumentException("유저를 찾을 수 없습니다. uuid=" + userUuid));
+                .orElseThrow(() -> new BaseException(ErrorCode.USER_NOT_FOUND));
 
         Popup popup = popupRepository.findByUuid(userAlertDeleteRequestDto.getPopupUuid())
-                .orElseThrow(() -> new IllegalArgumentException("팝업을 찾을 수 없습니다. uuid=" + userAlertDeleteRequestDto.getPopupUuid()));
+                .orElseThrow(() -> new BaseException(ErrorCode.POPUP_NOT_FOUND));
 
         UserAlert userAlert = userAlertRepository
                 .findByUser_IdAndPopup_Id(user.getId(), popup.getId())
-                .orElseThrow(() -> new IllegalArgumentException(
-                        "해당 유저/팝업에 대한 알림 이력이 없습니다. userId=" + user.getId() + ", popupId=" + popup.getId()
-                ));
+                .orElseThrow(() -> new BaseException(ErrorCode.USER_ALERT_NOT_FOUND));
 
         userAlertRepository.delete(userAlert);
     }
@@ -74,7 +74,7 @@ public class UserAlertService {
     @Transactional(readOnly = true)
     public List<UserAlertResponseDto> getUserAlertPopupList(String userUuid) {
         Users user = usersRepository.findByUuid(userUuid)
-                .orElseThrow(() -> new IllegalArgumentException("유저를 찾을 수 없습니다. uuid=" + userUuid));
+                .orElseThrow(() -> new BaseException(ErrorCode.USER_NOT_FOUND));
 
         List<UserAlert> userAlertList = userAlertRepository.findAllByUser_IdOrderByAlertedAtDesc(user.getId());
 
@@ -113,13 +113,13 @@ public class UserAlertService {
     @Transactional
     public void readUserAlertPopup(String userUuid, String popupUuid) {
         Users user = usersRepository.findByUuid(userUuid)
-                .orElseThrow(() -> new IllegalArgumentException("유저를 찾을 수 없습니다. uuid=" + userUuid));
+                .orElseThrow(() -> new BaseException(ErrorCode.USER_NOT_FOUND));
 
         Popup popup = popupRepository.findByUuid(popupUuid)
-                .orElseThrow(() -> new IllegalArgumentException("팝업을 찾을 수 없습니다. uuid=" + popupUuid));
+                .orElseThrow(() -> new BaseException(ErrorCode.POPUP_NOT_FOUND));
 
         UserAlert userAlert = userAlertRepository.findByUser_IdAndPopup_Id(user.getId(), popup.getId())
-                .orElseThrow(() -> new IllegalArgumentException("알림 팝업을 찾을 수 없습니다. "));
+                .orElseThrow(() -> new BaseException(ErrorCode.USER_ALERT_NOT_FOUND));
 
         if (userAlert.getReadAt() == null) {
             userAlert.markAsRead();

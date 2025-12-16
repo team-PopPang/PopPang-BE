@@ -1,6 +1,8 @@
 package com.poppang.be.domain.popup.application;
 
 import com.poppang.be.common.enums.Role;
+import com.poppang.be.common.exception.BaseException;
+import com.poppang.be.common.exception.ErrorCode;
 import com.poppang.be.domain.popup.entity.Popup;
 import com.poppang.be.domain.popup.infrastructure.PopupRepository;
 import com.poppang.be.domain.users.entity.Users;
@@ -20,14 +22,14 @@ public class PopupAdminService {
     public void deactivatePopup(String userUuid, String popupUuid) {
 
         Users user = usersRepository.findByUuid(userUuid)
-                .orElseThrow(() -> new IllegalArgumentException("유저를 찾을 수 없습니다."));
-
-        if (user.getRole() != Role.ADMIN) {
-            throw new IllegalArgumentException("관리자만 사용할 수 있는 기능입니다. ");
-        }
+                .orElseThrow(() -> new BaseException(ErrorCode.USER_NOT_FOUND));
 
         Popup popup = popupRepository.findByUuid(popupUuid)
-                .orElseThrow(() -> new IllegalArgumentException("팝업을 찾을 수 없습니다. "));
+                .orElseThrow(() -> new BaseException(ErrorCode.POPUP_NOT_FOUND));
+
+        if (user.getRole() != Role.ADMIN) {
+            throw new BaseException(ErrorCode.ACCESS_DENIED);
+        }
 
         popup.deactivate();
     }

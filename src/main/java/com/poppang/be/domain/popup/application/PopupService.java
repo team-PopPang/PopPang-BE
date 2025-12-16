@@ -1,7 +1,10 @@
 package com.poppang.be.domain.popup.application;
 
+import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.poppang.be.common.exception.BaseException;
+import com.poppang.be.common.exception.ErrorCode;
 import com.poppang.be.common.util.StringNormalizer;
 import com.poppang.be.domain.favorite.infrastructure.UserFavoriteRepository;
 import com.poppang.be.domain.popup.dto.request.PopupImageUpsertRequestDto;
@@ -105,8 +108,8 @@ public class PopupService {
                         .build();
 
                 regionDistrictsResponseList.add(regionDistrictsResponse);
-            } catch (Exception e) {
-                throw new RuntimeException("지역/구 JSON 파싱 오류: " + regionDistrictsRaw.getDistricts(), e);
+            } catch (JsonProcessingException e) {
+                throw new BaseException(ErrorCode.REGION_DISTRICTS_JSON_PARSE_ERROR);
             }
         }
 
@@ -134,7 +137,7 @@ public class PopupService {
     @Transactional(readOnly = true)
     public PopupResponseDto getPopupByUuid(String popupUuid) {
         Popup popup = popupRepository.findByUuid(popupUuid)
-                .orElseThrow(() -> new IllegalArgumentException("팝업을 찾을 수 없습니다. "));
+                .orElseThrow(() -> new BaseException(ErrorCode.POPUP_NOT_FOUND));
 
         // 팝업 이미지
         List<String> imageUrlList = popupImageRepository
@@ -202,7 +205,7 @@ public class PopupService {
 
             return popupResponseDtoMapper.toPopupResponseDtoList(popupList);
         } else {
-            throw new IllegalArgumentException("지원하지 않는 정렬 기준입니다: " + homeSortStandard);
+            throw new BaseException(ErrorCode.INVALID_SORT_STANDARD);
         }
     }
 
@@ -231,7 +234,7 @@ public class PopupService {
 
             return popupResponseDtoMapper.toPopupResponseDtoList(popupList);
         } else {
-            throw new IllegalArgumentException("지원하지 않는 정렬 기준입니다.: " + mapSortStandard);
+            throw new BaseException(ErrorCode.INVALID_SORT_STANDARD);
         }
 
     }
@@ -279,7 +282,7 @@ public class PopupService {
         if (popupRegisterRequestDto.getRecommendIdList() != null && !popupRegisterRequestDto.getRecommendIdList().isEmpty()) {
             List<Recommend> found = recommendRepository.findAllById(popupRegisterRequestDto.getRecommendIdList());
             if (found.size() != popupRegisterRequestDto.getRecommendIdList().size()) {
-                throw new IllegalArgumentException("유효하지 않은 recommendId가 포함되어 있습니다. ");
+                throw new BaseException(ErrorCode.INVALID_RECOMMEND_ID);
             }
 
             List<PopupRecommend> popupRecommendList = new ArrayList<>();
@@ -296,7 +299,7 @@ public class PopupService {
     @Transactional(readOnly = true)
     public List<PopupResponseDto> getRecommendPopupList(String userUuid) {
         Users user = usersRepository.findByUuid(userUuid)
-                .orElseThrow(() -> new IllegalArgumentException("유저를 찾을 수 없습니다."));
+                .orElseThrow(() -> new BaseException(ErrorCode.USER_NOT_FOUND));
 
         List<UserRecommend> userRecommendList = userRecommendRepository.findAllByUser_Uuid(userUuid);
 
@@ -346,10 +349,10 @@ public class PopupService {
     public List<PopupResponseDto> getRelatedPopupList(String popupUuid) {
 
         Popup popup = popupRepository.findByUuid(popupUuid)
-                .orElseThrow(() -> new IllegalArgumentException("팝업을 찾을 수 없습니다. "));
+                .orElseThrow(() -> new BaseException(ErrorCode.POPUP_NOT_FOUND));
 
         PopupRecommend popupRecommend = popupRecommendRepository.findByPopupId(popup.getId())
-                .orElseThrow(() -> new IllegalArgumentException("해당 팝업에는 추천 값이 존재하지 않습니다. "));//entty 말고 id로 조회하는 것부터 시작
+                .orElseThrow(() -> new BaseException(ErrorCode.POPUP_RECOMMEND_NOT_FOUND));
 
         Long recommendId = popupRecommend.getRecommend().getId();
 
