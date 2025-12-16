@@ -1,5 +1,7 @@
 package com.poppang.be.domain.users.application;
 
+import com.poppang.be.common.exception.BaseException;
+import com.poppang.be.common.exception.ErrorCode;
 import com.poppang.be.domain.popup.dto.response.UserUpdateFcmTokenResquestDto;
 import com.poppang.be.domain.users.dto.request.ChangeNicknameRequestDto;
 import com.poppang.be.domain.users.dto.request.UpdateAlertStatusRequestDto;
@@ -29,15 +31,14 @@ public class UsersService {
     @Transactional
     public void changeNickname(String userUuid, ChangeNicknameRequestDto changeNicknameRequestDto) {
 
-        String rawNickname = changeNicknameRequestDto.getNickname();
-        String nickname = rawNickname.trim();
+        String nickname = changeNicknameRequestDto.getNickname().trim();
 
         Users user = usersRepository.findByUuid(userUuid)
-                .orElseThrow(() -> new IllegalArgumentException("유저를 찾을 수 없습니다."));
+                .orElseThrow(() -> new BaseException(ErrorCode.USER_NOT_FOUND));
 
         boolean duplicated = usersRepository.existsByNickname(changeNicknameRequestDto.getNickname());
         if (duplicated) {
-            throw new IllegalArgumentException("이미 존재하는 닉네임입니다. ");
+            throw new BaseException(ErrorCode.DUPLICATE_NICKNAME);
         }
 
         user.changeNickname(changeNicknameRequestDto);
@@ -47,7 +48,7 @@ public class UsersService {
     public void softDeleteUser(String userUuid) {
 
         Users user = usersRepository.findByUuid(userUuid)
-                .orElseThrow(() -> new IllegalArgumentException("유저를 찾을 수 없습니다."));
+                .orElseThrow(() -> new BaseException(ErrorCode.USER_NOT_FOUND));
 
         user.softDelete();
     }
@@ -56,7 +57,7 @@ public class UsersService {
     public void restoreUser(String userUuid) {
 
         Users user = usersRepository.findByUuid(userUuid)
-                .orElseThrow(() -> new IllegalArgumentException("유저를 찾을 수 없습니다."));
+                .orElseThrow(() -> new BaseException(ErrorCode.USER_NOT_FOUND));
 
         user.restore();
     }
@@ -64,7 +65,7 @@ public class UsersService {
     @Transactional(readOnly = true)
     public boolean isFcmTokenDuplicated(String userUuid, String fcmToken) {
         Users user = usersRepository.findByUuid(userUuid)
-                .orElseThrow(() -> new IllegalArgumentException("유저를 찾을 수 없습니다. "));
+                .orElseThrow(() -> new BaseException(ErrorCode.USER_NOT_FOUND));
 
         String savedToken = user.getFcmToken();
 
@@ -79,7 +80,7 @@ public class UsersService {
     @Transactional
     public void updateFcmToken(String userUuid, UserUpdateFcmTokenResquestDto userUpdateFcmTokenResquestDto) {
         Users user = usersRepository.findByUuid(userUuid)
-                .orElseThrow(() -> new IllegalArgumentException("유저를 찾을 수 없습니다. "));
+                .orElseThrow(() -> new BaseException(ErrorCode.USER_NOT_FOUND));
 
         user.updateFcmToken(userUpdateFcmTokenResquestDto.getFcmToken());
     }
@@ -116,7 +117,7 @@ public class UsersService {
                                         .toList()
                         )
                         .build())
-                        .toList();
+                .toList();
 
         return userWithKeywordListResponseDtoBList;
     }
@@ -124,7 +125,7 @@ public class UsersService {
     @Transactional(readOnly = true)
     public GetUserResponseDto getUserInfo(String userUuid) {
         Users user = usersRepository.findByUuid(userUuid)
-                .orElseThrow(() -> new IllegalArgumentException("유저를 찾을 수 없습니다. "));
+                .orElseThrow(() -> new BaseException(ErrorCode.USER_NOT_FOUND));
 
         GetUserResponseDto getUserResponseDto = GetUserResponseDto.from(user);
 
@@ -134,7 +135,7 @@ public class UsersService {
     @Transactional
     public UpdateAlertStatusResponseDto updateAlertStatus(String userUuid, UpdateAlertStatusRequestDto updateAlertStatusRequestDto) {
         Users user = usersRepository.findByUuid(userUuid)
-                .orElseThrow(() -> new IllegalArgumentException("유저를 찾을 수 없습니다. "));
+                .orElseThrow(() -> new BaseException(ErrorCode.USER_NOT_FOUND));
 
         user.updateAlerted(updateAlertStatusRequestDto.isAlerted());
 
@@ -149,8 +150,9 @@ public class UsersService {
     @Transactional
     public void hardDeleteUser(String userUuid) {
         Users user = usersRepository.findByUuid(userUuid)
-                .orElseThrow(() -> new IllegalArgumentException("유저를 찾을 수 없습니다. "));
+                .orElseThrow(() -> new BaseException(ErrorCode.USER_NOT_FOUND));
 
         usersRepository.deleteById(user.getId());
     }
+
 }
