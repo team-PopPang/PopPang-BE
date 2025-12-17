@@ -1,14 +1,14 @@
 package com.poppang.be.domain.auth.presentation;
 
-import com.poppang.be.domain.auth.apple.application.AppleAuthService;
+import com.poppang.be.domain.auth.apple.application.AppleAuthServiceImpl;
 import com.poppang.be.domain.auth.apple.dto.request.AppleAppLoginRequestDto;
-import com.poppang.be.domain.auth.application.AuthService;
+import com.poppang.be.domain.auth.application.AuthServiceImpl;
 import com.poppang.be.domain.auth.dto.request.AutoLoginRequestDto;
 import com.poppang.be.domain.auth.dto.response.LoginResponseDto;
 import com.poppang.be.domain.auth.dto.response.SignupResponseDto;
-import com.poppang.be.domain.auth.google.application.GoogleAuthService;
+import com.poppang.be.domain.auth.google.application.GoogleAuthServiceImpl;
 import com.poppang.be.domain.auth.google.dto.request.GoogleAppLoginRequestDto;
-import com.poppang.be.domain.auth.kakao.application.KakaoAuthService;
+import com.poppang.be.domain.auth.kakao.application.KakaoAuthServiceImpl;
 import com.poppang.be.domain.auth.kakao.dto.request.KakaoAppLoginRequestDto;
 import com.poppang.be.domain.auth.kakao.dto.request.SignupRequestDto;
 import io.swagger.v3.oas.annotations.Operation;
@@ -21,10 +21,10 @@ import org.springframework.web.bind.annotation.*;
 @RequiredArgsConstructor
 public class AuthController {
 
-  private final KakaoAuthService kakaoAuthService;
-  private final AppleAuthService appleAuthService;
-  private final GoogleAuthService googleAuthService;
-  private final AuthService authService;
+  private final KakaoAuthServiceImpl kakaoAuthServiceImpl;
+  private final AppleAuthServiceImpl appleAuthServiceImpl;
+  private final GoogleAuthServiceImpl googleAuthServiceImpl;
+  private final AuthServiceImpl authServiceImpl;
 
   /* ---------- 웹(브라우저)용: GET code 콜백 ---------- */
 
@@ -34,7 +34,7 @@ public class AuthController {
       tags = {"[AUTH] 카카오"})
   @GetMapping("/kakao/login")
   public ResponseEntity<LoginResponseDto> kakaoWebLogin(@RequestParam("code") String authCode) {
-    LoginResponseDto loginResponseDto = kakaoAuthService.webLogin(authCode);
+    LoginResponseDto loginResponseDto = kakaoAuthServiceImpl.webLogin(authCode);
     return ResponseEntity.ok(loginResponseDto);
   }
 
@@ -44,7 +44,7 @@ public class AuthController {
       tags = {"[AUTH] 애플"})
   @GetMapping("/apple/login")
   public ResponseEntity<LoginResponseDto> appleWebLogin(@RequestParam("code") String authCode) {
-    LoginResponseDto loginResponseDto = appleAuthService.webLogin(authCode);
+    LoginResponseDto loginResponseDto = appleAuthServiceImpl.webLogin(authCode);
     return ResponseEntity.ok(loginResponseDto);
   }
 
@@ -54,7 +54,7 @@ public class AuthController {
       tags = {"[AUTH] 구글"})
   @GetMapping("/google/login")
   public ResponseEntity<LoginResponseDto> googleWebLogin(@RequestParam("code") String authCode) {
-    LoginResponseDto loginResponseDto = googleAuthService.webLogin(authCode);
+    LoginResponseDto loginResponseDto = googleAuthServiceImpl.webLogin(authCode);
     return ResponseEntity.ok(loginResponseDto);
   }
 
@@ -67,7 +67,7 @@ public class AuthController {
   @PostMapping("/kakao/mobile/login")
   public ResponseEntity<LoginResponseDto> kakaoMobileLogin(
       @RequestBody KakaoAppLoginRequestDto kakaoAppLoginRequestDto) {
-    LoginResponseDto loginResponseDto = kakaoAuthService.mobileLogin(kakaoAppLoginRequestDto);
+    LoginResponseDto loginResponseDto = kakaoAuthServiceImpl.mobileLogin(kakaoAppLoginRequestDto);
     return ResponseEntity.ok(loginResponseDto);
   }
 
@@ -78,7 +78,7 @@ public class AuthController {
   @PostMapping("/apple/mobile/login")
   public ResponseEntity<LoginResponseDto> appleMobileLogin(
       @RequestBody AppleAppLoginRequestDto appleAppLoginRequestDto) {
-    LoginResponseDto loginResponseDto = appleAuthService.mobileLogin(appleAppLoginRequestDto);
+    LoginResponseDto loginResponseDto = appleAuthServiceImpl.mobileLogin(appleAppLoginRequestDto);
     return ResponseEntity.ok(loginResponseDto);
   }
 
@@ -89,7 +89,7 @@ public class AuthController {
   @PostMapping("/google/mobile/login")
   public ResponseEntity<LoginResponseDto> googleMobileLogin(
       @RequestBody GoogleAppLoginRequestDto googleAppLoginRequestDto) {
-    LoginResponseDto loginResponseDto = googleAuthService.mobileLogin(googleAppLoginRequestDto);
+    LoginResponseDto loginResponseDto = googleAuthServiceImpl.mobileLogin(googleAppLoginRequestDto);
     return ResponseEntity.ok(loginResponseDto);
   }
 
@@ -102,7 +102,7 @@ public class AuthController {
   @PostMapping("/autoLogin")
   public ResponseEntity<LoginResponseDto> autoLogin(
       @RequestBody AutoLoginRequestDto autoLoginRequestDto) {
-    LoginResponseDto loginResponseDto = authService.autoLogin(autoLoginRequestDto);
+    LoginResponseDto loginResponseDto = authServiceImpl.autoLogin(autoLoginRequestDto);
     return ResponseEntity.ok(loginResponseDto);
   }
 
@@ -115,7 +115,7 @@ public class AuthController {
   @PostMapping("/kakao/signup")
   public ResponseEntity<SignupResponseDto> kakaoSignup(
       @RequestBody SignupRequestDto signupRequestDto) {
-    SignupResponseDto signupResponseDto = kakaoAuthService.signup(signupRequestDto);
+    SignupResponseDto signupResponseDto = kakaoAuthServiceImpl.signup(signupRequestDto);
     return ResponseEntity.ok(signupResponseDto);
   }
 
@@ -126,7 +126,7 @@ public class AuthController {
   @PostMapping("/apple/signup")
   public ResponseEntity<SignupResponseDto> appleSignup(
       @RequestBody SignupRequestDto signupRequestDto) {
-    SignupResponseDto signupResponseDto = appleAuthService.signup(signupRequestDto);
+    SignupResponseDto signupResponseDto = appleAuthServiceImpl.signup(signupRequestDto);
     return ResponseEntity.ok(signupResponseDto);
   }
 
@@ -137,7 +137,7 @@ public class AuthController {
   @PostMapping("/google/signup")
   public ResponseEntity<SignupResponseDto> googleSignup(
       @RequestBody SignupRequestDto signupRequestDto) {
-    SignupResponseDto signupResponseDto = googleAuthService.signup(signupRequestDto);
+    SignupResponseDto signupResponseDto = googleAuthServiceImpl.signup(signupRequestDto);
     return ResponseEntity.ok(signupResponseDto);
   }
 }

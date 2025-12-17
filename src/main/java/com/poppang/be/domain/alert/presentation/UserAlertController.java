@@ -1,6 +1,6 @@
 package com.poppang.be.domain.alert.presentation;
 
-import com.poppang.be.domain.alert.application.UserAlertService;
+import com.poppang.be.domain.alert.application.UserAlertServiceImpl;
 import com.poppang.be.domain.alert.dto.request.UserAlertDeleteRequestDto;
 import com.poppang.be.domain.alert.dto.request.UserAlertRegisterRequestDto;
 import com.poppang.be.domain.alert.dto.response.UserAlertResponseDto;
@@ -17,7 +17,7 @@ import org.springframework.web.bind.annotation.*;
 @RequiredArgsConstructor
 public class UserAlertController {
 
-  private final UserAlertService userAlertService;
+  private final UserAlertServiceImpl userAlertServiceImpl;
 
   @Operation(
       summary = "알림 받은 팝업 등록",
@@ -32,7 +32,7 @@ public class UserAlertController {
   public ResponseEntity<Void> registerUserAlert(
       @PathVariable String userUuid,
       @RequestBody UserAlertRegisterRequestDto userAlertRegisterRequestDto) {
-    userAlertService.registerUserAlert(userUuid, userAlertRegisterRequestDto);
+    userAlertServiceImpl.registerUserAlert(userUuid, userAlertRegisterRequestDto);
 
     return ResponseEntity.ok().build();
   }
@@ -50,7 +50,7 @@ public class UserAlertController {
   public ResponseEntity<Void> deleteUserAlert(
       @PathVariable String userUuid,
       @RequestBody UserAlertDeleteRequestDto userAlertDeleteRequestDto) {
-    userAlertService.deleteUserAlert(userUuid, userAlertDeleteRequestDto);
+    userAlertServiceImpl.deleteUserAlert(userUuid, userAlertDeleteRequestDto);
 
     return ResponseEntity.ok().build();
   }
@@ -69,7 +69,7 @@ public class UserAlertController {
   public ResponseEntity<List<UserAlertResponseDto>> getUserAlertPopupList(
       @PathVariable String userUuid) {
     List<UserAlertResponseDto> userAlertPopupList =
-        userAlertService.getUserAlertPopupList(userUuid);
+        userAlertServiceImpl.getUserAlertPopupList(userUuid);
 
     return ResponseEntity.ok(userAlertPopupList);
   }
@@ -89,7 +89,7 @@ public class UserAlertController {
   @PatchMapping("/read")
   public ResponseEntity<Void> readUserAlertPopup(
       @PathVariable String userUuid, @RequestParam String popupUuid) {
-    userAlertService.readUserAlertPopup(userUuid, popupUuid);
+    userAlertServiceImpl.readUserAlertPopup(userUuid, popupUuid);
 
     return ResponseEntity.ok().build();
   }

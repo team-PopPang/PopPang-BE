@@ -1,6 +1,6 @@
 package com.poppang.be.domain.recommend.presentation;
 
-import com.poppang.be.domain.recommend.application.RecommendService;
+import com.poppang.be.domain.recommend.application.RecommendServiceImpl;
 import com.poppang.be.domain.recommend.dto.response.RecommendResponseDto;
 import io.swagger.v3.oas.annotations.Operation;
 import java.util.List;
@@ -14,7 +14,7 @@ import org.springframework.web.bind.annotation.RestController;
 @RequiredArgsConstructor
 public class RecommendController {
 
-  private final RecommendService recommendService;
+  private final RecommendServiceImpl recommendServiceImpl;
 
   @Operation(
       summary = "추천(Recommend) 전체 조회",
@@ -22,7 +22,7 @@ public class RecommendController {
       tags = {"[RECOMMEND] 공통"})
   @GetMapping
   public List<RecommendResponseDto> getAllRecommendList() {
-    List<RecommendResponseDto> recommendResponseDtoList = recommendService.getAllRecommendList();
+    List<RecommendResponseDto> recommendResponseDtoList = recommendServiceImpl.getAllRecommendList();
 
     return recommendResponseDtoList;
   }
