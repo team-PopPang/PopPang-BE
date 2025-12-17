@@ -31,7 +31,7 @@ import org.springframework.web.client.RestTemplate;
 
 @Service
 @RequiredArgsConstructor
-public class KakaoAuthServiceImpl implements KakaoAuthService{
+public class KakaoAuthServiceImpl implements KakaoAuthService {
 
   private final KakaoProperties kakaoProperties;
   private final RestTemplate restTemplate = new RestTemplate();

@@ -33,7 +33,7 @@ import org.springframework.transaction.annotation.Transactional;
 
 @Service
 @RequiredArgsConstructor
-public class PopupUserServiceImpl implements PopupUserService{
+public class PopupUserServiceImpl implements PopupUserService {
 
   private final PopupRepository popupRepository;
   private final PopupImageRepository popupImageRepository;

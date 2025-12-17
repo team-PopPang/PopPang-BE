@@ -22,7 +22,8 @@ public class RecommendController {
       tags = {"[RECOMMEND] 공통"})
   @GetMapping
   public List<RecommendResponseDto> getAllRecommendList() {
-    List<RecommendResponseDto> recommendResponseDtoList = recommendServiceImpl.getAllRecommendList();
+    List<RecommendResponseDto> recommendResponseDtoList =
+        recommendServiceImpl.getAllRecommendList();
 
     return recommendResponseDtoList;
   }

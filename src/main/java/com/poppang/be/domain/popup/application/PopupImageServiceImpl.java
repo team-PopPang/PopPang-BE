@@ -15,7 +15,7 @@ import org.springframework.transaction.annotation.Transactional;
 
 @Service
 @RequiredArgsConstructor
-public class PopupImageServiceImpl implements PopupImageService{
+public class PopupImageServiceImpl implements PopupImageService {
 
   private final PopupImageRepository popupImageRepository;
   private final PopupRepository popupRepository;

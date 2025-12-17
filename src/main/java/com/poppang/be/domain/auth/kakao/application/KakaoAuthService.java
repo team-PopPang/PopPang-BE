@@ -7,9 +7,9 @@ import com.poppang.be.domain.auth.kakao.dto.request.SignupRequestDto;
 
 public interface KakaoAuthService {
 
-    LoginResponseDto webLogin(String authCode);
+  LoginResponseDto webLogin(String authCode);
 
-    LoginResponseDto mobileLogin(KakaoAppLoginRequestDto kakaoAppLoginRequestDto);
+  LoginResponseDto mobileLogin(KakaoAppLoginRequestDto kakaoAppLoginRequestDto);
 
-    SignupResponseDto signup(SignupRequestDto signupRequestDto);
+  SignupResponseDto signup(SignupRequestDto signupRequestDto);
 }

@@ -37,7 +37,7 @@ import org.springframework.web.client.RestTemplate;
 
 @Service
 @RequiredArgsConstructor
-public class AppleAuthServiceImpl implements AppleAuthService{
+public class AppleAuthServiceImpl implements AppleAuthService {
 
   private final AppleProperties appleProperties;
   private final RestTemplate restTemplate = new RestTemplate();

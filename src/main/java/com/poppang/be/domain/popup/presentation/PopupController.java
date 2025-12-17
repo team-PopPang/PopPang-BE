@@ -118,7 +118,8 @@ public class PopupController {
               + "서울은 '전체'와 실제 'OO구'들을 포함하고, 서울 외 지역은 '전체'만 포함합니다.")
   @GetMapping("/regions/districts")
   public ResponseEntity<List<RegionDistrictsResponse>> getRegionDistricts() {
-    List<RegionDistrictsResponse> regionDistrictsResponseList = popupServiceImpl.getRegionDistricts();
+    List<RegionDistrictsResponse> regionDistrictsResponseList =
+        popupServiceImpl.getRegionDistricts();
 
     return ResponseEntity.ok(regionDistrictsResponseList);
   }

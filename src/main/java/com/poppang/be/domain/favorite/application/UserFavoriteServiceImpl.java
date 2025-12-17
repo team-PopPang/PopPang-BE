@@ -25,7 +25,7 @@ import org.springframework.transaction.annotation.Transactional;
 
 @Service
 @RequiredArgsConstructor
-public class UserFavoriteServiceImpl implements UserFavoriteService{
+public class UserFavoriteServiceImpl implements UserFavoriteService {
 
   private final UsersRepository usersRepository;
   private final PopupRepository popupRepository;

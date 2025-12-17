@@ -7,9 +7,9 @@ import com.poppang.be.domain.auth.kakao.dto.request.SignupRequestDto;
 
 public interface GoogleAuthService {
 
-    LoginResponseDto webLogin(String authCode);
+  LoginResponseDto webLogin(String authCode);
 
-    LoginResponseDto mobileLogin(GoogleAppLoginRequestDto googleAppLoginRequestDto);
+  LoginResponseDto mobileLogin(GoogleAppLoginRequestDto googleAppLoginRequestDto);
 
-    SignupResponseDto signup(SignupRequestDto signupRequestDto);
+  SignupResponseDto signup(SignupRequestDto signupRequestDto);
 }

@@ -13,7 +13,7 @@ import org.springframework.transaction.annotation.Transactional;
 
 @Service
 @RequiredArgsConstructor
-public class PopupAdminServiceImpl implements PopupAdminService{
+public class PopupAdminServiceImpl implements PopupAdminService {
 
   private final UsersRepository usersRepository;
   private final PopupRepository popupRepository;

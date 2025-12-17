@@ -41,6 +41,7 @@ public class PopupTotalViewController {
       deprecated = true)
   @GetMapping("/{popupUuid}/view-count")
   public ResponseEntity<Map<String, Long>> getViewCount(@PathVariable String popupUuid) {
-    return ResponseEntity.ok(Map.of("viewCount", popupTotalViewCountServiceImpl.getDelta(popupUuid)));
+    return ResponseEntity.ok(
+        Map.of("viewCount", popupTotalViewCountServiceImpl.getDelta(popupUuid)));
   }
 }

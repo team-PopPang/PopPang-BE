@@ -4,30 +4,30 @@ import com.poppang.be.domain.popup.dto.response.UserUpdateFcmTokenResquestDto;
 import com.poppang.be.domain.users.dto.request.ChangeNicknameRequestDto;
 import com.poppang.be.domain.users.dto.request.UpdateAlertStatusRequestDto;
 import com.poppang.be.domain.users.dto.response.*;
-
 import java.util.List;
 
 public interface UsersService {
 
-    NicknameDuplicateResponseDto checkNicknameDuplicated(String nickname);
+  NicknameDuplicateResponseDto checkNicknameDuplicated(String nickname);
 
-    void changeNickname(String userUuid, ChangeNicknameRequestDto changeNicknameRequestDto);
+  void changeNickname(String userUuid, ChangeNicknameRequestDto changeNicknameRequestDto);
 
-    void softDeleteUser(String userUuid);
+  void softDeleteUser(String userUuid);
 
-    void restoreUser(String userUuid);
+  void restoreUser(String userUuid);
 
-    boolean isFcmTokenDuplicated(String userUuid, String fcmToken);
+  boolean isFcmTokenDuplicated(String userUuid, String fcmToken);
 
-    void updateFcmToken(String userUuid, UserUpdateFcmTokenResquestDto userUpdateFcmTokenResquestDto);
+  void updateFcmToken(String userUuid, UserUpdateFcmTokenResquestDto userUpdateFcmTokenResquestDto);
 
-    List<UserWithKeywordListResponseDto> getUserWithKeywordList();
+  List<UserWithKeywordListResponseDto> getUserWithKeywordList();
 
-    List<UserWithKeywordListResponseDtoB> getUserWithKeywordListB();
+  List<UserWithKeywordListResponseDtoB> getUserWithKeywordListB();
 
-    GetUserResponseDto getUserInfo(String userUuid);
+  GetUserResponseDto getUserInfo(String userUuid);
 
-    UpdateAlertStatusResponseDto updateAlertStatus(String userUuid, UpdateAlertStatusRequestDto updateAlertStatusRequestDto);
+  UpdateAlertStatusResponseDto updateAlertStatus(
+      String userUuid, UpdateAlertStatusRequestDto updateAlertStatusRequestDto);
 
-    void hardDeleteUser(String userUuid);
+  void hardDeleteUser(String userUuid);
 }

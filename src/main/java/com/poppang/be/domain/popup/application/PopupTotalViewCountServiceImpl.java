@@ -9,7 +9,7 @@ import org.springframework.stereotype.Service;
 
 @Service
 @RequiredArgsConstructor
-public class PopupTotalViewCountServiceImpl implements PopupTotalViewCountService{
+public class PopupTotalViewCountServiceImpl implements PopupTotalViewCountService {
 
   private final RedisTemplate<String, String> redisTemplate;
   private static final String PREFIX = "popup:view:";

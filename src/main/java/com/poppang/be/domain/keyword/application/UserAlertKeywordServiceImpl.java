@@ -17,7 +17,7 @@ import org.springframework.transaction.annotation.Transactional;
 
 @Service
 @RequiredArgsConstructor
-public class UserAlertKeywordServiceImpl implements UserAlertKeywordService{
+public class UserAlertKeywordServiceImpl implements UserAlertKeywordService {
 
   private final UserAlertKeywordRepository userAlertKeywordRepository;
   private final UsersRepository usersRepository;

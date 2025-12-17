@@ -25,7 +25,7 @@ import org.springframework.transaction.annotation.Transactional;
 
 @Service
 @RequiredArgsConstructor
-public class UserAlertServiceImpl implements UserAlertService{
+public class UserAlertServiceImpl implements UserAlertService {
 
   private final UserAlertRepository userAlertRepository;
   private final UsersRepository usersRepository;

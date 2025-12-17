@@ -5,5 +5,5 @@ import com.poppang.be.domain.auth.dto.response.LoginResponseDto;
 
 public interface AuthService {
 
-    LoginResponseDto autoLogin(AutoLoginRequestDto autoLoginRequestDto);
+  LoginResponseDto autoLogin(AutoLoginRequestDto autoLoginRequestDto);
 }

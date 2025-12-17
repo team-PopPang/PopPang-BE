@@ -4,16 +4,15 @@ import com.poppang.be.domain.favorite.dto.request.UserFavoriteDeleteRequestDto;
 import com.poppang.be.domain.favorite.dto.request.UserFavoriteRegisterRequestDto;
 import com.poppang.be.domain.favorite.dto.response.FavoriteCountResponseDto;
 import com.poppang.be.domain.popup.dto.response.PopupUserResponseDto;
-
 import java.util.List;
 
 public interface UserFavoriteService {
 
-    void registerFavorite(UserFavoriteRegisterRequestDto userFavoriteRegisterRequestDto);
+  void registerFavorite(UserFavoriteRegisterRequestDto userFavoriteRegisterRequestDto);
 
-    void deleteFavorite(UserFavoriteDeleteRequestDto userFavoriteDeleteRequestDto);
+  void deleteFavorite(UserFavoriteDeleteRequestDto userFavoriteDeleteRequestDto);
 
-    FavoriteCountResponseDto getFavoriteCount(String popupUuid);
+  FavoriteCountResponseDto getFavoriteCount(String popupUuid);
 
-    List<PopupUserResponseDto> getFavoritePopupList(String userUuid);
+  List<PopupUserResponseDto> getFavoritePopupList(String userUuid);
 }
