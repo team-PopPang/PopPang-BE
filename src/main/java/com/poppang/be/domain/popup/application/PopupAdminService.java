@@ -15,23 +15,26 @@ import org.springframework.transaction.annotation.Transactional;
 @RequiredArgsConstructor
 public class PopupAdminService {
 
-    private final UsersRepository usersRepository;
-    private final PopupRepository popupRepository;
+  private final UsersRepository usersRepository;
+  private final PopupRepository popupRepository;
 
-    @Transactional
-    public void deactivatePopup(String userUuid, String popupUuid) {
+  @Transactional
+  public void deactivatePopup(String userUuid, String popupUuid) {
 
-        Users user = usersRepository.findByUuid(userUuid)
-                .orElseThrow(() -> new BaseException(ErrorCode.USER_NOT_FOUND));
+    Users user =
+        usersRepository
+            .findByUuid(userUuid)
+            .orElseThrow(() -> new BaseException(ErrorCode.USER_NOT_FOUND));
 
-        Popup popup = popupRepository.findByUuid(popupUuid)
-                .orElseThrow(() -> new BaseException(ErrorCode.POPUP_NOT_FOUND));
+    Popup popup =
+        popupRepository
+            .findByUuid(popupUuid)
+            .orElseThrow(() -> new BaseException(ErrorCode.POPUP_NOT_FOUND));
 
-        if (user.getRole() != Role.ADMIN) {
-            throw new BaseException(ErrorCode.ACCESS_DENIED);
-        }
-
-        popup.deactivate();
+    if (user.getRole() != Role.ADMIN) {
+      throw new BaseException(ErrorCode.ACCESS_DENIED);
     }
 
+    popup.deactivate();
+  }
 }

@@ -11,14 +11,15 @@ import org.springframework.stereotype.Service;
 @RequiredArgsConstructor
 public class AuthService {
 
-    private final UsersRepository usersRepository;
+  private final UsersRepository usersRepository;
 
-    public LoginResponseDto autoLogin(AutoLoginRequestDto autoLoginRequestDto) {
+  public LoginResponseDto autoLogin(AutoLoginRequestDto autoLoginRequestDto) {
 
-        Users user = usersRepository.findByUuidAndDeletedFalse(autoLoginRequestDto.getUserUuid())
-                .orElseThrow(() -> new IllegalArgumentException("유저를 찾을 수 없습니다. "));
+    Users user =
+        usersRepository
+            .findByUuidAndDeletedFalse(autoLoginRequestDto.getUserUuid())
+            .orElseThrow(() -> new IllegalArgumentException("유저를 찾을 수 없습니다. "));
 
-        return LoginResponseDto.from(user);
-    }
-
+    return LoginResponseDto.from(user);
+  }
 }

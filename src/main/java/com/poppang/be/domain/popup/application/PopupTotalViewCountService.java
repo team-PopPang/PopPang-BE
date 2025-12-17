@@ -2,54 +2,53 @@ package com.poppang.be.domain.popup.application;
 
 import com.poppang.be.domain.popup.dto.response.PopupTotalViewCountResponseDto;
 import com.poppang.be.domain.popup.infrastructure.PopupTotalViewCountRepository;
+import java.time.Duration;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.stereotype.Service;
-
-import java.time.Duration;
 
 @Service
 @RequiredArgsConstructor
 public class PopupTotalViewCountService {
 
-    private final RedisTemplate<String, String> redisTemplate;
-    private static final String PREFIX = "popup:view:";
-    private static final String SUFFIX = ":delta";
-    private static final Duration TTL = Duration.ofSeconds(70);
-    private final PopupTotalViewCountRepository popupTotalViewCountRepository;
+  private final RedisTemplate<String, String> redisTemplate;
+  private static final String PREFIX = "popup:view:";
+  private static final String SUFFIX = ":delta";
+  private static final Duration TTL = Duration.ofSeconds(70);
+  private final PopupTotalViewCountRepository popupTotalViewCountRepository;
 
-    // 조회수 +1 (원자적 INCR)
-    public long increment(String popupId) {
+  // 조회수 +1 (원자적 INCR)
+  public long increment(String popupId) {
 
-        String key = PREFIX + popupId + SUFFIX;
-        Long after = redisTemplate.opsForValue().increment(key);
+    String key = PREFIX + popupId + SUFFIX;
+    Long after = redisTemplate.opsForValue().increment(key);
 
-        // TTL이 없으면(또는 만료 설정이 사라졌으면) 다시 걸어준다
-        Long expireSec = redisTemplate.getExpire(key);
-        if (expireSec == null || expireSec <= 0) {
-            redisTemplate.expire(key, TTL);
-        }
-
-        return after != null ? after : 0L;
+    // TTL이 없으면(또는 만료 설정이 사라졌으면) 다시 걸어준다
+    Long expireSec = redisTemplate.getExpire(key);
+    if (expireSec == null || expireSec <= 0) {
+      redisTemplate.expire(key, TTL);
     }
 
-    // 현재 1분 누적(delta) 조회 (없으면 0)
-    public long getDelta(String popupUuid) {
-        String key = PREFIX + popupUuid + SUFFIX;
-        String v = redisTemplate.opsForValue().get(key);
-        try { return v != null ? Long.parseLong(v) : 0L; }
-        catch (NumberFormatException e) {
-            return 0L; }
+    return after != null ? after : 0L;
+  }
+
+  // 현재 1분 누적(delta) 조회 (없으면 0)
+  public long getDelta(String popupUuid) {
+    String key = PREFIX + popupUuid + SUFFIX;
+    String v = redisTemplate.opsForValue().get(key);
+    try {
+      return v != null ? Long.parseLong(v) : 0L;
+    } catch (NumberFormatException e) {
+      return 0L;
     }
+  }
 
-    public PopupTotalViewCountResponseDto getTotalViewCount(String popupUuid) {
-        Long viewCountByPopupUuid = popupTotalViewCountRepository.getViewCountByPopupUuid(popupUuid);
+  public PopupTotalViewCountResponseDto getTotalViewCount(String popupUuid) {
+    Long viewCountByPopupUuid = popupTotalViewCountRepository.getViewCountByPopupUuid(popupUuid);
 
-        PopupTotalViewCountResponseDto popupTotalViewCountResponseDto = PopupTotalViewCountResponseDto.builder()
-                .totalViewCount(viewCountByPopupUuid)
-                .build();
+    PopupTotalViewCountResponseDto popupTotalViewCountResponseDto =
+        PopupTotalViewCountResponseDto.builder().totalViewCount(viewCountByPopupUuid).build();
 
-        return popupTotalViewCountResponseDto;
-    }
-
+    return popupTotalViewCountResponseDto;
+  }
 }

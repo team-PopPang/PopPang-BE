@@ -14,116 +14,132 @@ import com.poppang.be.domain.popup.infrastructure.PopupRepository;
 import com.poppang.be.domain.popup.mapper.PopupUserResponseDtoMapper;
 import com.poppang.be.domain.users.entity.Users;
 import com.poppang.be.domain.users.infrastructure.UsersRepository;
-import lombok.RequiredArgsConstructor;
-import org.springframework.stereotype.Service;
-import org.springframework.transaction.annotation.Transactional;
-
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Set;
 import java.util.stream.Collectors;
+import lombok.RequiredArgsConstructor;
+import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 @Service
 @RequiredArgsConstructor
 public class UserAlertService {
 
-    private final UserAlertRepository userAlertRepository;
-    private final UsersRepository usersRepository;
-    private final PopupRepository popupRepository;
-    private final UserFavoriteRepository userFavoriteRepository;
-    private final PopupUserResponseDtoMapper popupUserResponseDtoMapper;
+  private final UserAlertRepository userAlertRepository;
+  private final UsersRepository usersRepository;
+  private final PopupRepository popupRepository;
+  private final UserFavoriteRepository userFavoriteRepository;
+  private final PopupUserResponseDtoMapper popupUserResponseDtoMapper;
 
-    @Transactional
-    public void registerUserAlert(String userUuid, UserAlertRegisterRequestDto userAlertRegisterRequestDto) {
-        Users user = usersRepository.findByUuid(userUuid)
-                .orElseThrow(() -> new BaseException(ErrorCode.USER_NOT_FOUND));
+  @Transactional
+  public void registerUserAlert(
+      String userUuid, UserAlertRegisterRequestDto userAlertRegisterRequestDto) {
+    Users user =
+        usersRepository
+            .findByUuid(userUuid)
+            .orElseThrow(() -> new BaseException(ErrorCode.USER_NOT_FOUND));
 
-        Popup popup = popupRepository.findByUuid(userAlertRegisterRequestDto.getPopupUuid())
-                .orElseThrow(() -> new BaseException(ErrorCode.POPUP_NOT_FOUND));
+    Popup popup =
+        popupRepository
+            .findByUuid(userAlertRegisterRequestDto.getPopupUuid())
+            .orElseThrow(() -> new BaseException(ErrorCode.POPUP_NOT_FOUND));
 
-        if (userAlertRepository.existsByUser_IdAndPopup_Id(user.getId(), popup.getId())) {
-            throw new BaseException(ErrorCode.USER_ALERT_ALREADY_EXISTS);
-        }
-
-        UserAlert userAlert = UserAlert.builder()
-                .user(user)
-                .popup(popup)
-                .alertedAt(LocalDateTime.now())
-                .readAt(null)
-                .build();
-
-        userAlertRepository.save(userAlert);
+    if (userAlertRepository.existsByUser_IdAndPopup_Id(user.getId(), popup.getId())) {
+      throw new BaseException(ErrorCode.USER_ALERT_ALREADY_EXISTS);
     }
 
-    @Transactional
-    public void deleteUserAlert(String userUuid, UserAlertDeleteRequestDto userAlertDeleteRequestDto) {
-        Users user = usersRepository.findByUuid(userUuid)
-                .orElseThrow(() -> new BaseException(ErrorCode.USER_NOT_FOUND));
+    UserAlert userAlert =
+        UserAlert.builder()
+            .user(user)
+            .popup(popup)
+            .alertedAt(LocalDateTime.now())
+            .readAt(null)
+            .build();
 
-        Popup popup = popupRepository.findByUuid(userAlertDeleteRequestDto.getPopupUuid())
-                .orElseThrow(() -> new BaseException(ErrorCode.POPUP_NOT_FOUND));
+    userAlertRepository.save(userAlert);
+  }
 
-        UserAlert userAlert = userAlertRepository
-                .findByUser_IdAndPopup_Id(user.getId(), popup.getId())
-                .orElseThrow(() -> new BaseException(ErrorCode.USER_ALERT_NOT_FOUND));
+  @Transactional
+  public void deleteUserAlert(
+      String userUuid, UserAlertDeleteRequestDto userAlertDeleteRequestDto) {
+    Users user =
+        usersRepository
+            .findByUuid(userUuid)
+            .orElseThrow(() -> new BaseException(ErrorCode.USER_NOT_FOUND));
 
-        userAlertRepository.delete(userAlert);
+    Popup popup =
+        popupRepository
+            .findByUuid(userAlertDeleteRequestDto.getPopupUuid())
+            .orElseThrow(() -> new BaseException(ErrorCode.POPUP_NOT_FOUND));
+
+    UserAlert userAlert =
+        userAlertRepository
+            .findByUser_IdAndPopup_Id(user.getId(), popup.getId())
+            .orElseThrow(() -> new BaseException(ErrorCode.USER_ALERT_NOT_FOUND));
+
+    userAlertRepository.delete(userAlert);
+  }
+
+  @Transactional(readOnly = true)
+  public List<UserAlertResponseDto> getUserAlertPopupList(String userUuid) {
+    Users user =
+        usersRepository
+            .findByUuid(userUuid)
+            .orElseThrow(() -> new BaseException(ErrorCode.USER_NOT_FOUND));
+
+    List<UserAlert> userAlertList =
+        userAlertRepository.findAllByUser_IdOrderByAlertedAtDesc(user.getId());
+
+    if (userAlertList.isEmpty()) {
+      return List.of();
     }
 
-    @Transactional(readOnly = true)
-    public List<UserAlertResponseDto> getUserAlertPopupList(String userUuid) {
-        Users user = usersRepository.findByUuid(userUuid)
-                .orElseThrow(() -> new BaseException(ErrorCode.USER_NOT_FOUND));
+    List<Popup> popupList = userAlertList.stream().map(UserAlert::getPopup).toList();
 
-        List<UserAlert> userAlertList = userAlertRepository.findAllByUser_IdOrderByAlertedAtDesc(user.getId());
+    Set<Long> favoritedPopupIdList =
+        userFavoriteRepository.findAllByUserUuid(userUuid).stream()
+            .map(f -> f.getPopup().getId())
+            .collect(Collectors.toSet());
 
-        if (userAlertList.isEmpty()) {
-            return List.of();
-        }
+    List<PopupUserResponseDto> popupUserResponseDtoList =
+        popupUserResponseDtoMapper.toPopupUserResponseDtoList(popupList, favoritedPopupIdList);
 
-        List<Popup> popupList = userAlertList
-                .stream()
-                .map(UserAlert::getPopup)
-                .toList();
+    List<UserAlertResponseDto> result = new ArrayList<>(popupUserResponseDtoList.size());
 
-        Set<Long> favoritedPopupIdList = userFavoriteRepository.findAllByUserUuid(userUuid)
-                .stream()
-                .map(f -> f.getPopup().getId())
-                .collect(Collectors.toSet());
+    for (int i = 0; i < popupUserResponseDtoList.size(); i++) {
+      PopupUserResponseDto popupDto = popupUserResponseDtoList.get(i);
+      UserAlert userAlert = userAlertList.get(i); // 같은 순서라고 가정
 
-        List<PopupUserResponseDto> popupUserResponseDtoList =
-                popupUserResponseDtoMapper.toPopupUserResponseDtoList(popupList, favoritedPopupIdList);
+      boolean isRead = (userAlert.getReadAt() != null);
 
-        List<UserAlertResponseDto> result = new ArrayList<>(popupUserResponseDtoList.size());
-
-        for (int i = 0; i < popupUserResponseDtoList.size(); i++) {
-            PopupUserResponseDto popupDto = popupUserResponseDtoList.get(i);
-            UserAlert userAlert = userAlertList.get(i);  // 같은 순서라고 가정
-
-            boolean isRead = (userAlert.getReadAt() != null);
-
-            UserAlertResponseDto alertDto = UserAlertResponseDto.from(popupDto, isRead);
-            result.add(alertDto);
-        }
-
-        return result;
+      UserAlertResponseDto alertDto = UserAlertResponseDto.from(popupDto, isRead);
+      result.add(alertDto);
     }
 
-    @Transactional
-    public void readUserAlertPopup(String userUuid, String popupUuid) {
-        Users user = usersRepository.findByUuid(userUuid)
-                .orElseThrow(() -> new BaseException(ErrorCode.USER_NOT_FOUND));
+    return result;
+  }
 
-        Popup popup = popupRepository.findByUuid(popupUuid)
-                .orElseThrow(() -> new BaseException(ErrorCode.POPUP_NOT_FOUND));
+  @Transactional
+  public void readUserAlertPopup(String userUuid, String popupUuid) {
+    Users user =
+        usersRepository
+            .findByUuid(userUuid)
+            .orElseThrow(() -> new BaseException(ErrorCode.USER_NOT_FOUND));
 
-        UserAlert userAlert = userAlertRepository.findByUser_IdAndPopup_Id(user.getId(), popup.getId())
-                .orElseThrow(() -> new BaseException(ErrorCode.USER_ALERT_NOT_FOUND));
+    Popup popup =
+        popupRepository
+            .findByUuid(popupUuid)
+            .orElseThrow(() -> new BaseException(ErrorCode.POPUP_NOT_FOUND));
 
-        if (userAlert.getReadAt() == null) {
-            userAlert.markAsRead();
-        }
+    UserAlert userAlert =
+        userAlertRepository
+            .findByUser_IdAndPopup_Id(user.getId(), popup.getId())
+            .orElseThrow(() -> new BaseException(ErrorCode.USER_ALERT_NOT_FOUND));
+
+    if (userAlert.getReadAt() == null) {
+      userAlert.markAsRead();
     }
-
+  }
 }
