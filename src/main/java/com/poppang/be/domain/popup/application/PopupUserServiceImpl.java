@@ -95,7 +95,8 @@ public class PopupUserServiceImpl implements PopupUserService {
     Long favoriteCount = userFavoriteRepository.countByPopupUuid(popup.getUuid());
 
     // 조회 수
-    Long viewCount = popupTotalViewCountRepository.getViewCountByPopupUuid(popup.getUuid());
+    Long rawViewCount = popupTotalViewCountRepository.getViewCountByPopupUuid(popup.getUuid());
+    long viewCount = (rawViewCount == null) ? 0L : rawViewCount;
 
     // 좋아요 여부
     boolean isFavorited =
