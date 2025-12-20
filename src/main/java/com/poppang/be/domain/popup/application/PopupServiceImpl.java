@@ -170,8 +170,8 @@ public class PopupServiceImpl implements PopupService {
     Long favoriteCount = userFavoriteRepository.countByPopupUuid(popup.getUuid());
 
     // 조회 수
-    Long viewCount = popupTotalViewCountRepository.getViewCountByPopupUuid(popup.getUuid());
-
+    Long rawViewCount = popupTotalViewCountRepository.getViewCountByPopupUuid(popup.getUuid());
+    long viewCount = (rawViewCount == null) ? 0L : rawViewCount;
     // DTO 조립
     PopupResponseDto popupResponseDto =
         PopupResponseDto.builder()
