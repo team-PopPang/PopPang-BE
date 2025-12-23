@@ -102,7 +102,7 @@ public class UserAlertServiceImpl implements UserAlertService {
     List<Popup> popupList = userAlertList.stream().map(UserAlert::getPopup).toList();
 
     Set<Long> favoritedPopupIdList =
-        userFavoriteRepository.findAllByUserUuid(userUuid).stream()
+        userFavoriteRepository.findAllActivatedByUserUuid(userUuid).stream()
             .map(f -> f.getPopup().getId())
             .collect(Collectors.toSet());
 
