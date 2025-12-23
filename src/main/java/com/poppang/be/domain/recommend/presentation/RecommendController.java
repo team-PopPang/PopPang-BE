@@ -30,12 +30,13 @@ public class RecommendController {
   }
 
   @Operation(
-          summary = "[WEB] 추천(Recommend) 전체 조회",
-          description = "[WEB] 전체 추천 카테고리 목록을 조회합니다.",
-          tags = {"[RECOMMEND] 공통"})
+      summary = "[WEB] 추천(Recommend) 전체 조회",
+      description = "[WEB] 전체 추천 카테고리 목록을 조회합니다.",
+      tags = {"[RECOMMEND] 공통"})
   @GetMapping("/web")
   public ApiResponse<List<RecommendResponseDto>> webGetAllRecommendList() {
-    List<RecommendResponseDto> recommendResponseDtoList = recommendServiceImpl.webGetAllRecommendList();
+    List<RecommendResponseDto> recommendResponseDtoList =
+        recommendServiceImpl.webGetAllRecommendList();
 
     return ApiResponse.ok(recommendResponseDtoList);
   }
