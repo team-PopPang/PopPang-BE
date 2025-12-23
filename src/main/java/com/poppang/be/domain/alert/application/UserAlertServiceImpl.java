@@ -93,7 +93,7 @@ public class UserAlertServiceImpl implements UserAlertService {
             .orElseThrow(() -> new BaseException(ErrorCode.USER_NOT_FOUND));
 
     List<UserAlert> userAlertList =
-        userAlertRepository.findAllByUser_IdOrderByAlertedAtDesc(user.getId());
+        userAlertRepository.findAllByUserIdOrderByAlertedAtDesc(user.getId());
 
     if (userAlertList.isEmpty()) {
       return List.of();
