@@ -7,10 +7,6 @@ import com.poppang.be.domain.popup.infrastructure.projection.PopupWebUpcomingRow
 import java.time.LocalDate;
 import java.util.List;
 import java.util.Optional;
-
-import com.poppang.be.domain.popup.infrastructure.projection.PopupWebFavoriteRow;
-import com.poppang.be.domain.popup.infrastructure.projection.PopupWebRandomRow;
-import com.poppang.be.domain.popup.infrastructure.projection.PopupWebUpcomingRow;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
@@ -328,9 +324,8 @@ public interface PopupRepository extends JpaRepository<Popup, Long> {
   List<PopupWebRandomRow> findRandomActiveWithThumbnail(@Param("limit") int limit);
 
   @Query(
-          value =
-                  """
       value =
+          """
         SELECT
         p.uuid AS popupUuid,
         p.name AS popupName,
@@ -349,10 +344,8 @@ public interface PopupRepository extends JpaRepository<Popup, Long> {
                 AND p.end_date >= CURRENT_DATE
                 ORDER BY ptvc.view_count DESC
                 LIMIT :limit
-""", nativeQuery = true
-  )
-  List<PopupWebFavoriteRow> findTopViewedActiveWithThumbnail(@Param("limit")int limit);
 """,
+      nativeQuery = true)
   List<PopupWebFavoriteRow> findTopViewedActiveWithThumbnail(@Param("limit") int limit);
 
   @Query(
