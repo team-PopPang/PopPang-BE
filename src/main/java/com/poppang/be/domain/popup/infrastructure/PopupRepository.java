@@ -1,6 +1,9 @@
 package com.poppang.be.domain.popup.infrastructure;
 
 import com.poppang.be.domain.popup.entity.Popup;
+import com.poppang.be.domain.popup.infrastructure.projection.PopupWebFavoriteRow;
+import com.poppang.be.domain.popup.infrastructure.projection.PopupWebRandomRow;
+import com.poppang.be.domain.popup.infrastructure.projection.PopupWebUpcomingRow;
 import java.time.LocalDate;
 import java.util.List;
 import java.util.Optional;
@@ -17,7 +20,7 @@ public interface PopupRepository extends JpaRepository<Popup, Long> {
   Optional<Popup> findByUuid(String popupUuid);
 
   @Query(
-          """
+      """
 
                   select p
             from Popup p
@@ -305,8 +308,8 @@ public interface PopupRepository extends JpaRepository<Popup, Long> {
   List<Popup> findRandomActivePopups();
 
   @Query(
-          value =
-      """
+      value =
+          """
         SELECT
         p.uuid AS popupUuid,
         p.name AS popupName,
@@ -320,12 +323,14 @@ public interface PopupRepository extends JpaRepository<Popup, Long> {
                 AND p.end_date >= CURRENT_DATE
                 ORDER BY RAND()
                 LIMIT :limit
-""", nativeQuery = true)
+""",
+      nativeQuery = true)
   List<PopupWebRandomRow> findRandomActiveWithThumbnail(@Param("limit") int limit);
 
   @Query(
           value =
                   """
+      value =
         SELECT
         p.uuid AS popupUuid,
         p.name AS popupName,
@@ -347,10 +352,12 @@ public interface PopupRepository extends JpaRepository<Popup, Long> {
 """, nativeQuery = true
   )
   List<PopupWebFavoriteRow> findTopViewedActiveWithThumbnail(@Param("limit")int limit);
+""",
+  List<PopupWebFavoriteRow> findTopViewedActiveWithThumbnail(@Param("limit") int limit);
 
   @Query(
-          value =
-                  """
+      value =
+          """
             SELECT
                 p.uuid AS popupUuid,
                 p.name AS popupName,
@@ -366,10 +373,10 @@ public interface PopupRepository extends JpaRepository<Popup, Long> {
             AND p.start_date BETWEEN :startDate AND :endDate
             ORDER BY start_date ASC
             LIMIT :limit
-""", nativeQuery = true
-  )
+""",
+      nativeQuery = true)
   List<PopupWebUpcomingRow> findUpcomingActiveWithThumbnail(
-          @Param("startDate") LocalDate startDate,
-          @Param("endDate") LocalDate endDate,
-          @Param("limit") int limit);
+      @Param("startDate") LocalDate startDate,
+      @Param("endDate") LocalDate endDate,
+      @Param("limit") int limit);
 }

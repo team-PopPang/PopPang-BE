@@ -69,7 +69,7 @@ public class UserAlertController {
   public ResponseEntity<List<UserAlertResponseDto>> getUserAlertPopupList(
       @PathVariable String userUuid) {
     List<UserAlertResponseDto> userAlertPopupList =
-            userAlertService.getUserAlertPopupList(userUuid);
+        userAlertService.getUserAlertPopupList(userUuid);
 
     return ResponseEntity.ok(userAlertPopupList);
   }
