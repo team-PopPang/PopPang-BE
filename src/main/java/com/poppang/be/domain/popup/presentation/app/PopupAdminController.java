@@ -4,6 +4,7 @@ import com.poppang.be.domain.popup.application.PopupAdminServiceImpl;
 import io.swagger.v3.oas.annotations.Operation;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.PatchMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -38,4 +39,25 @@ public class PopupAdminController {
 
     return ResponseEntity.ok().build();
   }
+
+  @Operation(
+          summary = "[V2] 팝업 비활성화 (관리자 전용)",
+          description =
+                  """
+                   권장 API 입니다. (JWT 기반 인증/인가)
+                  
+                  - Authorization 헤더의 Bearer Access Token을 통해 인증합니다.
+                  - ADMIN 권한이 있는 사용자만 접근 가능합니다.
+                  
+                  - 처리 방식
+                    - Popup 엔티티 activated 값을 false로 변경 (dirty checking)
+                  """)
+  @PreAuthorize("hasRole('ADMIN')")
+  @PatchMapping("/popup/{popupUuid}/deactivate")
+  public ResponseEntity<Void> deactivatePopupV2(@PathVariable String popupUuid) {
+    popupAdminServiceImpl.deactivatePopupV2(popupUuid);
+    return ResponseEntity.ok().build();
+  }
+
+
 }

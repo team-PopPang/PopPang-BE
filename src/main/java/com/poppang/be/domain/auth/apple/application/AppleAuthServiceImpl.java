@@ -2,7 +2,7 @@ package com.poppang.be.domain.auth.apple.application;
 
 import com.nimbusds.jose.JOSEException;
 import com.nimbusds.jwt.JWTClaimsSet;
-import com.poppang.be.common.enums.Role;
+import com.poppang.be.domain.users.entity.Role;
 import com.poppang.be.common.mail.EmailService;
 import com.poppang.be.domain.auth.apple.config.AppleProperties;
 import com.poppang.be.domain.auth.apple.dto.request.AppleAppLoginRequestDto;
