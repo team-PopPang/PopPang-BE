@@ -1,7 +1,7 @@
 package com.poppang.be.domain.auth.kakao.dto.request;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
-import com.poppang.be.common.enums.Role;
+import com.poppang.be.domain.users.entity.Role;
 import com.poppang.be.domain.users.entity.Provider;
 import java.util.List;
 import lombok.Getter;

@@ -1,6 +1,6 @@
 package com.poppang.be.domain.auth.kakao.application;
 
-import com.poppang.be.common.enums.Role;
+import com.poppang.be.domain.users.entity.Role;
 import com.poppang.be.common.mail.EmailService;
 import com.poppang.be.domain.auth.dto.response.LoginResponseDto;
 import com.poppang.be.domain.auth.dto.response.SignupResponseDto;
