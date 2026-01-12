@@ -1,5 +1,6 @@
 package com.poppang.be.domain.keyword.presentation;
 
+import com.poppang.be.domain.keyword.application.UserAlertKeywordService;
 import com.poppang.be.domain.keyword.application.UserAlertKeywordServiceImpl;
 import com.poppang.be.domain.keyword.dto.request.UserAlertKeywordDeleteDto;
 import com.poppang.be.domain.keyword.dto.request.UserAlertKeywordRegisterRequestDto;
@@ -15,7 +16,7 @@ import org.springframework.web.bind.annotation.*;
 @RequiredArgsConstructor
 public class UserAlertKeywordController {
 
-  private final UserAlertKeywordServiceImpl userAlertKeywordServiceImpl;
+  private final UserAlertKeywordService userAlertKeywordService;
 
   @Operation(
       summary = "유저 알림 키워드 전체 조회",
@@ -25,7 +26,7 @@ public class UserAlertKeywordController {
   public ResponseEntity<List<UserAlertKeywordResponseDto>> getUserAlertKeywords(
       @RequestParam("userUuid") String userUuid) {
     List<UserAlertKeywordResponseDto> userAlertKeywordResponseDtoList =
-        userAlertKeywordServiceImpl.getUserAlertKeywordList(userUuid);
+        userAlertKeywordService.getUserAlertKeywordList(userUuid);
 
     return ResponseEntity.ok(userAlertKeywordResponseDtoList);
   }
@@ -37,7 +38,7 @@ public class UserAlertKeywordController {
   @PostMapping
   public ResponseEntity<Void> registerAlertKeyword(
       @RequestBody UserAlertKeywordRegisterRequestDto userAlertKeywordRegisterRequestDto) {
-    userAlertKeywordServiceImpl.registerAlertKeyword(userAlertKeywordRegisterRequestDto);
+    userAlertKeywordService.registerAlertKeyword(userAlertKeywordRegisterRequestDto);
 
     return ResponseEntity.ok().build();
   }
@@ -49,7 +50,7 @@ public class UserAlertKeywordController {
   @DeleteMapping
   public ResponseEntity<Void> deleteAlertKeyword(
       @RequestBody UserAlertKeywordDeleteDto userAlertKeywordDeleteDto) {
-    userAlertKeywordServiceImpl.deleteAlertKeyword(userAlertKeywordDeleteDto);
+    userAlertKeywordService.deleteAlertKeyword(userAlertKeywordDeleteDto);
 
     return ResponseEntity.ok().build();
   }

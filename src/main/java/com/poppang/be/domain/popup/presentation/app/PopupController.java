@@ -1,6 +1,6 @@
 package com.poppang.be.domain.popup.presentation.app;
 
-import com.poppang.be.domain.popup.application.PopupServiceImpl;
+import com.poppang.be.domain.popup.application.PopupService;
 import com.poppang.be.domain.popup.dto.app.request.PopupRegisterRequestDto;
 import com.poppang.be.domain.popup.dto.app.response.PopupResponseDto;
 import com.poppang.be.domain.popup.dto.app.response.RegionDistrictsResponse;
@@ -10,10 +10,11 @@ import com.poppang.be.domain.popup.enums.SortStandard;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.tags.Tag;
-import java.util.List;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
+
+import java.util.List;
 
 @Tag(name = "[POPUP] 공통", description = "팝업스토어 관련 API")
 @RestController
@@ -21,12 +22,12 @@ import org.springframework.web.bind.annotation.*;
 @RequiredArgsConstructor
 public class PopupController {
 
-  private final PopupServiceImpl popupServiceImpl;
+  private final PopupService popupService;
 
   @Operation(summary = "팝업 전체 조회", description = "모든 팝업스토어 정보를 조회합니다. (비활성화된 팝업 포함)")
   @GetMapping
   public ResponseEntity<List<PopupResponseDto>> getAllPopupList() {
-    List<PopupResponseDto> allPopupList = popupServiceImpl.getAllPopupList();
+    List<PopupResponseDto> allPopupList = popupService.getAllPopupList();
 
     return ResponseEntity.ok(allPopupList);
   }
@@ -34,7 +35,7 @@ public class PopupController {
   @Operation(summary = "팝업 단건 조회", description = "popupUuid로 단건 팝업 조회합니다. ")
   @GetMapping("/{popupUuid}")
   public ResponseEntity<PopupResponseDto> getPopupByUuid(@PathVariable String popupUuid) {
-    PopupResponseDto popupResponseDto = popupServiceImpl.getPopupByUuid(popupUuid);
+    PopupResponseDto popupResponseDto = popupService.getPopupByUuid(popupUuid);
 
     return ResponseEntity.ok(popupResponseDto);
   }
@@ -42,7 +43,7 @@ public class PopupController {
   @Operation(summary = "팝업 검색", description = "특정 키워드로 팝업스토어를 검색합니다.")
   @GetMapping("/search")
   public ResponseEntity<List<PopupResponseDto>> getSearchPopupList(@RequestParam("q") String q) {
-    List<PopupResponseDto> searchPopupList = popupServiceImpl.getSearchPopupList(q);
+    List<PopupResponseDto> searchPopupList = popupService.getSearchPopupList(q);
 
     return ResponseEntity.ok(searchPopupList);
   }
@@ -56,7 +57,7 @@ public class PopupController {
       @Parameter(description = "며칠 뒤까지 조회 (기본 10)")
           @RequestParam(name = "upcomingDays", required = false)
           Integer upcomingDays) {
-    List<PopupResponseDto> upcomingPopupList = popupServiceImpl.getUpcomingPopupList(upcomingDays);
+    List<PopupResponseDto> upcomingPopupList = popupService.getUpcomingPopupList(upcomingDays);
 
     return ResponseEntity.ok(upcomingPopupList);
   }
@@ -79,7 +80,7 @@ public class PopupController {
   @GetMapping("/{userUuid}/recommend")
   public ResponseEntity<List<PopupResponseDto>> getRecommendPopupList(
       @PathVariable String userUuid) {
-    List<PopupResponseDto> recommendPopupList = popupServiceImpl.getRecommendPopupList(userUuid);
+    List<PopupResponseDto> recommendPopupList = popupService.getRecommendPopupList(userUuid);
 
     return ResponseEntity.ok(recommendPopupList);
   }
@@ -92,7 +93,7 @@ public class PopupController {
       tags = {"[POPUP] 공통"})
   @GetMapping("/inProgress")
   public ResponseEntity<List<PopupResponseDto>> getInProgressPopupList() {
-    List<PopupResponseDto> inProgressPopupList = popupServiceImpl.getInProgressPopupList();
+    List<PopupResponseDto> inProgressPopupList = popupService.getInProgressPopupList();
 
     return ResponseEntity.ok(inProgressPopupList);
   }
@@ -106,7 +107,7 @@ public class PopupController {
   @PostMapping
   public ResponseEntity<Void> registerPopup(
       @RequestBody PopupRegisterRequestDto popupRegisterRequestDto) {
-    popupServiceImpl.registerPopup(popupRegisterRequestDto);
+    popupService.registerPopup(popupRegisterRequestDto);
 
     return ResponseEntity.ok().build();
   }
@@ -119,7 +120,7 @@ public class PopupController {
   @GetMapping("/regions/districts")
   public ResponseEntity<List<RegionDistrictsResponse>> getRegionDistricts() {
     List<RegionDistrictsResponse> regionDistrictsResponseList =
-        popupServiceImpl.getRegionDistricts();
+        popupService.getRegionDistricts();
 
     return ResponseEntity.ok(regionDistrictsResponseList);
   }
@@ -142,7 +143,7 @@ public class PopupController {
       @RequestParam(required = false) Double latitude,
       @RequestParam(required = false) Double longitude) {
     List<PopupResponseDto> filteredPopupList =
-        popupServiceImpl.getFilteredPopupList(region, district, sortStandard, latitude, longitude);
+        popupService.getFilteredPopupList(region, district, sortStandard, latitude, longitude);
 
     return ResponseEntity.ok(filteredPopupList);
   }
@@ -167,7 +168,7 @@ public class PopupController {
       @RequestParam String district,
       @RequestParam HomeSortStandard homeSortStandard) {
     List<PopupResponseDto> filteredHomePopupList =
-        popupServiceImpl.getFilteredHomePopupList(region, district, homeSortStandard);
+        popupService.getFilteredHomePopupList(region, district, homeSortStandard);
 
     return ResponseEntity.ok(filteredHomePopupList);
   }
@@ -196,7 +197,7 @@ public class PopupController {
       @RequestParam(required = false) Double longitude,
       @RequestParam MapSortStandard mapSortStandard) {
     List<PopupResponseDto> filteredMapPopupList =
-        popupServiceImpl.getFilteredMapPopupList(
+        popupService.getFilteredMapPopupList(
             region, district, latitude, longitude, mapSortStandard);
 
     return ResponseEntity.ok(filteredMapPopupList);
@@ -224,7 +225,7 @@ public class PopupController {
   @GetMapping("/{popupUuid}/related")
   public ResponseEntity<List<PopupResponseDto>> getRelatedPopupList(
       @PathVariable String popupUuid) {
-    List<PopupResponseDto> relatedPopupList = popupServiceImpl.getRelatedPopupList(popupUuid);
+    List<PopupResponseDto> relatedPopupList = popupService.getRelatedPopupList(popupUuid);
 
     return ResponseEntity.ok(relatedPopupList);
   }
@@ -246,7 +247,7 @@ public class PopupController {
                 """)
   @GetMapping("/random")
   public ResponseEntity<List<PopupResponseDto>> getRandomPopupList() {
-    List<PopupResponseDto> randomPopupList = popupServiceImpl.getRandomPopupList();
+    List<PopupResponseDto> randomPopupList = popupService.getRandomPopupList();
 
     return ResponseEntity.ok(randomPopupList);
   }

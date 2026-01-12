@@ -1,5 +1,6 @@
 package com.poppang.be.domain.favorite.presentation;
 
+import com.poppang.be.domain.favorite.application.UserFavoriteService;
 import com.poppang.be.domain.favorite.application.UserFavoriteServiceImpl;
 import com.poppang.be.domain.favorite.dto.request.UserFavoriteDeleteRequestDto;
 import com.poppang.be.domain.favorite.dto.request.UserFavoriteRegisterRequestDto;
@@ -16,7 +17,7 @@ import org.springframework.web.bind.annotation.*;
 @RequiredArgsConstructor
 public class UserFavoriteController {
 
-  private final UserFavoriteServiceImpl userFavoriteServiceImpl;
+  private final UserFavoriteService userFavoriteService;
 
   @Operation(
       summary = "찜 등록",
@@ -25,7 +26,7 @@ public class UserFavoriteController {
   @PostMapping
   public ResponseEntity<Void> registerFavorite(
       @RequestBody UserFavoriteRegisterRequestDto userFavoriteRegisterRequestDto) {
-    userFavoriteServiceImpl.registerFavorite(userFavoriteRegisterRequestDto);
+    userFavoriteService.registerFavorite(userFavoriteRegisterRequestDto);
 
     return ResponseEntity.ok().build();
   }
@@ -37,7 +38,7 @@ public class UserFavoriteController {
   @DeleteMapping
   public ResponseEntity<Void> deleteFavorite(
       @RequestBody UserFavoriteDeleteRequestDto userFavoriteDeleteRequestDto) {
-    userFavoriteServiceImpl.deleteFavorite(userFavoriteDeleteRequestDto);
+    userFavoriteService.deleteFavorite(userFavoriteDeleteRequestDto);
 
     return ResponseEntity.ok().build();
   }
@@ -50,7 +51,7 @@ public class UserFavoriteController {
   public ResponseEntity<FavoriteCountResponseDto> getFavoriteCount(
       @PathVariable("popupUuid") String popupUuid) {
     FavoriteCountResponseDto favoriteCountResponseDto =
-        userFavoriteServiceImpl.getFavoriteCount(popupUuid);
+        userFavoriteService.getFavoriteCount(popupUuid);
 
     return ResponseEntity.ok(favoriteCountResponseDto);
   }
@@ -63,7 +64,7 @@ public class UserFavoriteController {
   public ResponseEntity<List<PopupUserResponseDto>> getFavoritePopupList(
       @PathVariable("userUuid") String userUuid) {
     List<PopupUserResponseDto> userFavoritePopupResponseDtoList =
-        userFavoriteServiceImpl.getFavoritePopupList(userUuid);
+        userFavoriteService.getFavoritePopupList(userUuid);
 
     return ResponseEntity.ok(userFavoritePopupResponseDtoList);
   }

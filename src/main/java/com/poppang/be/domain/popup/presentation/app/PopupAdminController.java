@@ -1,6 +1,6 @@
 package com.poppang.be.domain.popup.presentation.app;
 
-import com.poppang.be.domain.popup.application.PopupAdminServiceImpl;
+import com.poppang.be.domain.popup.application.PopupAdminService;
 import io.swagger.v3.oas.annotations.Operation;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
@@ -15,7 +15,7 @@ import org.springframework.web.bind.annotation.RestController;
 @RequiredArgsConstructor
 public class PopupAdminController {
 
-  private final PopupAdminServiceImpl popupAdminServiceImpl;
+  private final PopupAdminService popupAdminService;
 
   @Operation(
       summary = "팝업 비활성화 (관리자 전용)",
@@ -35,7 +35,7 @@ public class PopupAdminController {
   @PatchMapping("/user/{userUuid}/popup/{popupUuid}/deactivate")
   public ResponseEntity<Void> deactivatePopup(
       @PathVariable String userUuid, @PathVariable String popupUuid) {
-    popupAdminServiceImpl.deactivatePopup(userUuid, popupUuid);
+    popupAdminService.deactivatePopup(userUuid, popupUuid);
 
     return ResponseEntity.ok().build();
   }
@@ -55,7 +55,7 @@ public class PopupAdminController {
   @PreAuthorize("hasRole('ADMIN')")
   @PatchMapping("/popup/{popupUuid}/deactivate")
   public ResponseEntity<Void> deactivatePopupV2(@PathVariable String popupUuid) {
-    popupAdminServiceImpl.deactivatePopupV2(popupUuid);
+    popupAdminService.deactivatePopupV2(popupUuid);
     return ResponseEntity.ok().build();
   }
 

@@ -1,21 +1,22 @@
 package com.poppang.be.domain.recommend.presentation;
 
 import com.poppang.be.common.response.ApiResponse;
-import com.poppang.be.domain.recommend.application.RecommendServiceImpl;
+import com.poppang.be.domain.recommend.application.RecommendService;
 import com.poppang.be.domain.recommend.dto.response.RecommendResponseDto;
 import io.swagger.v3.oas.annotations.Operation;
-import java.util.List;
 import lombok.RequiredArgsConstructor;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
+
+import java.util.List;
 
 @RestController
 @RequestMapping("/api/v1/recommend")
 @RequiredArgsConstructor
 public class RecommendController {
 
-  private final RecommendServiceImpl recommendServiceImpl;
+  private final RecommendService recommendService;
 
   @Operation(
       summary = "추천(Recommend) 전체 조회",
@@ -24,7 +25,7 @@ public class RecommendController {
   @GetMapping
   public List<RecommendResponseDto> getAllRecommendList() {
     List<RecommendResponseDto> recommendResponseDtoList =
-        recommendServiceImpl.getAllRecommendList();
+        recommendService.getAllRecommendList();
 
     return recommendResponseDtoList;
   }
@@ -36,7 +37,7 @@ public class RecommendController {
   @GetMapping("/web")
   public ApiResponse<List<RecommendResponseDto>> webGetAllRecommendList() {
     List<RecommendResponseDto> recommendResponseDtoList =
-        recommendServiceImpl.webGetAllRecommendList();
+        recommendService.webGetAllRecommendList();
 
     return ApiResponse.ok(recommendResponseDtoList);
   }
