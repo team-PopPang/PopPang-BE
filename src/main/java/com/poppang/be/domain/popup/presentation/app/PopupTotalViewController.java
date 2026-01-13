@@ -2,6 +2,7 @@ package com.poppang.be.domain.popup.presentation.app;
 
 import com.poppang.be.domain.popup.application.PopupTotalViewCountService;
 import com.poppang.be.domain.popup.dto.app.response.PopupTotalViewCountResponseDto;
+import io.swagger.v3.oas.annotations.Hidden;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.RequiredArgsConstructor;
@@ -36,10 +37,7 @@ public class PopupTotalViewController {
     return ResponseEntity.ok(popupTotalViewCountResponseDto);
   }
 
-  @Operation(
-      summary = "redis에 있는 조회수 조회",
-      description = "1분간 redis에만 저장되는 조회수를 반환합니다..",
-      deprecated = true)
+  @Hidden
   @GetMapping("/{popupUuid}/view-count")
   public ResponseEntity<Map<String, Long>> getViewCount(@PathVariable String popupUuid) {
     return ResponseEntity.ok(
