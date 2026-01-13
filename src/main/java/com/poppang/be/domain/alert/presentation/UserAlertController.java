@@ -11,7 +11,7 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
-@Tag(name = "[ALERT] 개인화", description = "유저별 알림 받은 팝업 관리 API")
+@Tag(name = "[ALERT] 회원", description = "회원 알림 팝업 관리 API")
 @RestController
 @RequestMapping("/api/v1/users/{userUuid}/alert")
 @RequiredArgsConstructor

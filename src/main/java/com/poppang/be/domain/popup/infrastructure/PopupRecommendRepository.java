@@ -13,7 +13,8 @@ import org.springframework.stereotype.Repository;
 @Repository
 public interface PopupRecommendRepository extends JpaRepository<PopupRecommend, Long> {
 
-  @Query("""
+  @Query(
+      """
         SELECT pr
         FROM PopupRecommend pr
         JOIN FETCH pr.recommend r

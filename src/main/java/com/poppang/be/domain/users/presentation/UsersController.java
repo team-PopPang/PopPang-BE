@@ -5,13 +5,13 @@ import com.poppang.be.domain.users.application.UsersService;
 import com.poppang.be.domain.users.dto.request.ChangeNicknameRequestDto;
 import com.poppang.be.domain.users.dto.request.UpdateAlertStatusRequestDto;
 import com.poppang.be.domain.users.dto.response.*;
+import io.swagger.v3.oas.annotations.Hidden;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
+import java.util.List;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
-
-import java.util.List;
 
 @Tag(name = "[USER] 공통", description = "유저 관련 API")
 @RestController
@@ -78,10 +78,7 @@ public class UsersController {
     return ResponseEntity.ok().build();
   }
 
-  @Operation(
-      summary = "유저 탈퇴 기능 (soft-delete)",
-      description = "유저 회원탈퇴를 진행합니다. (soft-delete)라서 데이터는 복구 가능한 상태입니다. ",
-      deprecated = true)
+  @Hidden
   @PatchMapping("/{userUuid}/soft-delete")
   public ResponseEntity<Void> softDeleteUser(@PathVariable String userUuid) {
     usersService.softDeleteUser(userUuid);
@@ -89,10 +86,7 @@ public class UsersController {
     return ResponseEntity.ok().build();
   }
 
-  @Operation(
-      summary = "유저 복구 기능 (soft-delete 복구)",
-      description = "유저 복구를 진행합니다. 테스트 환경에서 사용하기 위한 API입니다. ",
-      deprecated = true)
+  @Hidden
   @PatchMapping("/{userUuid}/resotre")
   public ResponseEntity<Void> restoreUser(@PathVariable String userUuid) {
     usersService.restoreUser(userUuid);

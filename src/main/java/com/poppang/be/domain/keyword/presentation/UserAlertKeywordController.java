@@ -1,7 +1,6 @@
 package com.poppang.be.domain.keyword.presentation;
 
 import com.poppang.be.domain.keyword.application.UserAlertKeywordService;
-import com.poppang.be.domain.keyword.application.UserAlertKeywordServiceImpl;
 import com.poppang.be.domain.keyword.dto.request.UserAlertKeywordDeleteDto;
 import com.poppang.be.domain.keyword.dto.request.UserAlertKeywordRegisterRequestDto;
 import com.poppang.be.domain.keyword.dto.response.UserAlertKeywordResponseDto;
