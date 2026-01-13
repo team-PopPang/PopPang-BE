@@ -251,4 +251,23 @@ public class PopupController {
 
     return ResponseEntity.ok(randomPopupList);
   }
+
+  @Operation(
+          summary = "추천 카테고리별 팝업 목록 조회",
+          description = """
+        특정 추천 카테고리(recommendId)에 속한 팝업 스토어 목록을 조회합니다.
+        
+        - 지도 상단 Featured / 추천 영역에서 사용됩니다.
+        - 현재 활성화된 팝업만 반환합니다.
+        """
+  )
+  @GetMapping("/recommendations/{recommendId}")
+  public ResponseEntity<List<PopupResponseDto>> getRecommendationPopupList(
+          @PathVariable Long recommendId
+  ) {
+    List<PopupResponseDto> recommendationPopupList = popupService.getRecommendationPopupList(recommendId);
+
+    return ResponseEntity.ok(recommendationPopupList);
+  }
+
 }

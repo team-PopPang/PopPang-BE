@@ -86,7 +86,7 @@ public interface PopupRepository extends JpaRepository<Popup, Long> {
       @Param("excludeSize") int excludeSize,
       @Param("limit") int limit);
 
-  interface RegionDistrictsRaw {
+    interface RegionDistrictsRaw {
     String getRegion();
 
     String getDistricts();
@@ -372,4 +372,18 @@ public interface PopupRepository extends JpaRepository<Popup, Long> {
       @Param("startDate") LocalDate startDate,
       @Param("endDate") LocalDate endDate,
       @Param("limit") int limit);
+
+  @Query(
+          value = """
+                SELECT distinct p
+                FROM PopupRecommend pr
+                JOIN pr.popup p
+                WHERE pr.recommend.id = :recommendId
+            AND p.activated = true
+            AND p.startDate <= CURRENT_DATE
+            AND p.endDate >= CURRENT_DATE
+"""
+  )
+  List<Popup> findActivePopupsByRecommendId(@Param("recommendId") Long recommendId);
+
 }
