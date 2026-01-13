@@ -212,4 +212,14 @@ public class PopupUserController {
 
     return ResponseEntity.ok(randomPopupList);
   }
+
+  @GetMapping("/recommendations/{recommendId}")
+  public ResponseEntity<List<PopupUserResponseDto>> getRecommendationPopupList(
+          @PathVariable String userUuid,
+          @PathVariable Long recommendId
+  ) {
+    List<PopupUserResponseDto> recommendationPopupList = popupUserService.getRecommendationPopupList(userUuid, recommendId);
+
+    return ResponseEntity.ok(recommendationPopupList);
+  }
 }
