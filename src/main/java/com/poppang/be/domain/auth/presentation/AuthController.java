@@ -74,6 +74,7 @@ public class AuthController {
     LoginResponseDto loginResponseDto = kakaoAuthService.mobileLogin(kakaoAppLoginRequestDto);
     return ResponseEntity.ok(loginResponseDto);
   }
+
   @Hidden
   @Operation(
       summary = "[APP] 애플 로그인",

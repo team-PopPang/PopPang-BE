@@ -11,11 +11,10 @@ import io.swagger.v3.oas.annotations.Hidden;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.tags.Tag;
+import java.util.List;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
-
-import java.util.List;
 
 @Tag(name = "[POPUP] 비회원", description = "비회원 유저 팝업 API")
 @RestController
@@ -49,9 +48,7 @@ public class PopupController {
     return ResponseEntity.ok(searchPopupList);
   }
 
-  @Operation(
-      summary = "다가오는 팝업 조회 (D-1 ~ D-10)",
-      description = "오늘부터 10일 이내에 시작하는 팝업을 반환합니다.")
+  @Operation(summary = "다가오는 팝업 조회 (D-1 ~ D-10)", description = "오늘부터 10일 이내에 시작하는 팝업을 반환합니다.")
   @GetMapping("/upcoming")
   public ResponseEntity<List<PopupResponseDto>> getUpcomingPopupList(
       @Parameter(description = "며칠 뒤까지 조회 (기본 10)")
@@ -118,8 +115,7 @@ public class PopupController {
               + "서울은 '전체'와 실제 'OO구'들을 포함하고, 서울 외 지역은 '전체'만 포함합니다.")
   @GetMapping("/regions/districts")
   public ResponseEntity<List<RegionDistrictsResponse>> getRegionDistricts() {
-    List<RegionDistrictsResponse> regionDistrictsResponseList =
-        popupService.getRegionDistricts();
+    List<RegionDistrictsResponse> regionDistrictsResponseList = popupService.getRegionDistricts();
 
     return ResponseEntity.ok(regionDistrictsResponseList);
   }
@@ -243,21 +239,20 @@ public class PopupController {
   }
 
   @Operation(
-          summary = "추천 카테고리별 팝업 목록 조회",
-          description = """
+      summary = "추천 카테고리별 팝업 목록 조회",
+      description =
+          """
         특정 추천 카테고리(recommendId)에 속한 팝업 스토어 목록을 조회합니다.
-        
+
         - 지도 상단 Featured / 추천 영역에서 사용됩니다.
         - 현재 활성화된 팝업만 반환합니다.
-        """
-  )
+        """)
   @GetMapping("/recommendations/{recommendId}")
   public ResponseEntity<List<PopupResponseDto>> getRecommendationPopupList(
-          @PathVariable Long recommendId
-  ) {
-    List<PopupResponseDto> recommendationPopupList = popupService.getRecommendationPopupList(recommendId);
+      @PathVariable Long recommendId) {
+    List<PopupResponseDto> recommendationPopupList =
+        popupService.getRecommendationPopupList(recommendId);
 
     return ResponseEntity.ok(recommendationPopupList);
   }
-
 }

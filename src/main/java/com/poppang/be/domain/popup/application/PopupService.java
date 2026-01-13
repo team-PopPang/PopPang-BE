@@ -44,5 +44,4 @@ public interface PopupService {
   List<PopupResponseDto> getRandomPopupList();
 
   List<PopupResponseDto> getRecommendationPopupList(Long recommendId);
-
 }

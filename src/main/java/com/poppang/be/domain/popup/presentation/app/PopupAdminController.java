@@ -43,14 +43,14 @@ public class PopupAdminController {
   }
 
   @Operation(
-          summary = "[V2] 팝업 비활성화 (관리자 전용)",
-          description =
-                  """
+      summary = "[V2] 팝업 비활성화 (관리자 전용)",
+      description =
+          """
                    권장 API 입니다. (JWT 기반 인증/인가)
-                  
+
                   - Authorization 헤더의 Bearer Access Token을 통해 인증합니다.
                   - ADMIN 권한이 있는 사용자만 접근 가능합니다.
-                  
+
                   - 처리 방식
                     - Popup 엔티티 activated 값을 false로 변경 (dirty checking)
                   """)
@@ -60,6 +60,4 @@ public class PopupAdminController {
     popupAdminService.deactivatePopupV2(popupUuid);
     return ResponseEntity.ok().build();
   }
-
-
 }

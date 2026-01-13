@@ -45,9 +45,6 @@ public class RecommendServiceImpl implements RecommendService {
   public List<RecommendFeaturedResponseDto> getFeaturedForMap() {
     List<Recommend> recommendList = recommendRepository.findAllByIdIn(FEATURED_RECOMMEND_IDS);
 
-    return recommendList.stream()
-            .map(RecommendFeaturedResponseDto::from)
-            .toList();
+    return recommendList.stream().map(RecommendFeaturedResponseDto::from).toList();
   }
-
 }

@@ -4,9 +4,9 @@ import java.time.Duration;
 import java.util.Optional;
 
 public interface RefreshTokenRedisRepository {
-    void save(String userUuid, String refreshToken, Duration ttl);
+  void save(String userUuid, String refreshToken, Duration ttl);
 
-    Optional<String> find(String userUuid);
+  Optional<String> find(String userUuid);
 
-    void delete(String userUuid);
+  void delete(String userUuid);
 }

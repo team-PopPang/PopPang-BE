@@ -14,17 +14,18 @@ import org.springframework.web.bind.annotation.*;
 @RequestMapping("/api/v1/auth")
 public class TokenController {
 
-    private final TokenService tokenService;
+  private final TokenService tokenService;
 
-    @Hidden
-    @PostMapping("/token/test")
-    public ApiResponse<TokenResponseDto> issueTest(@RequestParam String userUuid) {
-        return ApiResponse.ok(tokenService.issueTokens(userUuid));
-    }
+  @Hidden
+  @PostMapping("/token/test")
+  public ApiResponse<TokenResponseDto> issueTest(@RequestParam String userUuid) {
+    return ApiResponse.ok(tokenService.issueTokens(userUuid));
+  }
 
-    @Hidden
-    @PostMapping("/refresh")
-    public ApiResponse<AccessTokenResponseDto> refresh(@RequestBody TokenRefreshRequestDto tokenRefreshRequestDto) {
-        return ApiResponse.ok(tokenService.refreshAccessToken(tokenRefreshRequestDto.refreshToken()));
-    }
+  @Hidden
+  @PostMapping("/refresh")
+  public ApiResponse<AccessTokenResponseDto> refresh(
+      @RequestBody TokenRefreshRequestDto tokenRefreshRequestDto) {
+    return ApiResponse.ok(tokenService.refreshAccessToken(tokenRefreshRequestDto.refreshToken()));
+  }
 }

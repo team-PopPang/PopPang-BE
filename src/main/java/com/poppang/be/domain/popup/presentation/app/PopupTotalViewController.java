@@ -5,11 +5,10 @@ import com.poppang.be.domain.popup.dto.app.response.PopupTotalViewCountResponseD
 import io.swagger.v3.oas.annotations.Hidden;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
+import java.util.Map;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
-
-import java.util.Map;
 
 @Tag(name = "[POPUP] Redis 조회수", description = "팝업스토어 Redis 관련 API")
 @RestController
@@ -40,7 +39,6 @@ public class PopupTotalViewController {
   @Hidden
   @GetMapping("/{popupUuid}/view-count")
   public ResponseEntity<Map<String, Long>> getViewCount(@PathVariable String popupUuid) {
-    return ResponseEntity.ok(
-        Map.of("viewCount", popupTotalViewCountService.getDelta(popupUuid)));
+    return ResponseEntity.ok(Map.of("viewCount", popupTotalViewCountService.getDelta(popupUuid)));
   }
 }

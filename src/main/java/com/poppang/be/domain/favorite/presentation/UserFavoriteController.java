@@ -1,7 +1,6 @@
 package com.poppang.be.domain.favorite.presentation;
 
 import com.poppang.be.domain.favorite.application.UserFavoriteService;
-import com.poppang.be.domain.favorite.application.UserFavoriteServiceImpl;
 import com.poppang.be.domain.favorite.dto.request.UserFavoriteDeleteRequestDto;
 import com.poppang.be.domain.favorite.dto.request.UserFavoriteRegisterRequestDto;
 import com.poppang.be.domain.favorite.dto.response.FavoriteCountResponseDto;
