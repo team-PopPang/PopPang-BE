@@ -213,6 +213,13 @@ public class PopupUserController {
     return ResponseEntity.ok(randomPopupList);
   }
 
+  @Operation(
+          summary = "추천 카테고리별 팝업 목록 조회",
+          description = """
+        특정 추천 카테고리(recommendId)에 속한 팝업 목록을 조회합니다.
+        유저 UUID를 기준으로 좋아요 여부(favorited) 등 사용자 맞춤 정보가 포함됩니다.
+        """
+  )
   @GetMapping("/recommendations/{recommendId}")
   public ResponseEntity<List<PopupUserResponseDto>> getRecommendationPopupList(
           @PathVariable String userUuid,
