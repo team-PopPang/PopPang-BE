@@ -15,5 +15,5 @@ public interface PopupWebService {
 
   List<PopupWebUpcomingResponseDto> getUpcomingPopupList();
 
-    PopupWebDetailResponseDto getPopupDetail(String popupUuid);
+  PopupWebDetailResponseDto getPopupDetail(String popupUuid);
 }

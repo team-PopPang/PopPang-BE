@@ -20,8 +20,7 @@ public class PopupWebController {
 
   private final PopupWebService popupWebService;
 
-  @Operation(summary = "[WEB] 랜덤 팝업 목록 조회",
-          description = "웹 메인 화면에 노출되는 랜덤 팝업스토어 목록을 조회합니다.")
+  @Operation(summary = "[WEB] 랜덤 팝업 목록 조회", description = "웹 메인 화면에 노출되는 랜덤 팝업스토어 목록을 조회합니다.")
   @GetMapping("/random")
   public ApiResponse<List<PopupWebRandomResponseDto>> getRandomPopupList() {
     List<PopupWebRandomResponseDto> randomPopupList = popupWebService.getRandomPopupList();
@@ -30,8 +29,8 @@ public class PopupWebController {
   }
 
   @Operation(
-          summary = "[WEB] 인기(즐겨찾기) 팝업 목록 조회",
-          description = "즐겨찾기 수 기준으로 정렬된 인기 팝업스토어 목록을 조회합니다.")
+      summary = "[WEB] 인기(즐겨찾기) 팝업 목록 조회",
+      description = "즐겨찾기 수 기준으로 정렬된 인기 팝업스토어 목록을 조회합니다.")
   @GetMapping("/favorite")
   public ApiResponse<List<PopupWebFavoriteResponseDto>> getFavoritePopupList() {
     List<PopupWebFavoriteResponseDto> favoritePopupList = popupWebService.getFavoritePopupList();
@@ -39,8 +38,7 @@ public class PopupWebController {
     return ApiResponse.ok(favoritePopupList);
   }
 
-  @Operation(summary = "[WEB] 오픈 예정 팝업 목록 조회",
-          description = "아직 시작되지 않은 오픈 예정 팝업스토어 목록을 조회합니다.")
+  @Operation(summary = "[WEB] 오픈 예정 팝업 목록 조회", description = "아직 시작되지 않은 오픈 예정 팝업스토어 목록을 조회합니다.")
   @GetMapping("/upcoming")
   public ApiResponse<List<PopupWebUpcomingResponseDto>> getUpcomingPopupList() {
     List<PopupWebUpcomingResponseDto> upcomingPopupList = popupWebService.getUpcomingPopupList();
@@ -48,14 +46,9 @@ public class PopupWebController {
     return ApiResponse.ok(upcomingPopupList);
   }
 
-  @Operation(
-          summary = "팝업스토어 상세 조회",
-          description = "popupUuid를 이용해 팝업스토어의 상세 정보를 조회합니다."
-  )
+  @Operation(summary = "팝업스토어 상세 조회", description = "popupUuid를 이용해 팝업스토어의 상세 정보를 조회합니다.")
   @GetMapping("/{popupUuid}")
-  public ApiResponse<PopupWebDetailResponseDto> getPopupDetail(
-          @PathVariable String popupUuid
-  ) {
+  public ApiResponse<PopupWebDetailResponseDto> getPopupDetail(@PathVariable String popupUuid) {
     PopupWebDetailResponseDto popupDetail = popupWebService.getPopupDetail(popupUuid);
 
     return ApiResponse.ok(popupDetail);
