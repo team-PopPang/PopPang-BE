@@ -6,12 +6,11 @@ import com.poppang.be.domain.popup.dto.app.request.PopupSubmissionStatusUpdateRe
 import com.poppang.be.domain.popup.dto.app.response.PopPopupSubmissionResponseDto;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
+import java.util.List;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
-
-import java.util.List;
 
 @Tag(name = "[ADMIN]", description = "관리자 전용 API")
 @RestController
@@ -22,9 +21,9 @@ public class PopupAdminController {
   private final PopupAdminService popupAdminService;
 
   @Operation(
-          summary = "팝업 비활성화 (관리자 전용)",
-          description =
-                  """
+      summary = "팝업 비활성화 (관리자 전용)",
+      description =
+          """
                           관리자만 사용할 수 있는 API입니다.
 
                           특정 팝업(popupUuid)을 비활성화(is_active = false) 상태로 변경합니다.
@@ -38,16 +37,16 @@ public class PopupAdminController {
                           """)
   @PatchMapping("/user/{userUuid}/popup/{popupUuid}/deactivate")
   public ResponseEntity<Void> deactivatePopup(
-          @PathVariable String userUuid, @PathVariable String popupUuid) {
+      @PathVariable String userUuid, @PathVariable String popupUuid) {
     popupAdminService.deactivatePopup(userUuid, popupUuid);
 
     return ResponseEntity.ok().build();
   }
 
   @Operation(
-          summary = "[V2] 팝업 비활성화 (관리자 전용)",
-          description =
-                  """
+      summary = "[V2] 팝업 비활성화 (관리자 전용)",
+      description =
+          """
                            권장 API 입니다. (JWT 기반 인증/인가)
 
                           - Authorization 헤더의 Bearer Access Token을 통해 인증합니다.
@@ -63,39 +62,33 @@ public class PopupAdminController {
     return ResponseEntity.ok().build();
   }
 
-  @Operation(
-          summary = "팝업스토어 제보 등록",
-          description = "사용자가 팝업스토어 정보를 제보합니다."
-  )
+  @Operation(summary = "팝업스토어 제보 등록", description = "사용자가 팝업스토어 정보를 제보합니다.")
   @PostMapping("/popup-submissions")
   public ResponseEntity<Void> createPopupSubmission(
-          @RequestBody PopupSubmissionCreateRequestDto popupSubmissionCreateRequestDto
-  ) {
+      @RequestBody PopupSubmissionCreateRequestDto popupSubmissionCreateRequestDto) {
     popupAdminService.createPopupSubmission(popupSubmissionCreateRequestDto);
 
     return ResponseEntity.ok().build();
   }
 
   @Operation(
-          summary = "팝업스토어 제보 목록 조회 (PENDING)",
-          description = "관리자가 승인 대기(PENDING) 상태의 제보 목록을 조회합니다."
-  )
+      summary = "팝업스토어 제보 목록 조회 (PENDING)",
+      description = "관리자가 승인 대기(PENDING) 상태의 제보 목록을 조회합니다.")
   @GetMapping("popup-submissions")
   public ResponseEntity<List<PopPopupSubmissionResponseDto>> getPendingSubmissions() {
-    List<PopPopupSubmissionResponseDto> popupSubmissionResponseDtoList = popupAdminService.getPendingSubmissions();
+    List<PopPopupSubmissionResponseDto> popupSubmissionResponseDtoList =
+        popupAdminService.getPendingSubmissions();
 
     return ResponseEntity.ok(popupSubmissionResponseDtoList);
   }
 
   @Operation(
-          summary = "팝업스토어 제보 상태 변경",
-          description = "제보 상태를 PENDING → APPROVED 또는 REJECTED 로 변경합니다."
-  )
+      summary = "팝업스토어 제보 상태 변경",
+      description = "제보 상태를 PENDING → APPROVED 또는 REJECTED 로 변경합니다.")
   @PatchMapping("/popup-submissions/{submissionId}/status")
   public ResponseEntity<Void> updateSubmissionStatus(
-          @PathVariable Long submissionId,
-          @RequestBody PopupSubmissionStatusUpdateRequestDto popupSubmissionStatusUpdateRequestDto
-  ) {
+      @PathVariable Long submissionId,
+      @RequestBody PopupSubmissionStatusUpdateRequestDto popupSubmissionStatusUpdateRequestDto) {
     popupAdminService.updateSubmissionStatus(submissionId, popupSubmissionStatusUpdateRequestDto);
 
     return ResponseEntity.ok().build();

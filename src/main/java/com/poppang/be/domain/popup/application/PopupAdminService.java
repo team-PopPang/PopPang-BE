@@ -3,7 +3,6 @@ package com.poppang.be.domain.popup.application;
 import com.poppang.be.domain.popup.dto.app.request.PopupSubmissionCreateRequestDto;
 import com.poppang.be.domain.popup.dto.app.request.PopupSubmissionStatusUpdateRequestDto;
 import com.poppang.be.domain.popup.dto.app.response.PopPopupSubmissionResponseDto;
-
 import java.util.List;
 
 public interface PopupAdminService {
@@ -16,6 +15,7 @@ public interface PopupAdminService {
 
   List<PopPopupSubmissionResponseDto> getPendingSubmissions();
 
-  void updateSubmissionStatus(Long submissionId, PopupSubmissionStatusUpdateRequestDto popupSubmissionStatusUpdateRequestDto);
-
+  void updateSubmissionStatus(
+      Long submissionId,
+      PopupSubmissionStatusUpdateRequestDto popupSubmissionStatusUpdateRequestDto);
 }

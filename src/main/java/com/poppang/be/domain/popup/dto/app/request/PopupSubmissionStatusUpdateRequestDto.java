@@ -8,6 +8,5 @@ import lombok.NoArgsConstructor;
 @NoArgsConstructor
 public class PopupSubmissionStatusUpdateRequestDto {
 
-    private PopupSubmissionStatus popupSubmissionStatus;
-
+  private PopupSubmissionStatus popupSubmissionStatus;
 }

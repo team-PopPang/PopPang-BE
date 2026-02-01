@@ -13,11 +13,10 @@ import com.poppang.be.domain.popup.infrastructure.PopupSubmissionRepository;
 import com.poppang.be.domain.users.entity.Role;
 import com.poppang.be.domain.users.entity.Users;
 import com.poppang.be.domain.users.infrastructure.UsersRepository;
+import java.util.List;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
-
-import java.util.List;
 
 @Service
 @RequiredArgsConstructor
@@ -60,7 +59,8 @@ public class PopupAdminServiceImpl implements PopupAdminService {
   }
 
   @Override
-  public void createPopupSubmission(PopupSubmissionCreateRequestDto popupSubmissionCreateRequestDto) {
+  public void createPopupSubmission(
+      PopupSubmissionCreateRequestDto popupSubmissionCreateRequestDto) {
     PopupSubmission popupSubmission = popupSubmissionCreateRequestDto.toEntity();
     popupSubmissionRepository.save(popupSubmission);
   }
@@ -68,19 +68,23 @@ public class PopupAdminServiceImpl implements PopupAdminService {
   @Override
   @Transactional(readOnly = true)
   public List<PopPopupSubmissionResponseDto> getPendingSubmissions() {
-    List<PopupSubmission> popupSubmissionList = popupSubmissionRepository.findByStatus(PopupSubmissionStatus.PENDING);
+    List<PopupSubmission> popupSubmissionList =
+        popupSubmissionRepository.findByStatus(PopupSubmissionStatus.PENDING);
 
-    List<PopPopupSubmissionResponseDto> popupSubmissionResponseDtoList = popupSubmissionList.stream()
-            .map(PopPopupSubmissionResponseDto::from)
-            .toList();
+    List<PopPopupSubmissionResponseDto> popupSubmissionResponseDtoList =
+        popupSubmissionList.stream().map(PopPopupSubmissionResponseDto::from).toList();
 
     return popupSubmissionResponseDtoList;
   }
 
   @Override
   @Transactional
-  public void updateSubmissionStatus(Long submissionId, PopupSubmissionStatusUpdateRequestDto popupSubmissionStatusUpdateRequestDto) {
-    PopupSubmission popupSubmission = popupSubmissionRepository.findById(submissionId)
+  public void updateSubmissionStatus(
+      Long submissionId,
+      PopupSubmissionStatusUpdateRequestDto popupSubmissionStatusUpdateRequestDto) {
+    PopupSubmission popupSubmission =
+        popupSubmissionRepository
+            .findById(submissionId)
             .orElseThrow(() -> new BaseException(ErrorCode.POPUP_NOT_FOUND));
 
     if (popupSubmission.getStatus() != PopupSubmissionStatus.PENDING) {
@@ -88,5 +92,4 @@ public class PopupAdminServiceImpl implements PopupAdminService {
     }
     popupSubmission.updateStatus(popupSubmissionStatusUpdateRequestDto.getPopupSubmissionStatus());
   }
-
 }
