@@ -56,6 +56,8 @@ getKey:
 	$(call download_file,src/main/resources/auth,AuthKey_382T2TB4RW.p8) && \
 	$(call download_file,src/main/resources,application-dev.yml) && \
 	$(call download_file,src/main/resources,application-local.yml)
+	$(call download_file,src/main/resources,application-prod.yml)
+	$(call download_file,src/main/resources,application.yml)
 	@echo "✅ download completed."
 
 # =========================================
